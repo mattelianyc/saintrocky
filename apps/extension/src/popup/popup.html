@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Standard Deviants</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <p class="eyebrow">Saint Rocky</p>
+      <h1>Browser runtime</h1>
+      <p id="connection-summary" class="summary">Waiting for auth handoff.</p>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Status</strong>
+          <span id="monitor-status" class="badge">idle</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <span>Assignments</span>
+            <strong id="assignment-count">0</strong>
+          </div>
+          <div class="metric">
+            <span>TradingView</span>
+            <strong id="tradingview-status">idle</strong>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="arm-toggle" class="button" type="button">Toggle armed</button>
+          <button id="sign-out-button" class="button button-secondary" type="button">Sign out</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Pending violation</strong>
+        </div>
+        <div id="violation-empty" class="empty">No live violation.</div>
+        <div id="violation-card" class="violation hidden">
+          <strong id="violation-title"></strong>
+          <p id="violation-summary"></p>
+          <div class="actions">
+            <button id="comply-button" class="button button-secondary" type="button">Stay blocked</button>
+            <button id="bypass-button" class="button" type="button">Pay to bypass</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Assignments</strong>
+        </div>
+        <ul id="assignment-list" class="list"></ul>
+      </section>
+    </main>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>

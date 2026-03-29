@@ -1,0 +1,26 @@
+.ui-StatusBanner {
+  border-radius: var(--ui-radius);
+  border: 1px solid var(--ui-border);
+  padding: var(--ui-space-small) var(--ui-space-medium);
+  font-family: var(--ui-font);
+}
+
+.ui-StatusBanner--info {
+  background: color-mix(in srgb, var(--ui-info) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ui-info) 28%, transparent);
+}
+
+.ui-StatusBanner--success {
+  background: color-mix(in srgb, var(--ui-success) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ui-success) 28%, transparent);
+}
+
+.ui-StatusBanner--warning {
+  background: color-mix(in srgb, var(--ui-warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ui-warning) 28%, transparent);
+}
+
+.ui-StatusBanner--error {
+  background: color-mix(in srgb, var(--ui-error) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ui-error) 28%, transparent);
+}

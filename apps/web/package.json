@@ -1,0 +1,34 @@
+{
+  "name": "@saintrocky/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 5173",
+    "build": "next build",
+    "start": "next start --port ${PORT:-5173}",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@saintrocky/alerts": "0.1.0",
+    "@saintrocky/api-client": "0.1.0",
+    "@saintrocky/billing": "0.1.0",
+    "@saintrocky/branding": "0.1.0",
+    "@saintrocky/config": "0.1.0",
+    "@saintrocky/network-policies": "0.1.0",
+    "@saintrocky/realtime": "0.1.0",
+    "@saintrocky/shared": "0.1.0",
+    "@saintrocky/ui": "0.1.0",
+    "@saintrocky/users": "0.1.0",
+    "@saintrocky/wallet": "0.1.0",
+    "@saintrocky/workflows": "0.1.0",
+    "framer-motion": "^12.29.2",
+    "next": "^16.1.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "eslint": "^9.17.0"
+  }
+}

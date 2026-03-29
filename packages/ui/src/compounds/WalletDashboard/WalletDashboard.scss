@@ -1,0 +1,215 @@
+/* Wallet page */
+.c-WalletConnectRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.c-WalletAddress {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+  word-break: break-all;
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+}
+
+.c-WalletStatus {
+  font-size: 0.85rem;
+}
+
+.c-WalletStatus--linked {
+  color: var(--ui-success, #22c55e);
+}
+
+.c-WalletError {
+  color: var(--ui-danger, #ef4444);
+  font-size: 0.85rem;
+}
+
+.c-VaultBalance {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.c-VaultBalance__label {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+}
+
+.c-VaultBalance__value {
+  font-size: 2rem;
+}
+
+.c-VaultActions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-VaultActions__input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.9rem;
+  border: 1px solid var(--ui-shell-border, var(--ui-border));
+  border-radius: 0.375rem;
+  background: var(--ui-shell-surface, var(--ui-surface));
+  color: var(--ui-shell-text, var(--ui-text));
+}
+
+.c-VaultActions__buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.c-LinkedWalletList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.c-LinkedWalletList__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ui-shell-border, var(--ui-border));
+}
+
+.c-LinkedWalletList__address {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c-LinkedWalletList__label {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  font-size: 0.8rem;
+}
+
+/* Trades page */
+.c-TradesWalletSelector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.c-TradesWalletSelector select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--ui-shell-border, var(--ui-border));
+  border-radius: 0.375rem;
+  background: var(--ui-shell-surface, var(--ui-surface));
+  color: var(--ui-shell-text, var(--ui-text));
+  font-size: 0.85rem;
+}
+
+.c-TradeTable {
+  overflow-x: auto;
+}
+
+.c-TradeTable__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.c-TradeTable__table th,
+.c-TradeTable__table td {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--ui-shell-border, var(--ui-border));
+}
+
+.c-TradeTable__table th {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}
+
+.c-TradeTable__row--violation {
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.c-TradeViolationBadge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--ui-danger, #ef4444);
+}
+
+.c-TradeCleanBadge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--ui-success, #22c55e);
+}
+
+.c-TradeSignature {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+}
+
+/* Leaderboard page */
+.c-DisciplineScore {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.c-DisciplineScore__value {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.c-DisciplineScore__label {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  font-size: 1.2rem;
+}
+
+.c-DisciplineScore__rank {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  font-size: 0.85rem;
+}
+
+.c-LeaderboardTable {
+  overflow-x: auto;
+}
+
+.c-LeaderboardTable__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.c-LeaderboardTable__table th,
+.c-LeaderboardTable__table td {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--ui-shell-border, var(--ui-border));
+}
+
+.c-LeaderboardTable__table th {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}

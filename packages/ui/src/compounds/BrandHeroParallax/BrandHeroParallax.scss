@@ -1,0 +1,287 @@
+.c-BrandHeroParallax {
+  position: relative;
+  width: 100%;
+}
+
+.c-BrandHeroParallax__viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+}
+
+.c-BrandHeroParallax__section {
+  position: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.c-BrandHeroParallax__scrollSpacer {
+  height: var(--ui-marketing-hero-scroll-runway);
+  pointer-events: none;
+}
+
+.c-BrandHeroParallax__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.c-BrandHeroParallax__mediaVideo {
+  position: absolute;
+  inset: 0;
+}
+
+.c-BrandHeroParallax__mediaVideo {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  will-change: opacity, transform;
+}
+
+.c-BrandHeroParallax__stencilPanel {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(10 10 12);
+  pointer-events: none;
+  will-change: opacity, transform, filter;
+}
+
+.c-BrandHeroParallax__contentPanel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: opacity, transform, filter;
+}
+
+.c-BrandHeroParallax__wordmarkFrame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.c-BrandHeroParallax__intro {
+  position: absolute;
+  inset: 0 50% 0 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.85rem;
+  width: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+  text-align: center;
+  color: rgb(255 255 255 / 0.96);
+  pointer-events: auto;
+}
+
+.c-BrandHeroParallax__introEyebrow {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.9);
+}
+
+.c-BrandHeroParallax__introBrandStack {
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+}
+
+.c-BrandHeroParallax__introLogo {
+  display: block;
+  width: min(8rem, 32vw);
+  height: auto;
+}
+
+.c-BrandHeroParallax__introWordmark {
+  margin: 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(1.35rem, 2.2vw, 2.25rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.98);
+}
+
+.c-BrandHeroParallax__introLine {
+  margin: 0;
+  width: min(32rem, calc(50vw - clamp(2.5rem, 8vw, 6rem)));
+  font-size: clamp(0.95rem, 1.15vw, 1.12rem);
+  line-height: 1.8;
+  color: rgb(255 255 255 / 0.9);
+}
+
+.c-BrandHeroParallax__introLink {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  pointer-events: auto;
+}
+
+.c-BrandHeroParallax__introSignoff {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+  justify-items: center;
+}
+
+.c-BrandHeroParallax__introSignoffLine {
+  margin: 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.98);
+}
+
+.c-BrandHeroParallax__dogStage {
+  position: absolute;
+  inset: 0 0 0 50%;
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgb(255 255 255);
+  pointer-events: none;
+}
+
+.c-BrandHeroParallax__dogImage {
+  position: relative;
+  bottom: -38%;
+  width: min(42vw, 34rem);
+  max-width: none;
+  height: auto;
+  will-change: transform;
+}
+
+.c-BrandHeroParallax__wordmark {
+  margin: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.18em;
+  width: calc(100vw - (2 * clamp(1rem, 4vw, 2.5rem)));
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline: 0;
+  text-align: center;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(2.6rem, 9vw, 8rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.c-BrandHeroParallax__word {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
+}
+
+.c-BrandHeroParallax__wordmarkPrimary {
+  color: rgb(10 10 12 / 0.96);
+  text-shadow: none;
+}
+
+.c-BrandHeroParallax__wordmarkStencil {
+  color: rgb(236 223 197 / 0.98);
+}
+
+.c-BrandHeroParallax__characterOuter,
+.c-BrandHeroParallax__characterInner {
+  display: inline-block;
+}
+
+@media (max-width: 1024px) {
+  .c-BrandHeroParallax__intro {
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+
+  .c-BrandHeroParallax__introWordmark {
+    font-size: clamp(1.15rem, 2.4vw, 1.8rem);
+  }
+
+  .c-BrandHeroParallax__introLine {
+    width: min(24rem, calc(50vw - clamp(2rem, 8vw, 4rem)));
+  }
+
+  .c-BrandHeroParallax__introSignoffLine {
+    font-size: clamp(0.92rem, 1.8vw, 1.15rem);
+  }
+
+  .c-BrandHeroParallax__dogImage {
+    width: min(48vw, 28rem);
+    bottom: -34%;
+  }
+
+  .c-BrandHeroParallax__wordmark {
+    width: calc(100vw - (2 * clamp(0.875rem, 4vw, 2rem)));
+    font-size: clamp(2rem, 9.4vw, 5.8rem);
+    letter-spacing: 0.05em;
+    gap: 0.16em;
+  }
+}
+
+@media (max-width: 640px) {
+  .c-BrandHeroParallax__intro {
+    gap: 0.65rem;
+    padding-inline: 0.9rem 0.5rem;
+  }
+
+  .c-BrandHeroParallax__introLogo {
+    width: min(5.25rem, 26vw);
+  }
+
+  .c-BrandHeroParallax__introWordmark {
+    font-size: 0.88rem;
+    letter-spacing: 0.09em;
+  }
+
+  .c-BrandHeroParallax__introLine {
+    width: calc(50vw - 1.4rem);
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .c-BrandHeroParallax__introSignoffLine {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+  }
+
+  .c-BrandHeroParallax__dogStage {
+    inset: 0 0 0 50%;
+  }
+
+  .c-BrandHeroParallax__dogImage {
+    width: min(44vw, 14rem);
+    bottom: -22%;
+  }
+
+  .c-BrandHeroParallax__wordmark {
+    width: calc(100vw - (2 * clamp(0.75rem, 4vw, 1.25rem)));
+    font-size: clamp(1.7rem, 10vw, 4rem);
+    letter-spacing: 0.04em;
+    gap: 0.14em;
+  }
+}

@@ -1,0 +1,275 @@
+.c-RulesWorkspace {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.c-RulesWorkspace__header {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-RulesWorkspace__header h1,
+.c-RulesWorkspace__header p {
+  margin: 0;
+}
+
+.c-RulesWorkspace__eyebrow,
+.c-RulesWorkspacePanel__eyebrow,
+.c-RulesWorkspacePanel__itemEyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ui-shell-accent);
+}
+
+.c-RulesWorkspacePanel {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-RulesWorkspacePanel__toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.7fr);
+  gap: 1rem;
+  align-items: end;
+}
+
+.c-RulesWorkspacePanel__toolbar h2,
+.c-RulesWorkspacePanel__toolbar p,
+.c-RulesWorkspacePanel__stack h3 {
+  margin: 0;
+}
+
+.c-RulesWorkspacePanel__toolbar p,
+.c-RulesWorkspacePanel__meta,
+.c-RulesWorkspacePanel__empty,
+.c-RulesWorkspacePanel__templateButton span:last-child {
+  color: var(--ui-shell-text-muted);
+  line-height: 1.65;
+}
+
+.c-RulesWorkspacePanel__selectLabel,
+.c-RulesWorkspacePanel__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.c-RulesWorkspacePanel__select,
+.c-RulesWorkspacePanel__input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--ui-shell-border);
+  background: transparent;
+  color: inherit;
+  padding: 0.85rem 0;
+  font: inherit;
+}
+
+.c-RulesWorkspacePanel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.c-RulesWorkspacePanel__stack {
+  display: grid;
+  gap: 0.85rem;
+  align-content: start;
+}
+
+.c-RulesWorkspacePanel__item {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.c-RulesWorkspacePanel__itemHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.c-RulesWorkspacePanel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.c-RulesWorkspacePanel__templateButton {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem 0;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ui-shell-text) 10%, transparent);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.c-RulesWorkspacePanel__templateButton.is-selected {
+  border-bottom-color: var(--ui-shell-accent);
+}
+
+.c-RulesWorkspacePanel__fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.c-RulesWorkspacePanel__loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.c-RulesWorkspacePanel__stack--lg {
+  gap: 1.25rem;
+}
+
+.c-RulesWorkspaceSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.c-RulesWorkspaceSummaryCard {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.c-RulesWorkspaceSummaryCard span,
+.c-RulesWorkspaceEditor__metaGrid span,
+.c-RulesWorkspaceEditor__quote span,
+.c-RulesWorkspaceEditor__pendingEdit span {
+  color: var(--ui-shell-text-muted);
+}
+
+.c-RulesWorkspaceSummaryCard strong {
+  font-size: 1.75rem;
+}
+
+.c-RulesWorkspaceCurrentGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.c-RulesWorkspaceList,
+.c-RulesWorkspaceList__section,
+.c-RulesWorkspaceList__items,
+.c-RulesWorkspaceEditor,
+.c-RulesWorkspaceEditor__timingStack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.c-RulesWorkspaceList__sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.c-RulesWorkspaceList__sectionHeader h3,
+.c-RulesWorkspaceList__sectionHeader span {
+  margin: 0;
+}
+
+.c-RulesWorkspaceList__item,
+.c-RulesWorkspaceEditor__timingOption {
+  display: grid;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 1rem 0;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ui-shell-text) 10%, transparent);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.c-RulesWorkspaceList__item.is-selected,
+.c-RulesWorkspaceEditor__timingOption.is-selected {
+  border-bottom-color: var(--ui-shell-accent);
+}
+
+.c-RulesWorkspaceList__itemHeader,
+.c-RulesWorkspaceEditor__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.c-RulesWorkspaceEditor__header h3,
+.c-RulesWorkspaceEditor__pendingEdit strong,
+.c-RulesWorkspaceEditor__pendingEdit p,
+.c-RulesWorkspaceEditor__quote strong {
+  margin: 0;
+}
+
+.c-RulesWorkspaceEditor__summary {
+  margin: 0.4rem 0 0;
+  color: var(--ui-shell-text-muted);
+  line-height: 1.6;
+}
+
+.c-RulesWorkspaceEditor__status {
+  color: var(--ui-shell-text-muted);
+}
+
+.c-RulesWorkspaceEditor__metaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.c-RulesWorkspaceEditor__metaGrid div,
+.c-RulesWorkspaceEditor__pendingEdit,
+.c-RulesWorkspaceEditor__quote {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.c-RulesWorkspaceEditor__pendingEdit {
+  padding: 1rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--ui-shell-text) 10%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ui-shell-text) 10%, transparent);
+}
+
+.c-RulesWorkspaceEditor__fieldGrid,
+.c-RulesWorkspaceDraftGrid,
+.c-RulesWorkspaceEditor__timingOptions {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-RulesWorkspaceEditor__timingOptions {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.c-RulesWorkspaceEditor__empty {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.c-RulesWorkspaceEditor__empty h3,
+.c-RulesWorkspaceEditor__empty h4,
+.c-RulesWorkspaceEditor__empty p {
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .c-RulesWorkspacePanel__toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .c-RulesWorkspaceSummaryGrid,
+  .c-RulesWorkspaceCurrentGrid,
+  .c-RulesWorkspaceEditor__metaGrid {
+    grid-template-columns: 1fr;
+  }
+}

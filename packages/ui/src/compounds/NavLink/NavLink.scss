@@ -1,0 +1,27 @@
+/* NavLink */
+.c-NavLink {
+  padding: 8px 10px;
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-fg);
+  border: 0;
+  background-image: none;
+}
+
+.c-NavLink:hover {
+  text-decoration: none;
+  background: color-mix(in srgb, var(--ui-primary) 8%, transparent);
+}
+
+.c-NavLink.is-active {
+  background: color-mix(in srgb, var(--ui-primary) 12%, transparent);
+  color: var(--ui-fg);
+}
+
+.c-NavLink:focus-visible {
+  outline: none;
+  box-shadow: var(--ui-ring);
+}
+
+
+
+

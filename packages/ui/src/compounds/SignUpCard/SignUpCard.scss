@@ -1,0 +1,55 @@
+.c-SignUpCard {
+  width: min(32rem, 100%);
+  background: var(--ui-shell-panel);
+  border: 1px solid var(--ui-shell-border);
+  box-shadow: var(--ui-shell-shadow);
+}
+
+.c-SignUpCard__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-SignUpCard__copy {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-SignUpCard__copy h1,
+.c-SignUpCard__copy p {
+  margin: 0;
+}
+
+.c-SignUpCard__copy p:last-child {
+  color: var(--ui-shell-text-muted);
+}
+
+.c-SignUpCard__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ui-shell-accent);
+}
+
+.c-SignUpCard__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.c-SignUpCard__message {
+  margin: 0;
+  color: var(--ui-shell-accent-strong);
+}
+
+.c-SignUpCard__footer {
+  margin: 0;
+  color: var(--ui-shell-text-muted);
+}
+
+.c-SignUpCard__link {
+  color: var(--ui-shell-accent-strong);
+  text-decoration: none;
+}
+
+.c-SignUpCard__link:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,568 @@
+:where(.srOnly) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:where(body.sr-WebBody) {
+  --ui-bg: var(--ui-shell-background);
+  --ui-fg: var(--ui-shell-text);
+  --ui-muted: var(--ui-shell-text-muted);
+  --ui-card: var(--ui-shell-panel);
+  --ui-input: color-mix(in srgb, var(--ui-shell-text) 6%, transparent);
+  --ui-border: var(--ui-shell-border);
+  --ui-border-strong: color-mix(in srgb, var(--ui-shell-border) 82%, var(--ui-shell-text));
+  --ui-shadow: var(--ui-shell-shadow);
+  --ui-font-brand: var(--font-silka-mono, var(--ui-font));
+  --ui-marketing-background-color: rgb(255 250 252);
+  --ui-marketing-hero-scroll-runway: 68vh;
+
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--ui-shell-accent) 18%, transparent),
+      transparent 30%
+    ),
+    radial-gradient(circle at 86% 12%, var(--ui-shell-glow), transparent 26%),
+    linear-gradient(
+      180deg,
+      var(--ui-shell-background-strong) 0%,
+      var(--ui-shell-background) 42%,
+      var(--ui-shell-background-soft) 100%
+    ),
+    var(--ui-marketing-background-color);
+  color: var(--ui-shell-text);
+}
+
+:where(body.sr-WebBody img) {
+  max-width: 100%;
+  height: auto;
+}
+
+.sr-MarketingShell {
+  min-height: 100vh;
+}
+
+.sr-MarketingHeader {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  backdrop-filter: blur(18px);
+  background: color-mix(in srgb, var(--ui-shell-background-strong) 84%, transparent);
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    background 220ms ease,
+    backdrop-filter 220ms ease;
+}
+
+.sr-MarketingShell:not(.is-scrolled) .sr-MarketingHeader {
+  background: transparent;
+  backdrop-filter: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.sr-MarketingBrand {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sr-MarketingBrandLogo {
+  display: block;
+  width: auto;
+  height: 2.25rem;
+}
+
+.sr-MarketingBrandCompany,
+.sr-WebDashboardBrandEyebrow,
+.sr-Eyebrow {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ui-shell-text-muted);
+}
+
+.sr-MarketingActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.sr-MarketingShell:not(.is-scrolled) .sr-MarketingActions {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+.sr-MarketingFooter {
+  padding: 2rem 1.5rem 4rem;
+  color: var(--ui-shell-text-muted);
+}
+
+.sr-AuthShell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.5rem;
+}
+
+.sr-WebDashboardLayout {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sr-WebDashboardLayout.c-PageLayout {
+  gap: 0;
+}
+
+.sr-WebDashboardLayout .c-PageLayout__sidebar {
+  display: flex;
+  align-self: stretch;
+  flex: 0 0 18rem;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  padding: 1.5rem 1.25rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ui-shell-accent) 92%, white) 0%,
+      color-mix(in srgb, var(--ui-shell-accent) 72%, white) 100%
+    );
+}
+
+.sr-WebDashboardLayout .c-PageLayout__main {
+  height: 100vh;
+  overflow-y: auto;
+  padding: 2rem 1.5rem;
+}
+
+.sr-WebDashboardSidebar {
+  width: 100%;
+  color: rgb(8 17 13 / 0.96);
+}
+
+.sr-WebDashboardSidebar .c-AppSidebar__brand,
+.sr-WebDashboardSidebar .c-AppSidebar__footer {
+  color: inherit;
+  background: transparent;
+}
+
+.sr-WebDashboardSidebar .c-AppSidebar__brand {
+  justify-content: flex-start;
+}
+
+.sr-WebDashboardSidebar .c-AppSidebar__nav {
+  gap: 0.35rem;
+}
+
+.sr-WebDashboardSidebar .c-AppSidebar__link,
+.sr-WebDashboardSidebar .c-AppSidebar__toggle {
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--ui-radius);
+  background: transparent;
+  color: rgb(8 17 13 / 0.78);
+}
+
+.sr-WebDashboardSidebar .c-AppSidebar__link:hover,
+.sr-WebDashboardSidebar .c-AppSidebar__toggle:hover {
+  background: color-mix(in srgb, white 32%, transparent);
+  color: rgb(8 17 13 / 0.96);
+}
+
+.sr-WebDashboardSidebar .c-AppSidebar__link.is-active,
+.sr-WebDashboardSidebar .c-AppSidebar__toggle.is-active {
+  background: color-mix(in srgb, rgb(8 17 13) 12%, white 28%);
+  color: rgb(8 17 13 / 0.98);
+}
+
+.sr-WebDashboardBrand {
+  display: grid;
+  gap: 1rem;
+  text-align: left;
+}
+
+.sr-WebDashboardBrandLogo {
+  width: 100%;
+  max-width: 10.5rem;
+  height: auto;
+}
+
+.sr-WebDashboardBrandMeta {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sr-WebDashboardBrandUser {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(8 17 13 / 0.88);
+}
+
+.sr-WebDashboardFooter {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sr-WebDashboardSidebar .ui-Button--ghost {
+  justify-content: flex-start;
+  color: rgb(8 17 13 / 0.78);
+}
+
+.sr-WebDashboardSidebar .ui-Button--ghost:not(:disabled):not([data-disabled]):hover {
+  background: color-mix(in srgb, white 32%, transparent);
+  color: rgb(8 17 13 / 0.96);
+}
+
+.sr-NotFoundShell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 2rem;
+}
+
+.sr-NotFoundCard {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  width: min(100%, 40rem);
+  text-align: center;
+  box-shadow: var(--ui-shell-shadow);
+}
+
+.sr-NotFoundCopy {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sr-NotFoundCopy p {
+  color: var(--ui-shell-text-muted);
+  line-height: 1.7;
+}
+
+.sr-NotFoundLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: var(--ui-shell-accent);
+  color: var(--ui-primary-contrast);
+  font-weight: 600;
+}
+
+:where(body.sr-DesktopBody) {
+  --ui-bg: var(--ui-desktop-background-end);
+  --ui-fg: var(--ui-desktop-text);
+  --ui-muted: var(--ui-desktop-text-muted);
+  --ui-card: var(--ui-desktop-card-surface);
+  --ui-input: var(--ui-desktop-surface);
+  --ui-border: var(--ui-desktop-border);
+  --ui-border-strong: color-mix(in srgb, var(--ui-desktop-border) 82%, var(--ui-desktop-text));
+  --ui-shadow: var(--ui-desktop-shadow);
+
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--ui-desktop-kicker) 18%, transparent), transparent 30%),
+    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--ui-shell-accent-strong) 14%, transparent), transparent 24%),
+    linear-gradient(180deg, var(--ui-desktop-background-start) 0%, var(--ui-desktop-background-end) 100%);
+  color: var(--ui-desktop-text);
+}
+
+:where(body.sr-DesktopBody #root) {
+  min-height: 100vh;
+}
+
+.desktop-App,
+.desktop-Layout {
+  min-height: 100vh;
+}
+
+.desktop-Layout .c-PageLayout__main {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.desktop-Layout .c-PageLayout__sidebar {
+  padding: 16px;
+  background: var(--ui-desktop-sidebar-surface);
+  border-right: 0;
+}
+
+.desktop-Layout .c-AppSidebar,
+.desktop-Layout .c-AppSidebar__brand,
+.desktop-Layout .c-AppSidebar__footer {
+  color: var(--ui-desktop-text);
+}
+
+.desktop-Layout .c-AppSidebar__brand,
+.desktop-Layout .c-AppSidebar__footer {
+  background: var(--ui-desktop-surface);
+}
+
+.desktop-Layout .c-AppSidebar .c-NavLink,
+.desktop-Layout .c-AppSidebar .c-AppSidebar__toggle {
+  background: transparent;
+  color: var(--ui-desktop-text);
+}
+
+.desktop-Layout .c-AppSidebar .c-NavLink.is-active,
+.desktop-Layout .c-AppSidebar .c-AppSidebar__toggle.is-active {
+  background: color-mix(in srgb, var(--ui-desktop-kicker) 18%, transparent);
+}
+
+.desktop-SidebarBrand {
+  display: grid;
+  gap: 4px;
+}
+
+.desktop-SidebarEyebrow,
+.desktop-Kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ui-desktop-kicker);
+  font-size: 12px;
+}
+
+.desktop-SidebarWordmark {
+  font-size: 32px;
+  font-weight: 300;
+}
+
+.desktop-SidebarHint {
+  color: var(--ui-desktop-text-muted);
+  font-size: 12px;
+}
+
+.desktop-Hero,
+.desktop-CenteredContent {
+  padding: 24px;
+}
+
+.desktop-HeroCard,
+.desktop-LoadingCard,
+.desktop-HubHeroCard,
+.desktop-HubPanel,
+.desktop-RuntimeMetric {
+  background: var(--ui-desktop-card-surface);
+  color: var(--ui-desktop-text);
+  box-shadow: var(--ui-desktop-shadow);
+}
+
+.desktop-HeroHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.desktop-RuntimeGrid,
+.desktop-HubMetricGrid,
+.desktop-HubGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.desktop-RuntimeGrid {
+  min-width: 260px;
+}
+
+.desktop-HubMetricGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.desktop-HubGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.desktop-RuntimeLabel {
+  display: block;
+  font-size: 12px;
+  color: var(--ui-desktop-text-muted);
+  letter-spacing: 0.04em;
+}
+
+.desktop-RuntimeValue {
+  display: block;
+  margin-top: 4px;
+  color: var(--ui-desktop-text);
+}
+
+.desktop-RuntimeMetric {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.desktop-AuthScreen,
+.desktop-LoadingScreen {
+  padding: 24px;
+}
+
+.desktop-AuthCard,
+.desktop-LoadingCard {
+  width: min(560px, 100%);
+}
+
+.desktop-AuthHint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ui-desktop-text-muted);
+}
+
+.desktop-StatusBanner {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.desktop-CenteredContent {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+
+.desktop-LoadingCard {
+  justify-self: center;
+}
+
+.desktop-AuthCard .ui-Input {
+  background: var(--ui-desktop-surface);
+  color: var(--ui-desktop-text);
+  border-bottom-color: var(--ui-desktop-border);
+}
+
+.desktop-AuthCard label,
+.desktop-LoadingCard .Kicker,
+.desktop-HeroCard .Kicker,
+.desktop-HubHeroCard .Kicker {
+  color: var(--ui-desktop-text-muted);
+}
+
+.desktop-EnforcementHub {
+  display: grid;
+  gap: 16px;
+}
+
+.desktop-HubHeroCard,
+.desktop-HubPanel {
+  padding: 20px;
+}
+
+.desktop-HubHeroHeader,
+.desktop-HubPanelHeader,
+.desktop-HubActions,
+.desktop-HubHeroActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.desktop-HubList,
+.desktop-PreferenceList {
+  display: grid;
+  gap: 12px;
+}
+
+.desktop-HubListItem,
+.desktop-ViolationCard,
+.desktop-PreferenceRow {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--ui-desktop-surface) 88%, transparent);
+}
+
+.desktop-PreferenceRow {
+  width: 100%;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.desktop-HubMeta,
+.desktop-HubEmpty {
+  color: var(--ui-desktop-text-muted);
+  font-size: 13px;
+}
+
+.desktop-ViolationCard {
+  background: color-mix(in srgb, var(--ui-desktop-kicker) 16%, var(--ui-desktop-surface));
+}
+
+@media (max-width: 1100px) {
+  .desktop-HeroHeader {
+    flex-direction: column;
+  }
+
+  .desktop-HubGrid,
+  .desktop-HubMetricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-RuntimeGrid {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .sr-WebDashboardLayout .c-PageLayout {
+    flex-direction: column;
+  }
+
+  .sr-WebDashboardLayout .c-PageLayout__sidebar {
+    width: 100%;
+    min-height: auto;
+    height: auto;
+  }
+
+  .sr-WebDashboardLayout .c-PageLayout__main {
+    height: auto;
+    overflow: visible;
+    padding: 1.5rem;
+  }
+
+  .desktop-Layout .c-PageLayout__main {
+    padding: 16px;
+  }
+
+  .desktop-Hero,
+  .desktop-CenteredContent,
+  .desktop-AuthScreen,
+  .desktop-LoadingScreen {
+    padding: 16px;
+  }
+
+  .desktop-ResourceGrid {
+    grid-template-columns: 1fr;
+  }
+}

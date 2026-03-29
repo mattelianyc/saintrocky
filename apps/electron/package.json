@@ -1,0 +1,40 @@
+{
+  "name": "@saintrocky/electron",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"yarn dev:renderer\" \"yarn dev:app\"",
+    "dev:renderer": "vite --host 127.0.0.1 --port 5174",
+    "dev:app": "wait-on tcp:5174 && cross-env ELECTRON_RENDERER_URL=http://127.0.0.1:5174 electron .",
+    "start": "electron .",
+    "build": "vite build",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@saintrocky/alerts": "0.1.0",
+    "@saintrocky/api-client": "0.1.0",
+    "@saintrocky/icons": "0.1.0",
+    "@saintrocky/branding": "0.1.0",
+    "@saintrocky/config": "0.1.0",
+    "@saintrocky/network-policies": "0.1.0",
+    "@saintrocky/realtime": "0.1.0",
+    "@saintrocky/shared": "0.1.0",
+    "@saintrocky/ui": "0.1.0",
+    "@saintrocky/workflows": "0.1.0",
+    "dotenv": "^16.4.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^37.2.6",
+    "eslint": "^9.17.0",
+    "sass": "^1.98.0",
+    "vite": "^8.0.3",
+    "wait-on": "^9.0.4"
+  }
+}

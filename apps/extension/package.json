@@ -1,0 +1,24 @@
+{
+  "name": "@saintrocky/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node -e \"console.log('extension: run yarn workspace @saintrocky/extension build and load apps/extension/dist as unpacked')\"",
+    "build": "vite build && node ./scripts/write-manifest.mjs",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@saintrocky/alerts": "0.1.0",
+    "@saintrocky/api-client": "0.1.0",
+    "@saintrocky/branding": "0.1.0",
+    "@saintrocky/network-policies": "0.1.0",
+    "@saintrocky/realtime": "0.1.0",
+    "@saintrocky/shared": "0.1.0",
+    "@saintrocky/workflows": "0.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "vite": "^8.0.3"
+  }
+}

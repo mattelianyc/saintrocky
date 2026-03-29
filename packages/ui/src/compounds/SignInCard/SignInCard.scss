@@ -1,0 +1,55 @@
+.c-SignInCard {
+  width: min(32rem, 100%);
+  background: var(--ui-shell-panel);
+  border: 1px solid var(--ui-shell-border);
+  box-shadow: var(--ui-shell-shadow);
+}
+
+.c-SignInCard__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-SignInCard__copy {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-SignInCard__copy h1,
+.c-SignInCard__copy p {
+  margin: 0;
+}
+
+.c-SignInCard__copy p:last-child {
+  color: var(--ui-shell-text-muted);
+}
+
+.c-SignInCard__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ui-shell-accent);
+}
+
+.c-SignInCard__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.c-SignInCard__message {
+  margin: 0;
+  color: var(--ui-shell-accent-strong);
+}
+
+.c-SignInCard__footer {
+  margin: 0;
+  color: var(--ui-shell-text-muted);
+}
+
+.c-SignInCard__link {
+  color: var(--ui-shell-accent-strong);
+  text-decoration: none;
+}
+
+.c-SignInCard__link:hover {
+  text-decoration: underline;
+}

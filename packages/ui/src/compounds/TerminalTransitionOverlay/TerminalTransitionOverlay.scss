@@ -1,0 +1,37 @@
+.c-TerminalTransitionOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(245, 233, 208, 0.96) 0%, rgba(245, 233, 208, 0.68) 18%, transparent 42%),
+    linear-gradient(180deg, rgba(232, 216, 186, 0.98) 0%, rgba(236, 221, 191, 0.98) 100%);
+  color: rgba(0, 0, 0, 0.92);
+  pointer-events: none;
+}
+
+.c-TerminalTransitionOverlay__scanlines {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.035) 0, rgba(0, 0, 0, 0.035) 1px, transparent 1px, transparent 4px);
+  opacity: 0.28;
+}
+
+.c-TerminalTransitionOverlay__content {
+  position: relative;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  font-family: 'SFMono-Regular', 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+  font-size: clamp(0.72rem, 1vw, 0.92rem);
+  line-height: 1.55;
+  letter-spacing: 0.018em;
+}
+
+.c-TerminalTransitionOverlay__line {
+  margin: 0;
+}
+
+.c-TerminalTransitionOverlay__line + .c-TerminalTransitionOverlay__line {
+  margin-top: 0.35rem;
+}

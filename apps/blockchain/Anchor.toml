@@ -1,0 +1,22 @@
+[features]
+seeds = false
+skip-lint = false
+
+[programs.localnet]
+saintrocky_escrow = "EXNdWwQipapxRhAMdYk15BLiiS1zZ2Wp3yCSF5jWdnwx"
+
+[programs.devnet]
+saintrocky_escrow = "EXNdWwQipapxRhAMdYk15BLiiS1zZ2Wp3yCSF5jWdnwx"
+
+[workspace]
+members = ["escrow"]
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

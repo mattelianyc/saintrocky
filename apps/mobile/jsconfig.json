@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@saintrocky/*": ["src/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}
+
+
