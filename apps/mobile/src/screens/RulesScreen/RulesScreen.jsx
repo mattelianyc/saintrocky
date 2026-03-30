@@ -1,68 +1,123 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { api } from '@saintrocky/api-client';
-import { Card, useTheme } from '@saintrocky/ui-native';
+import { buildRulesChannel } from '@saintrocky/realtime';
+import {
+  Badge,
+  EmptyState,
+  RuleListItem,
+  SectionHeader,
+  useTheme
+} from '@saintrocky/ui-native';
 
-function RuleRow({ rule, theme }) {
-  const statusColor = rule.status === 'active'
-    ? theme.colors.success
-    : theme.colors.mutedForeground;
+import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
+import { createStyles } from '@/screens/RulesScreen/RulesScreen.styles.js';
 
-  return (
-    <Card style={{ marginBottom: 12 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ color: theme.colors.foreground, fontWeight: '600', flex: 1 }}>
-          {rule.title || rule.summary}
-        </Text>
-        <View style={{
-          backgroundColor: statusColor,
-          paddingHorizontal: 8,
-          paddingVertical: 2,
-          borderRadius: 4
-        }}>
-          <Text style={{ color: '#fff', fontSize: 12 }}>{rule.status}</Text>
-        </View>
-      </View>
-      <Text style={{ color: theme.colors.mutedForeground, marginTop: 4, fontSize: 13 }}>
-        {rule.summary}
-      </Text>
-    </Card>
-  );
-}
+const FILTER_OPTIONS = ['all', 'active', 'inactive', 'draft'];
 
-export function RulesScreen({ auth }) {
+export function RulesScreen({ auth, navigation }) {
   const { theme } = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [rules, setRules] = useState([]);
+  const [drafts, setDrafts] = useState([]);
+  const [activeFilter, setActiveFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadRules = useCallback(async () => {
-    try {
-      const result = await api.rules.listRules(auth.user?.email);
-      setRules(result.rules || []);
-    } catch {}
-  }, [auth.user?.email]);
+  const ownerEmail = auth.user?.email;
+  const rulesChannel = ownerEmail ? buildRulesChannel(ownerEmail) : null;
 
-  useEffect(() => { loadRules(); }, [loadRules]);
+  useRealtimeChannel(rulesChannel, {
+    onEvent() {
+      loadData();
+    }
+  });
+
+  const loadData = useCallback(async () => {
+    try {
+      const [rulesResult, draftsResult] = await Promise.all([
+        api.rules.listRules(ownerEmail),
+        api.rules.listDrafts(ownerEmail)
+      ]);
+      setRules(rulesResult.rules || []);
+      setDrafts(draftsResult.drafts || []);
+    } catch {}
+  }, [ownerEmail]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await loadRules();
+    await loadData();
     setRefreshing(false);
-  }, [loadRules]);
+  }, [loadData]);
+
+  const combinedRules = useMemo(() => {
+    const draftItems = drafts.map((draft) => ({
+      ...draft,
+      ruleId: draft.ruleDraftId,
+      title: draft.title || draft.summary || 'AI Draft',
+      status: 'draft',
+      isDraft: true
+    }));
+
+    const allItems = [...rules, ...draftItems];
+
+    if (activeFilter === 'all') return allItems;
+    return allItems.filter((item) => item.status === activeFilter);
+  }, [rules, drafts, activeFilter]);
+
+  const counts = useMemo(() => ({
+    all: rules.length + drafts.length,
+    active: rules.filter((r) => r.status === 'active').length,
+    inactive: rules.filter((r) => r.status === 'inactive').length,
+    draft: drafts.length
+  }), [rules, drafts]);
+
+  const handleRulePress = useCallback((rule) => {
+    navigation.navigate('RuleDetail', { rule });
+  }, [navigation]);
 
   return (
-    <FlatList
-      data={rules}
-      keyExtractor={(item) => item.ruleId}
-      contentContainerStyle={{ padding: 16 }}
-      renderItem={({ item }) => <RuleRow rule={item} theme={theme} />}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      ListEmptyComponent={
-        <Text style={{ color: theme.colors.mutedForeground, textAlign: 'center', marginTop: 40 }}>
-          No rules configured yet.
-        </Text>
-      }
-    />
+    <View style={styles.container}>
+      <View style={styles.filterRow}>
+        {FILTER_OPTIONS.map((filter) => (
+          <Badge
+            key={filter}
+            variant={activeFilter === filter ? 'primary' : 'default'}
+            onPress={() => setActiveFilter(filter)}
+          >
+            <Text
+              style={activeFilter === filter ? styles.filterActiveText : styles.filterText}
+              onPress={() => setActiveFilter(filter)}
+            >
+              {filter.charAt(0).toUpperCase() + filter.slice(1)} ({counts[filter] || 0})
+            </Text>
+          </Badge>
+        ))}
+      </View>
+
+      <FlatList
+        data={combinedRules}
+        keyExtractor={(item) => item.ruleId || item.ruleDraftId}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+          <RuleListItem
+            rule={item}
+            onPress={() => handleRulePress(item)}
+          />
+        )}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListEmptyComponent={
+          <EmptyState
+            iconName="tactics"
+            title="No rules yet"
+            message="Create rules from the Strategy workspace on web, or browse templates to get started."
+          />
+        }
+      />
+    </View>
   );
 }

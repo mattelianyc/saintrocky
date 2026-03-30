@@ -3,10 +3,10 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-saintrocky_escrow = "EXNdWwQipapxRhAMdYk15BLiiS1zZ2Wp3yCSF5jWdnwx"
+saintrocky_escrow = "CT1KzU4EtRSHyjTmFtemKcJGXcTQWc6K6He1PfpZuqsU"
 
 [programs.devnet]
-saintrocky_escrow = "EXNdWwQipapxRhAMdYk15BLiiS1zZ2Wp3yCSF5jWdnwx"
+saintrocky_escrow = "CT1KzU4EtRSHyjTmFtemKcJGXcTQWc6K6He1PfpZuqsU"
 
 [workspace]
 members = ["escrow"]

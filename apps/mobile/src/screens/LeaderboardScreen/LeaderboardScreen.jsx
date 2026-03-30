@@ -1,42 +1,88 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { api } from '@saintrocky/api-client';
-import { Card, useTheme } from '@saintrocky/ui-native';
+import { buildLeaderboardChannel } from '@saintrocky/realtime';
+import {
+  Avatar,
+  Badge,
+  Card,
+  EmptyState,
+  useTheme
+} from '@saintrocky/ui-native';
 
-function LeaderboardRow({ entry, theme }) {
+import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
+import { createStyles } from '@/screens/LeaderboardScreen/LeaderboardScreen.styles.js';
+
+const PODIUM_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
+
+function LeaderboardEntry({ entry, index, isCurrentUser, theme, styles }) {
+  const rank = entry.rank || index + 1;
+  const isPodium = rank <= 3;
+  const podiumColor = isPodium ? PODIUM_COLORS[rank - 1] : null;
+
   return (
-    <Card style={{ marginBottom: 8 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{
-          width: 32, height: 32, borderRadius: 16,
-          backgroundColor: theme.colors.accent,
-          justifyContent: 'center', alignItems: 'center', marginRight: 12
-        }}>
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>
-            {entry.rank}
+    <Card style={[styles.entryCard, isCurrentUser && styles.currentUserCard]}>
+      <View style={styles.entryRow}>
+        <View style={[
+          styles.rankCircle,
+          isPodium && { backgroundColor: podiumColor }
+        ]}>
+          <Text style={[styles.rankText, isPodium && styles.podiumRankText]}>
+            {rank}
           </Text>
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: theme.colors.foreground, fontWeight: '600' }}>
-            {entry.displayName}
+
+        <Avatar
+          name={entry.displayName}
+          size="sm"
+          color={isPodium ? podiumColor : undefined}
+        />
+
+        <View style={styles.entryBody}>
+          <Text style={styles.entryName} numberOfLines={1}>
+            {entry.displayName || entry.email || 'Anonymous'}
           </Text>
-          <Text style={{ color: theme.colors.mutedForeground, fontSize: 12 }}>
-            {entry.activeRuleCount} rules · {entry.complianceRate}% compliance
+          <Text style={styles.entryMeta}>
+            {entry.activeRuleCount || 0} rules · {entry.complianceRate || 0}% compliance
           </Text>
         </View>
-        <Text style={{ color: theme.colors.accent, fontWeight: '700', fontSize: 18 }}>
-          {entry.disciplineScore}
-        </Text>
+
+        <View style={styles.scoreColumn}>
+          <Text style={[styles.scoreValue, isPodium && { color: podiumColor }]}>
+            {entry.disciplineScore ?? 0}
+          </Text>
+          <Text style={styles.scoreLabel}>pts</Text>
+        </View>
       </View>
+
+      {isCurrentUser ? (
+        <Badge variant="primary" size="xs" style={styles.youBadge}>You</Badge>
+      ) : null}
     </Card>
   );
 }
 
-export function LeaderboardScreen() {
+export function LeaderboardScreen({ auth }) {
   const { theme } = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  const currentUserId = auth?.user?.userId;
+
+  useRealtimeChannel(buildLeaderboardChannel(), {
+    onSnapshot(data) {
+      if (Array.isArray(data?.leaderboard)) {
+        setLeaderboard(data.leaderboard);
+      }
+    },
+    onEvent(message) {
+      if (message?.data?.leaderboard) {
+        setLeaderboard(message.data.leaderboard);
+      }
+    }
+  });
 
   const load = useCallback(async () => {
     try {
@@ -45,7 +91,9 @@ export function LeaderboardScreen() {
     } catch {}
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -57,13 +105,31 @@ export function LeaderboardScreen() {
     <FlatList
       data={leaderboard}
       keyExtractor={(item) => item.userId}
-      contentContainerStyle={{ padding: 16 }}
-      renderItem={({ item }) => <LeaderboardRow entry={item} theme={theme} />}
+      contentContainerStyle={styles.listContent}
+      renderItem={({ item, index }) => (
+        <LeaderboardEntry
+          entry={item}
+          index={index}
+          isCurrentUser={item.userId === currentUserId}
+          theme={theme}
+          styles={styles}
+        />
+      )}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Leaderboard</Text>
+          <Text style={styles.headerSubtitle}>
+            Discipline scores updated in real time
+          </Text>
+        </View>
+      }
       ListEmptyComponent={
-        <Text style={{ color: theme.colors.mutedForeground, textAlign: 'center', marginTop: 40 }}>
-          No leaderboard data yet.
-        </Text>
+        <EmptyState
+          iconName="trophy"
+          title="No rankings yet"
+          message="Activate rules and maintain compliance to earn your spot on the board."
+        />
       }
     />
   );

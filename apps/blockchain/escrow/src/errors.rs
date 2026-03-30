@@ -31,4 +31,13 @@ pub enum EscrowError {
 
     #[msg("Cannot withdraw more than the available balance.")]
     ExcessiveWithdrawal,
+
+    #[msg("Cannot lock or unlock a zero stake amount.")]
+    ZeroStakeAmount,
+
+    #[msg("Cannot lock more SOL than is currently unlocked.")]
+    InsufficientUnlockedBalance,
+
+    #[msg("Cannot unlock more SOL than is currently locked.")]
+    ExcessiveStakeUnlock,
 }

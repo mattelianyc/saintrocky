@@ -11,6 +11,13 @@ import {
   submitRuleDraft,
   updateUserRuleStatus
 } from '../services/rules.service.js';
+import {
+  cancelRuleChangeRequest,
+  confirmRuleChangeRequest,
+  getRuleChangeRequest,
+  requestRuleDeactivation,
+  requestRuleOverride
+} from '../services/override.service.js';
 import { requireUser } from '../utils/auth.js';
 
 function respondWithError(res, error) {
@@ -97,6 +104,120 @@ export async function updateUserRuleStatusController(req, res) {
 export async function editUserRuleController(req, res) {
   try {
     return res.json(await editUserRule({ ...req.body, actor: await getActor(req), ruleId: req.params.id }));
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function requestRuleOverrideController(req, res) {
+  try {
+    return res
+      .status(201)
+      .json(await requestRuleOverride({ ...req.body, actor: await getActor(req), ruleId: req.params.id }));
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function getRuleOverrideRequestController(req, res) {
+  try {
+    return res.json(
+      await getRuleChangeRequest({
+        actor: await getActor(req),
+        ruleId: req.params.id,
+        requestId: req.params.requestId,
+        requestKind: 'override'
+      })
+    );
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function confirmRuleOverrideRequestController(req, res) {
+  try {
+    return res.json(
+      await confirmRuleChangeRequest({
+        actor: await getActor(req),
+        ruleId: req.params.id,
+        requestId: req.params.requestId,
+        requestKind: 'override'
+      })
+    );
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function cancelRuleOverrideRequestController(req, res) {
+  try {
+    return res.json(
+      await cancelRuleChangeRequest({
+        actor: await getActor(req),
+        ruleId: req.params.id,
+        requestId: req.params.requestId,
+        requestKind: 'override'
+      })
+    );
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function requestRuleDeactivationController(req, res) {
+  try {
+    return res.status(201).json(
+      await requestRuleDeactivation({
+        ...req.body,
+        actor: await getActor(req),
+        ruleId: req.params.id
+      })
+    );
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function getRuleDeactivationRequestController(req, res) {
+  try {
+    return res.json(
+      await getRuleChangeRequest({
+        actor: await getActor(req),
+        ruleId: req.params.id,
+        requestId: req.params.requestId,
+        requestKind: 'deactivation'
+      })
+    );
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function confirmRuleDeactivationRequestController(req, res) {
+  try {
+    return res.json(
+      await confirmRuleChangeRequest({
+        actor: await getActor(req),
+        ruleId: req.params.id,
+        requestId: req.params.requestId,
+        requestKind: 'deactivation'
+      })
+    );
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function cancelRuleDeactivationRequestController(req, res) {
+  try {
+    return res.json(
+      await cancelRuleChangeRequest({
+        actor: await getActor(req),
+        ruleId: req.params.id,
+        requestId: req.params.requestId,
+        requestKind: 'deactivation'
+      })
+    );
   } catch (error) {
     return respondWithError(res, error);
   }

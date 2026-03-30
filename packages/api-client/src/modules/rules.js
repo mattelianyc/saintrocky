@@ -42,6 +42,38 @@ export function createRulesClient(httpClient) {
       const response = await httpClient.post(`/v1/rules/${ruleId}/edit`, payload);
       return response.data;
     },
+    async requestOverride(ruleId, payload = {}) {
+      const response = await httpClient.post(`/v1/rules/${ruleId}/override`, payload);
+      return response.data;
+    },
+    async getOverrideRequest(ruleId, requestId) {
+      const response = await httpClient.get(`/v1/rules/${ruleId}/override/${requestId}`);
+      return response.data;
+    },
+    async confirmOverrideRequest(ruleId, requestId) {
+      const response = await httpClient.post(`/v1/rules/${ruleId}/override/${requestId}/confirm`);
+      return response.data;
+    },
+    async cancelOverrideRequest(ruleId, requestId) {
+      const response = await httpClient.post(`/v1/rules/${ruleId}/override/${requestId}/cancel`);
+      return response.data;
+    },
+    async requestDeactivation(ruleId, payload = {}) {
+      const response = await httpClient.post(`/v1/rules/${ruleId}/deactivation`, payload);
+      return response.data;
+    },
+    async getDeactivationRequest(ruleId, requestId) {
+      const response = await httpClient.get(`/v1/rules/${ruleId}/deactivation/${requestId}`);
+      return response.data;
+    },
+    async confirmDeactivationRequest(ruleId, requestId) {
+      const response = await httpClient.post(`/v1/rules/${ruleId}/deactivation/${requestId}/confirm`);
+      return response.data;
+    },
+    async cancelDeactivationRequest(ruleId, requestId) {
+      const response = await httpClient.post(`/v1/rules/${ruleId}/deactivation/${requestId}/cancel`);
+      return response.data;
+    },
     async listRuntimeAssignments(runtimeSurface, runtimeCapabilities = [], ownerEmail) {
       const response = await httpClient.get('/v1/rules/runtime/assignments', {
         params: {

@@ -12,19 +12,25 @@ const ThemeContext = createContext(null);
 
 function buildTheme(mode) {
   const tokens = getTokens(mode);
+  const isDark = mode === 'dark';
   return {
     mode: tokens.colorScheme,
     colors: {
       background: tokens.colors.background,
       foreground: tokens.colors.foreground,
       muted: tokens.colors.muted,
+      mutedForeground: tokens.colors.muted,
       card: tokens.colors.card,
       border: tokens.colors.border,
       borderStrong: tokens.colors.borderStrong,
       inputBackground: tokens.colors.input,
       primary: tokens.colors.primary,
       primaryText: tokens.colors.primaryText,
-      error: tokens.colors.error
+      accent: tokens.colors.primary,
+      error: tokens.colors.error,
+      success: isDark ? '#4ade80' : '#22c55e',
+      warning: isDark ? '#fbbf24' : '#f59e0b',
+      secondaryAccent: tokens.shell.accentStrong
     },
     shell: {
       background: tokens.shell.background,
@@ -106,6 +112,13 @@ export function useTheme() {
   return context;
 }
 
+const NAVIGATION_FONTS = {
+  regular: { fontFamily: 'System', fontWeight: '400' },
+  medium: { fontFamily: 'System', fontWeight: '500' },
+  bold: { fontFamily: 'System', fontWeight: '700' },
+  heavy: { fontFamily: 'System', fontWeight: '900' }
+};
+
 export function createNavigationTheme(theme) {
   return {
     dark: theme.mode === 'dark',
@@ -116,7 +129,8 @@ export function createNavigationTheme(theme) {
       text: theme.colors.foreground,
       border: theme.colors.border,
       notification: theme.colors.primary
-    }
+    },
+    fonts: NAVIGATION_FONTS
   };
 }
 

@@ -1,14 +1,22 @@
 import { Router } from 'express';
 
 import {
+  cancelRuleDeactivationRequestController,
+  cancelRuleOverrideRequestController,
+  confirmRuleDeactivationRequestController,
+  confirmRuleOverrideRequestController,
   createUserRuleFromTemplateController,
   editUserRuleController,
+  getRuleDeactivationRequestController,
   getRuleDraftController,
+  getRuleOverrideRequestController,
   listRuleDraftsController,
   listRuleTemplatesController,
   listRuntimeAssignmentsController,
   listUserRulesController,
   publishRuleDraftController,
+  requestRuleDeactivationController,
+  requestRuleOverrideController,
   reportRuntimeEventController,
   submitRuleDraftController,
   updateUserRuleStatusController
@@ -26,6 +34,14 @@ export function createRulesRouter() {
   router.post('/from-template', createUserRuleFromTemplateController);
   router.post('/:id/edit', editUserRuleController);
   router.post('/:id/status', updateUserRuleStatusController);
+  router.post('/:id/override', requestRuleOverrideController);
+  router.get('/:id/override/:requestId', getRuleOverrideRequestController);
+  router.post('/:id/override/:requestId/confirm', confirmRuleOverrideRequestController);
+  router.post('/:id/override/:requestId/cancel', cancelRuleOverrideRequestController);
+  router.post('/:id/deactivation', requestRuleDeactivationController);
+  router.get('/:id/deactivation/:requestId', getRuleDeactivationRequestController);
+  router.post('/:id/deactivation/:requestId/confirm', confirmRuleDeactivationRequestController);
+  router.post('/:id/deactivation/:requestId/cancel', cancelRuleDeactivationRequestController);
   router.get('/runtime/assignments', listRuntimeAssignmentsController);
   router.post('/runtime/events', reportRuntimeEventController);
 

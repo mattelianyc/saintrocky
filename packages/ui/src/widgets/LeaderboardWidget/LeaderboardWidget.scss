@@ -1,0 +1,234 @@
+/* ── LeaderboardWidget ── */
+
+.w-LeaderboardWidget {
+  display: grid;
+  gap: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Hero variant (dark bg, marketing landing) ── */
+
+.w-LeaderboardWidget--hero {
+  background: rgb(10 10 12);
+  color: rgb(255 255 255 / 0.92);
+  border-radius: var(--ui-radius);
+  overflow: hidden;
+}
+
+/* ── Compact variant (dashboard embed) ── */
+
+.w-LeaderboardWidget--compact {
+  border: 1px solid var(--ui-shell-border);
+  border-radius: var(--ui-radius);
+  background: var(--ui-shell-panel);
+  color: var(--ui-shell-text);
+}
+
+/* ── Header row ── */
+
+.w-LeaderboardWidget__header {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1.6fr) 72px 72px minmax(100px, 1fr) 80px;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  color: var(--ui-shell-accent);
+}
+
+.w-LeaderboardWidget--compact .w-LeaderboardWidget__header {
+  color: var(--ui-shell-text-muted);
+  font-size: 0.7rem;
+}
+
+/* ── Rows ── */
+
+.w-LeaderboardWidget__rows {
+  display: grid;
+}
+
+.w-LeaderboardWidget__row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1.6fr) 72px 72px minmax(100px, 1fr) 80px;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.w-LeaderboardWidget--hero .w-LeaderboardWidget__row {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--ui-shell-accent) 3%, transparent), transparent 40%),
+    transparent;
+  border-bottom: 1px solid rgb(255 255 255 / 0.04);
+}
+
+.w-LeaderboardWidget--compact .w-LeaderboardWidget__row {
+  border-bottom: 1px solid var(--ui-shell-border);
+}
+
+.w-LeaderboardWidget__row.is-hot {
+  transform: translateX(3px);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--ui-shell-accent) 12%, transparent), transparent 40%),
+    transparent;
+}
+
+.w-LeaderboardWidget__row.is-watch {
+  opacity: 0.72;
+}
+
+/* ── Cell styles ── */
+
+.w-LeaderboardWidget__rank {
+  color: var(--ui-shell-accent);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+}
+
+.w-LeaderboardWidget__trader {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgb(255 255 255 / 0.96);
+}
+
+.w-LeaderboardWidget--compact .w-LeaderboardWidget__trader {
+  color: var(--ui-shell-text);
+}
+
+.w-LeaderboardWidget__score {
+  font-weight: 700;
+  color: var(--ui-shell-accent);
+}
+
+.w-LeaderboardWidget__streak {
+  color: rgb(255 255 255 / 0.6);
+}
+
+.w-LeaderboardWidget--compact .w-LeaderboardWidget__streak {
+  color: var(--ui-shell-text-muted);
+}
+
+.w-LeaderboardWidget__earnings {
+  color: var(--ui-shell-accent);
+  font-weight: 600;
+}
+
+.w-LeaderboardWidget__staked {
+  color: rgb(255 255 255 / 0.52);
+  text-align: right;
+}
+
+.w-LeaderboardWidget--compact .w-LeaderboardWidget__staked {
+  color: var(--ui-shell-text-muted);
+}
+
+/* ── Live pill ── */
+
+.w-LeaderboardWidget__livePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 1.35rem;
+  padding: 0 0.45rem;
+  border-radius: var(--ui-radius);
+  background: rgb(255 255 255 / 0.06);
+  color: rgb(255 255 255 / 0.4);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.w-LeaderboardWidget__livePill.is-live {
+  background: color-mix(in srgb, var(--ui-shell-accent) 18%, transparent);
+  color: var(--ui-shell-accent);
+}
+
+.w-LeaderboardWidget__livePill.is-live::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ui-shell-accent);
+  animation: leaderboardPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes leaderboardPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── Empty state ── */
+
+.w-LeaderboardWidget__empty {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: rgb(255 255 255 / 0.4);
+}
+
+.w-LeaderboardWidget--compact .w-LeaderboardWidget__empty {
+  color: var(--ui-shell-text-muted);
+}
+
+/* ── SlotCounter ── */
+
+.w-SlotCounter {
+  display: inline-flex;
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+.w-SlotCounter__digitWrapper {
+  display: inline-block;
+  height: 1.2em;
+  overflow: hidden;
+  position: relative;
+}
+
+.w-SlotCounter__digitStrip {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.w-SlotCounter__digit {
+  display: block;
+  height: 1.2em;
+  line-height: 1.2em;
+  text-align: center;
+}
+
+.w-SlotCounter__static {
+  display: inline-block;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 720px) {
+  .w-LeaderboardWidget__header,
+  .w-LeaderboardWidget__row {
+    grid-template-columns: 48px minmax(0, 1.4fr) 56px 56px minmax(80px, 1fr) 64px;
+    gap: 0.5rem;
+    padding-inline: 0.75rem;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .w-LeaderboardWidget__header,
+  .w-LeaderboardWidget__row {
+    grid-template-columns: 40px 1fr 48px 1fr;
+  }
+
+  .w-LeaderboardWidget__header > :nth-child(4),
+  .w-LeaderboardWidget__header > :nth-child(6),
+  .w-LeaderboardWidget__row > :nth-child(4),
+  .w-LeaderboardWidget__row > :nth-child(6) {
+    display: none;
+  }
+}

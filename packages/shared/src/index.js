@@ -91,6 +91,18 @@ export {
   formatCompiledRuleSurfaceLabel
 } from './rules-runtime.js';
 
+export {
+  FRIENDSHIP_STATUSES,
+  CAMPAIGN_STATUSES,
+  CAMPAIGN_MEMBERSHIP_STATUSES,
+  MAX_DIRECT_MESSAGE_LENGTH,
+  MAX_CAMPAIGN_RULES,
+  isKnownFriendshipStatus,
+  isKnownCampaignStatus,
+  isKnownCampaignMembershipStatus,
+  buildConversationId
+} from './social.js';
+
 export { useTerminalTyping } from './marketing/index.js';
 
 

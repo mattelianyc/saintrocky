@@ -19,5 +19,11 @@
       "js": ["src/content/content.js"],
       "run_at": "document_idle"
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["paywalldog.png", "assets/paywalldog.png"],
+      "matches": ["<all_urls>"]
+    }
   ]
 }

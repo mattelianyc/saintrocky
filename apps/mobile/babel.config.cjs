@@ -6,8 +6,6 @@ module.exports = function (api) {
       [
         'module-resolver',
         {
-          // Ensure paths resolve relative to this babel config file, not the monorepo root.
-          // This matters when running Jest from the workspace root.
           cwd: 'babelrc',
           root: ['./'],
           alias: {
@@ -18,5 +16,3 @@ module.exports = function (api) {
     ]
   };
 };
-
-

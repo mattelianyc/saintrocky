@@ -31,7 +31,25 @@ const materialIconMap = {
   seo: 'search',
   warning: 'warning',
   logout: 'logout',
-  send: 'send'
+  send: 'send',
+  wallet: 'account-balance-wallet',
+  trades: 'swap-horiz',
+  trophy: 'emoji-events',
+  tactics: 'verified-user',
+  strategy: 'lightbulb',
+  chat: 'chat-bubble-outline',
+  edit: 'edit',
+  inspect: 'visibility',
+  pause: 'pause-circle-outline',
+  activate: 'play-circle-outline',
+  archive: 'archive',
+  notifications: 'notifications',
+  refresh: 'refresh',
+  shield: 'shield',
+  fire: 'local-fire-department',
+  schedule: 'schedule',
+  link: 'link',
+  copy: 'content-copy'
 };
 
 export const iconNames = Object.keys(materialIconMap);

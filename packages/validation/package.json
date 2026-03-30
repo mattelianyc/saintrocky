@@ -13,6 +13,7 @@
     "build": "node -e \"console.log('validation: no build step')\""
   },
   "dependencies": {
+    "@saintrocky/fuckyoupayme": "0.1.0",
     "@saintrocky/shared": "0.1.0",
     "yup": "^1.4.0"
   },

@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { api } from "@saintrocky/api-client";
+import {
+  calculateLockedStake,
+  LAMPORTS_PER_SOL
+} from "@saintrocky/fuckyoupayme";
 import {
   RULE_DRAFT_STATUS_LABELS,
   RULE_ENFORCEMENT_SURFACE_LABELS,
@@ -10,11 +15,19 @@ import {
   formatCompiledRuleSurfaceLabel
 } from "@saintrocky/shared";
 
-import { Button } from '../../primitives/Button/Button.jsx';
-import { Card } from '../../primitives/Card/Card.jsx';
-import { Field } from '../../primitives/Field/Field.jsx';
-import { Spinner } from '../../primitives/Spinner/Spinner.jsx';
-import { StatusBanner } from '../StatusBanner/StatusBanner.jsx';
+import { Button } from "../../primitives/Button/Button.jsx";
+import { Card } from "../../primitives/Card/Card.jsx";
+import { Field } from "../../primitives/Field/Field.jsx";
+import { Spinner } from "../../primitives/Spinner/Spinner.jsx";
+import { ProblemIndexSlider } from "../ProblemIndexSlider/ProblemIndexSlider.jsx";
+import { StatusBanner } from "../StatusBanner/StatusBanner.jsx";
+
+const REVIEW_ANIMATION = {
+  initial: { opacity: 0, x: 16 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -8 },
+  transition: { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
+};
 
 function getToneForStatus(status) {
   if (status === "ready_for_activation") return "success";
@@ -52,7 +65,14 @@ function formatCompiledRuleAppTargets(compiledRule) {
   return targets.filter((entry) => entry.type === "app").map((entry) => entry.value);
 }
 
-export function RuleAuthoringWorkspace({ section, showHeader = true }) {
+export function RuleAuthoringWorkspace({
+  section,
+  showHeader = true,
+  problemIndex: externalProblemIndex,
+  onProblemIndexChange: externalOnProblemIndexChange
+}) {
+  const isControlled = externalProblemIndex !== undefined && typeof externalOnProblemIndexChange === "function";
+
   const [authors, setAuthors] = useState([]);
   const [selectedAuthorEmail, setSelectedAuthorEmail] = useState("");
   const [drafts, setDrafts] = useState([]);
@@ -60,9 +80,13 @@ export function RuleAuthoringWorkspace({ section, showHeader = true }) {
   const [naturalLanguageDraft, setNaturalLanguageDraft] = useState(
     "When I am in deep work mode, block YouTube in the browser unless I pay to override it."
   );
+  const [localProblemIndex, setLocalProblemIndex] = useState(externalProblemIndex ?? 50);
   const [clarificationAnswers, setClarificationAnswers] = useState({});
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("");
+
+  const effectiveProblemIndex = isControlled ? externalProblemIndex : localProblemIndex;
+  const handleProblemIndexChange = isControlled ? externalOnProblemIndexChange : setLocalProblemIndex;
 
   const selectedDraft = useMemo(
     () => drafts.find((draft) => draft.id === selectedDraftId) || drafts[0] || null,
@@ -95,11 +119,9 @@ export function RuleAuthoringWorkspace({ section, showHeader = true }) {
   }, []);
 
   useEffect(() => {
-    if (!selectedDraft) {
-      return;
-    }
-
+    if (!selectedDraft) return;
     setNaturalLanguageDraft(selectedDraft.naturalLanguageDraft || "");
+    handleProblemIndexChange(selectedDraft.problemIndex ?? 50);
     setClarificationAnswers({});
   }, [selectedDraft]);
 
@@ -121,6 +143,7 @@ export function RuleAuthoringWorkspace({ section, showHeader = true }) {
         authorEmail: selectedAuthorEmail || undefined,
         draftId: selectedDraft?.status === "needs_clarification" ? selectedDraft.id : undefined,
         naturalLanguageDraft,
+        problemIndex: effectiveProblemIndex,
         clarificationAnswers: buildClarificationAnswerPayload(
           selectedDraft?.clarificationQuestions,
           clarificationAnswers
@@ -200,6 +223,10 @@ export function RuleAuthoringWorkspace({ section, showHeader = true }) {
               </Field.Description>
             </Field.Root>
 
+            {!isControlled ? (
+              <ProblemIndexSlider value={effectiveProblemIndex} onChange={handleProblemIndexChange} />
+            ) : null}
+
             {selectedDraft?.status === "needs_clarification" ? (
               <div className="c-RuleAuthoringWorkspace__clarificationStack">
                 <h3>Clarification questions</h3>
@@ -242,64 +269,81 @@ export function RuleAuthoringWorkspace({ section, showHeader = true }) {
                 <Spinner />
               </div>
             ) : selectedDraft ? (
-              <>
-                <StatusBanner
-                  message={formatStatus(selectedDraft.status)}
-                  tone={getToneForStatus(selectedDraft.status)}
-                />
+              <AnimatePresence mode="wait">
+                <motion.div key={selectedDraft.id} {...REVIEW_ANIMATION}>
+                  <StatusBanner
+                    message={formatStatus(selectedDraft.status)}
+                    tone={getToneForStatus(selectedDraft.status)}
+                  />
 
-                <div className="c-RuleAuthoringWorkspace__detailList">
-                  <div>
-                    <span>Status</span>
-                    <strong>{formatStatus(selectedDraft.status)}</strong>
+                  <div className="c-RuleAuthoringWorkspace__detailList">
+                    <div>
+                      <span>Status</span>
+                      <strong>{formatStatus(selectedDraft.status)}</strong>
+                    </div>
+                    <div>
+                      <span>Surface</span>
+                      <strong>{formatSurface(selectedDraft.enforcementSurface)}</strong>
+                    </div>
+                    <div>
+                      <span>Confidence</span>
+                      <strong>{selectedDraft.confidenceScore}</strong>
+                    </div>
+                    <div>
+                      <span>Problem index</span>
+                      <strong>{selectedDraft.problemIndex ?? 50}</strong>
+                    </div>
+                    <div>
+                      <span>Locked stake</span>
+                      <strong>
+                        {(
+                          ((selectedDraft.lockedStakeLamports ??
+                            calculateLockedStake(selectedDraft.problemIndex ?? 50)) ||
+                            0) / LAMPORTS_PER_SOL
+                        ).toFixed(2)}{" "}
+                        SOL
+                      </strong>
+                    </div>
                   </div>
-                  <div>
-                    <span>Surface</span>
-                    <strong>{formatSurface(selectedDraft.enforcementSurface)}</strong>
-                  </div>
-                  <div>
-                    <span>Confidence</span>
-                    <strong>{selectedDraft.confidenceScore}</strong>
-                  </div>
-                </div>
 
-                {selectedDraft.compiledRule ? (
-                  <div className="c-RuleAuthoringWorkspace__canonicalCard">
-                    <h3>Compiled rule summary</h3>
-                    <p>{selectedDraft.compiledRule.summary}</p>
-                    <ul className="c-RuleAuthoringWorkspace__noteList">
-                      <li>Inferred surfaces: {formatCompiledRuleSurfaceLabel(selectedDraft.compiledRule)}</li>
-                      <li>
-                        Domain targets: {formatCompiledRuleDomainTargets(selectedDraft.compiledRule).join(", ") || "—"}
-                      </li>
-                      <li>App targets: {formatCompiledRuleAppTargets(selectedDraft.compiledRule).join(", ") || "—"}</li>
-                      <li>Chain constraints: {selectedDraft.compiledRule.chainConstraints?.type || "—"}</li>
-                      <li>Schedule type: {selectedDraft.compiledRule.schedule?.type}</li>
-                      <li>Enforcement action: {selectedDraft.compiledRule.enforcement?.action}</li>
-                      <li>
-                        Bypass: {selectedDraft.compiledRule.bypass?.feeModel}
-                        {selectedDraft.compiledRule.bypass?.escrowDeductionBps != null
-                          ? ` (${selectedDraft.compiledRule.bypass.escrowDeductionBps} bps)`
-                          : ""}
-                      </li>
-                      {selectedDraft.compiledRule.telemetry?.templateId ? (
-                        <li>Telemetry template: {selectedDraft.compiledRule.telemetry.templateId}</li>
-                      ) : null}
-                    </ul>
-                  </div>
-                ) : null}
+                  {selectedDraft.compiledRule ? (
+                    <div className="c-RuleAuthoringWorkspace__canonicalCard">
+                      <h3>Compiled rule summary</h3>
+                      <p>{selectedDraft.compiledRule.summary}</p>
+                      <ul className="c-RuleAuthoringWorkspace__noteList">
+                        <li>Inferred surfaces: {formatCompiledRuleSurfaceLabel(selectedDraft.compiledRule)}</li>
+                        <li>
+                          Domain targets: {formatCompiledRuleDomainTargets(selectedDraft.compiledRule).join(", ") || "—"}
+                        </li>
+                        <li>App targets: {formatCompiledRuleAppTargets(selectedDraft.compiledRule).join(", ") || "—"}</li>
+                        <li>Chain constraints: {selectedDraft.compiledRule.chainConstraints?.type || "—"}</li>
+                        <li>Schedule type: {selectedDraft.compiledRule.schedule?.type}</li>
+                        <li>Enforcement action: {selectedDraft.compiledRule.enforcement?.action}</li>
+                        <li>
+                          Bypass: {selectedDraft.compiledRule.bypass?.feeModel}
+                          {selectedDraft.compiledRule.bypass?.escrowDeductionBps != null
+                            ? ` (${selectedDraft.compiledRule.bypass.escrowDeductionBps} bps)`
+                            : ""}
+                        </li>
+                        {selectedDraft.compiledRule.telemetry?.templateId ? (
+                          <li>Telemetry template: {selectedDraft.compiledRule.telemetry.templateId}</li>
+                        ) : null}
+                      </ul>
+                    </div>
+                  ) : null}
 
-                {selectedDraft.validationNotes?.length ? (
-                  <div>
-                    <h3>Validation notes</h3>
-                    <ul className="c-RuleAuthoringWorkspace__noteList">
-                      {selectedDraft.validationNotes.map((note) => (
-                        <li key={note}>{note}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </>
+                  {selectedDraft.validationNotes?.length ? (
+                    <div>
+                      <h3>Validation notes</h3>
+                      <ul className="c-RuleAuthoringWorkspace__noteList">
+                        {selectedDraft.validationNotes.map((note) => (
+                          <li key={note}>{note}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </motion.div>
+              </AnimatePresence>
             ) : (
               <p className="c-RuleAuthoringWorkspace__emptyState">
                 No rule drafts yet for this member. Submit one to start the flow.
@@ -310,16 +354,19 @@ export function RuleAuthoringWorkspace({ section, showHeader = true }) {
       </div>
 
       <section className="c-RuleAuthoringWorkspace__historyGrid">
-        {drafts.map((draft) => (
-          <button
+        {drafts.map((draft, index) => (
+          <motion.button
             key={draft.id}
             className="c-RuleAuthoringWorkspace__historyCard"
             type="button"
             onClick={() => setSelectedDraftId(draft.id)}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.04, duration: 0.18 }}
           >
             <strong>{formatStatus(draft.status)}</strong>
             <span>{draft.naturalLanguageDraft}</span>
-          </button>
+          </motion.button>
         ))}
       </section>
     </div>

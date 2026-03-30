@@ -2,6 +2,8 @@ import { contextBridge } from 'electron';
 import { ipcRenderer } from 'electron';
 
 import {
+  cancelRuntimeOverride,
+  confirmRuntimeOverride,
   getActivity,
   getAlerts,
   getControlPlaneSnapshot,
@@ -41,6 +43,8 @@ contextBridge.exposeInMainWorld('saintRockyDesktop', {
   setRuntimeArmed,
   setRuntimePreferences,
   resolveRuntimeViolation,
+  confirmRuntimeOverride,
+  cancelRuntimeOverride,
   updateNativeRuntimeState(payload) {
     ipcRenderer.send('desktop-runtime:update-state', payload);
   },

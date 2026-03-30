@@ -19,6 +19,8 @@ const RuleDraftSchema = new mongoose.Schema(
     enforcementAction: { type: String, default: null },
     bypassAllowed: { type: Boolean, default: false },
     bypassFeeModel: { type: String, default: 'none' },
+    problemIndex: { type: Number, default: 50, min: 0, max: 100 },
+    lockedStakeLamports: { type: Number, default: 0 },
     confidenceScore: { type: Number, default: 0 },
     validationNotes: { type: [String], default: [] },
     createdAt: { type: String, required: true },

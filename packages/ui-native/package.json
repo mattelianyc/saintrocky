@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@saintrocky/design-tokens": "0.1.0",
+    "@saintrocky/fuckyoupayme": "0.1.0",
     "@saintrocky/icons": "0.1.0",
     "@saintrocky/storage": "0.1.0",
     "@react-native-async-storage/async-storage": "^1.23.1"

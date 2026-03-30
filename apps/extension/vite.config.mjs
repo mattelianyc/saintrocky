@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  publicDir: path.resolve(currentDirectory, "src/assets"),
   build: {
     emptyOutDir: true,
     outDir: "dist",
@@ -18,7 +19,8 @@ export default defineConfig({
       output: {
         entryFileNames: "assets/[name].js",
         chunkFileNames: "assets/[name].js",
-        assetFileNames: "assets/[name][extname]"
+        assetFileNames: "assets/[name][extname]",
+        manualChunks: undefined
       }
     }
   }

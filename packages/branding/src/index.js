@@ -54,6 +54,11 @@ export const saintRockyBranding = {
       summary: "Live ranking, live drift, live shame management.",
       visibilityLabel: "Visibility toggle",
       payoutLabel: "Discipline dividend",
+      valuePropLines: [
+        "You only pay when you choose to override your own rules.",
+        "Payment is always optional.",
+        "50% of all override fees are redistributed to traders who stay disciplined."
+      ],
       items: [
         {
           displayName: "Maya Chen",
@@ -133,13 +138,30 @@ export const saintRockyBranding = {
     {
       title: "Leaderboard",
       summary: "Discipline rankings with verifiable on-chain scores and gradient reward payouts."
+    },
+    {
+      title: "Friends",
+      summary: "Add trusted traders, share accountability, and build a real social graph around discipline."
+    },
+    {
+      title: "Messages",
+      summary: "Chat with accepted friends in a private realtime inbox tied to your accountability network."
+    },
+    {
+      title: "Campaigns",
+      summary: "Launch shared challenges with aligned rules, shared time windows, and group accountability."
     }
   ],
   dashboardSections: [
     {
-      slug: "rules",
-      title: "Rules",
-      description: "Draft enforceable self-authored rules with AI clarification before activation."
+      slug: "tactics",
+      title: "Tactics",
+      description: "Manage active rules, overrides, scheduled edits, and AI drafts."
+    },
+    {
+      slug: "strategy",
+      title: "Strategy",
+      description: "Browse rule templates and create new rules with AI validation."
     },
     {
       slug: "wallet",
@@ -152,9 +174,19 @@ export const saintRockyBranding = {
       description: "Review detected on-chain trades, violations, and penalty history."
     },
     {
-      slug: "leaderboard",
-      title: "Leaderboard",
-      description: "Discipline rankings and reward distribution across the network."
+      slug: "friends",
+      title: "Friends",
+      description: "Manage your accountability network, incoming requests, and suggested members."
+    },
+    {
+      slug: "messages",
+      title: "Messages",
+      description: "Direct message your accepted friends with realtime delivery."
+    },
+    {
+      slug: "campaigns",
+      title: "Campaigns",
+      description: "Coordinate shared rule challenges across a fixed time window."
     }
   ],
   auth: {
@@ -163,9 +195,9 @@ export const saintRockyBranding = {
       "Use the shared Saint Rocky account layer to manage browser, desktop, and on-chain enforcement from one place."
   },
   mobile: {
-    title: "Mobile companion, kept intentionally simple",
+    title: "Mobile command center",
     summary:
-      "The mobile release focuses on auth, escrow balance, rules overview, and leaderboard while deeper enforcement stays on desktop and browser."
+      "Real-time violation alerts, social accountability, and discipline tracking — your command center, always in your pocket."
   }
 };
 

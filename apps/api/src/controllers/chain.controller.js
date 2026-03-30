@@ -2,9 +2,11 @@ import { handleHeliusWebhook, getRecentTrades } from '../services/chain-watcher.
 import { requireUser } from '../utils/auth.js';
 import { WalletLink } from '../models/wallet-link.model.js';
 import { env } from '../config/env.js';
+import { connectMongo } from '../db/mongo.js';
 
 export async function heliusWebhookController(req, res) {
   try {
+    await connectMongo(env.mongodbUri);
     const authHeader = req.headers['authorization'] || '';
     const expectedSecret = env.heliusWebhookSecret;
 
@@ -25,6 +27,7 @@ export async function heliusWebhookController(req, res) {
 
 export async function listRecentTradesController(req, res) {
   try {
+    await connectMongo(env.mongodbUri);
     const actor = await requireUser(req);
     const { walletAddress } = req.query;
 

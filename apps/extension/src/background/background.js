@@ -1,5 +1,5 @@
 import { createApiClient, setUnauthorizedHandler } from "@saintrocky/api-client";
-import { buildRuntimeChannel, createRealtimeClient } from "@saintrocky/realtime";
+import { buildRulesChannel, buildRuntimeChannel, createRealtimeClient } from "@saintrocky/realtime";
 import { isScheduleActive } from "@saintrocky/shared";
 
 const STORAGE_KEY = "saintRockyExtensionRuntime";
@@ -11,7 +11,11 @@ const MESSAGE_TYPES = {
   clearBlock: "SAINTROCKY_EXTENSION_CLEAR_BLOCK",
   setArmed: "SAINTROCKY_EXTENSION_SET_ARMED",
   resolveViolation: "SAINTROCKY_EXTENSION_RESOLVE_VIOLATION",
-  signOut: "SAINTROCKY_EXTENSION_SIGN_OUT"
+  signOut: "SAINTROCKY_EXTENSION_SIGN_OUT",
+  requestOverride: "SAINTROCKY_EXTENSION_REQUEST_OVERRIDE",
+  confirmOverride: "SAINTROCKY_EXTENSION_CONFIRM_OVERRIDE",
+  cancelOverride: "SAINTROCKY_EXTENSION_CANCEL_OVERRIDE",
+  renderOverrideCountdown: "SAINTROCKY_EXTENSION_RENDER_OVERRIDE_COUNTDOWN"
 };
 
 let state = null;
@@ -19,6 +23,7 @@ let hasLoadedState = false;
 let apiClient = null;
 let realtimeClient = null;
 let cleanupRuntimeSubscription = null;
+let cleanupRulesSubscription = null;
 
 function buildInitialState() {
   return {
@@ -28,8 +33,10 @@ function buildInitialState() {
     connectionState: "idle",
     isArmed: true,
     assignments: [],
+    rules: [],
     recentEvents: [],
     pendingViolation: null,
+    pendingOverrideRequest: null,
     blockedTabIds: [],
     latestPageContext: null,
     runtimeConfig: {
@@ -55,11 +62,15 @@ async function clearAuthState() {
   state.sessionUser = null;
   state.connectionState = "idle";
   state.assignments = [];
+  state.rules = [];
   state.pendingViolation = null;
+  state.pendingOverrideRequest = null;
   state.recentEvents = [];
   state.blockedTabIds = [];
   cleanupRuntimeSubscription?.();
   cleanupRuntimeSubscription = null;
+  cleanupRulesSubscription?.();
+  cleanupRulesSubscription = null;
   realtimeClient?.disconnect();
   realtimeClient = null;
   await persistState();
@@ -129,7 +140,8 @@ async function publishExtensionSession() {
     runtimeState: {
       isArmed: state.isArmed,
       assignmentCount: state.assignments.length,
-      pendingViolation: Boolean(state.pendingViolation)
+      pendingViolation: Boolean(state.pendingViolation),
+      pendingOverrideRequest: Boolean(state.pendingOverrideRequest)
     }
   });
 }
@@ -143,6 +155,40 @@ async function bootstrapAssignments() {
   );
   state.assignments = response.assignments || [];
   await persistState();
+}
+
+function findPendingOverrideForRule(ruleId) {
+  const rule = state.rules.find((r) => r.ruleId === ruleId);
+  if (!rule?.pendingRuleChangeRequests) return null;
+  return rule.pendingRuleChangeRequests.override || null;
+}
+
+function syncPendingOverrideFromRules() {
+  if (!state.pendingViolation) return;
+  const pending = findPendingOverrideForRule(state.pendingViolation.ruleId);
+  state.pendingOverrideRequest = pending;
+}
+
+function subscribeRulesChannel() {
+  cleanupRulesSubscription?.();
+  cleanupRulesSubscription = null;
+  if (!realtimeClient || !state.sessionUser?.email) return;
+
+  cleanupRulesSubscription = realtimeClient.subscribe(
+    buildRulesChannel(state.sessionUser.email),
+    async (message) => {
+      if (message.type !== "channel.snapshot") return;
+      state.rules = message.payload?.rules || [];
+      syncPendingOverrideFromRules();
+      await persistState();
+
+      if (state.pendingOverrideRequest && state.pendingViolation) {
+        await sendOverrideCountdownToBlockedTabs();
+      }
+
+      await publishExtensionSession();
+    }
+  );
 }
 
 function subscribeRuntimeChannel() {
@@ -174,6 +220,7 @@ async function connectRealtime() {
     await persistState();
     if (connection.state === "authenticated") {
       subscribeRuntimeChannel();
+      subscribeRulesChannel();
       await bootstrapAssignments();
       await publishExtensionSession();
     }
@@ -184,6 +231,25 @@ async function connectRealtime() {
 async function sendTabMessage(tabId, payload) {
   if (!tabId) return;
   try { await chrome.tabs.sendMessage(tabId, payload); } catch {}
+}
+
+async function sendOverrideCountdownToBlockedTabs() {
+  if (!state.pendingViolation || !state.pendingOverrideRequest) return;
+  const rule = state.rules.find((r) => r.ruleId === state.pendingViolation.ruleId);
+  const payload = {
+    requestedAt: state.pendingOverrideRequest.requestedAt,
+    freeAt: state.pendingOverrideRequest.currentQuote?.freeAt || state.pendingOverrideRequest.freeAt,
+    problemIndex: state.pendingOverrideRequest.problemIndex,
+    lockedStakeLamports: state.pendingOverrideRequest.lockedStakeLamports,
+    ruleId: state.pendingViolation.ruleId,
+    requestId: state.pendingOverrideRequest.requestId,
+    title: rule?.summary || state.pendingViolation.title,
+    summary: state.pendingViolation.summary
+  };
+
+  for (const tabId of state.blockedTabIds) {
+    await sendTabMessage(tabId, { type: MESSAGE_TYPES.renderOverrideCountdown, payload });
+  }
 }
 
 function domainMatchesTarget(domain, targetValue) {
@@ -214,6 +280,7 @@ async function evaluateTab(tabId, url = "") {
   const assignment = getTriggeredAssignment(url);
   if (!assignment) {
     state.pendingViolation = null;
+    state.pendingOverrideRequest = null;
     state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
     await persistState();
     await publishExtensionSession();
@@ -230,10 +297,19 @@ async function evaluateTab(tabId, url = "") {
     domain: getDomain(url)
   };
   state.blockedTabIds = [...new Set([...state.blockedTabIds, tabId])];
+
+  syncPendingOverrideFromRules();
+
   await reportRuntimeEvent("rule_triggered", assignment, { tabId, url });
   await reportRuntimeEvent("bypass_offered", assignment, { tabId, url });
+  await persistState();
   await publishExtensionSession();
-  await sendTabMessage(tabId, { type: MESSAGE_TYPES.renderBlock, payload: state.pendingViolation });
+
+  if (state.pendingOverrideRequest) {
+    await sendOverrideCountdownToBlockedTabs();
+  } else {
+    await sendTabMessage(tabId, { type: MESSAGE_TYPES.renderBlock, payload: state.pendingViolation });
+  }
 }
 
 async function resolveViolation(action = "comply") {
@@ -241,22 +317,82 @@ async function resolveViolation(action = "comply") {
   const assignment = state.assignments.find((item) => item.ruleId === state.pendingViolation.ruleId);
   if (!assignment) {
     state.pendingViolation = null;
+    state.pendingOverrideRequest = null;
     await persistState();
     return state;
   }
 
   const tabId = state.pendingViolation.tabId;
   if (action === "pay_to_bypass") {
-    await reportRuntimeEvent("bypass_accepted", assignment, { tabId, url: state.pendingViolation.url });
-    state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
-    await sendTabMessage(tabId, { type: MESSAGE_TYPES.clearBlock });
-  } else {
-    await reportRuntimeEvent("rule_blocked", assignment, { tabId, url: state.pendingViolation.url });
+    try {
+      const result = await getApiClient().rules.requestOverride(state.pendingViolation.ruleId);
+      if (result?.request) {
+        state.pendingOverrideRequest = result.request;
+        await persistState();
+        await sendOverrideCountdownToBlockedTabs();
+        await publishExtensionSession();
+        return state;
+      }
+    } catch (error) {
+      await reportRuntimeEvent("override_request_failed", assignment, {
+        tabId,
+        url: state.pendingViolation.url,
+        error: error?.message
+      });
+      throw error;
+    }
   }
 
+  await reportRuntimeEvent("rule_blocked", assignment, { tabId, url: state.pendingViolation.url });
+
   state.pendingViolation = null;
+  state.pendingOverrideRequest = null;
   await persistState();
   await publishExtensionSession();
+  return state;
+}
+
+async function handleConfirmOverride() {
+  if (!state.pendingViolation || !state.pendingOverrideRequest) return state;
+  const ruleId = state.pendingViolation.ruleId;
+  const requestId = state.pendingOverrideRequest.requestId;
+
+  try {
+    await getApiClient().rules.confirmOverrideRequest(ruleId, requestId);
+    const tabId = state.pendingViolation.tabId;
+    state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
+    await sendTabMessage(tabId, { type: MESSAGE_TYPES.clearBlock });
+    state.pendingViolation = null;
+    state.pendingOverrideRequest = null;
+    await persistState();
+    await publishExtensionSession();
+  } catch (error) {
+    throw error;
+  }
+
+  return state;
+}
+
+async function handleCancelOverride() {
+  if (!state.pendingViolation || !state.pendingOverrideRequest) return state;
+  const ruleId = state.pendingViolation.ruleId;
+  const requestId = state.pendingOverrideRequest.requestId;
+
+  try {
+    await getApiClient().rules.cancelOverrideRequest(ruleId, requestId);
+    state.pendingOverrideRequest = null;
+    await persistState();
+    for (const tabId of state.blockedTabIds) {
+      await sendTabMessage(tabId, {
+        type: MESSAGE_TYPES.renderBlock,
+        payload: state.pendingViolation
+      });
+    }
+    await publishExtensionSession();
+  } catch (error) {
+    throw error;
+  }
+
   return state;
 }
 
@@ -321,7 +457,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       if (message?.type === MESSAGE_TYPES.setArmed) {
         state.isArmed = Boolean(message.payload?.isArmed);
-        if (!state.isArmed) state.pendingViolation = null;
+        if (!state.isArmed) {
+          state.pendingViolation = null;
+          state.pendingOverrideRequest = null;
+        }
         await persistState();
         await publishExtensionSession();
         sendResponse({ ok: true, state });
@@ -330,6 +469,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       if (message?.type === MESSAGE_TYPES.resolveViolation) {
         await resolveViolation(message.payload?.action || "comply");
+        sendResponse({ ok: true, state });
+        return;
+      }
+
+      if (message?.type === MESSAGE_TYPES.requestOverride) {
+        await resolveViolation("pay_to_bypass");
+        sendResponse({ ok: true, state });
+        return;
+      }
+
+      if (message?.type === MESSAGE_TYPES.confirmOverride) {
+        await handleConfirmOverride();
+        sendResponse({ ok: true, state });
+        return;
+      }
+
+      if (message?.type === MESSAGE_TYPES.cancelOverride) {
+        await handleCancelOverride();
         sendResponse({ ok: true, state });
         return;
       }

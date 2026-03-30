@@ -128,8 +128,7 @@ function buildCompiledRuleBase(template, summary) {
     },
     bypass: {
       allowed: true,
-      feeModel: 'escrow_deduction',
-      escrowDeductionBps: 100
+      feeModel: 'sleep_on_it'
     },
     telemetry: {
       templateId: template.templateId,

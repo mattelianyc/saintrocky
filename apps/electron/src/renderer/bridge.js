@@ -54,6 +54,14 @@ export function resolveRuntimeViolation(action) {
   return getDesktopBridge().resolveRuntimeViolation(action);
 }
 
+export function confirmRuntimeOverride() {
+  return getDesktopBridge().confirmRuntimeOverride();
+}
+
+export function cancelRuntimeOverride() {
+  return getDesktopBridge().cancelRuntimeOverride();
+}
+
 export function updateNativeRuntimeState(payload) {
   return getDesktopBridge().updateNativeRuntimeState(payload);
 }

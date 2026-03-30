@@ -8,4 +8,3 @@ export const analytics = createAnalytics({
     environment: appConfig.EXPO_PUBLIC_APP_ENV
   }
 });
-

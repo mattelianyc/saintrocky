@@ -7,6 +7,10 @@ import {
   foundationalRuleTemplates,
   getRuleTemplateById
 } from '@saintrocky/shared';
+import {
+  calculateLockedStake,
+  clampProblemIndex
+} from '@saintrocky/fuckyoupayme';
 import { buildRulesChannel, buildRuntimeChannel } from '@saintrocky/realtime';
 import {
   validateRuleDraftSubmission,
@@ -33,6 +37,7 @@ import {
   saveUserRule
 } from './rule-runtime-store.service.js';
 import { publishEvent, publishSnapshot } from './realtime.service.js';
+import { listPendingRuleChangeRequestsByRuleId } from './override.service.js';
 
 function buildValidationError(message, validation) {
   const error = new Error(message);
@@ -69,9 +74,18 @@ function inferRuntimeSurfaces(compiledRule) {
   return surfaces;
 }
 
+function resolveProblemIndex(problemIndex, fallbackProblemIndex = 50) {
+  const normalizedFallback = clampProblemIndex(fallbackProblemIndex);
+  return problemIndex == null ? normalizedFallback : clampProblemIndex(problemIndex);
+}
+
 function buildRuleDraftRecord({ existingDraft, author, submission, assessment }) {
   const timestamp = new Date().toISOString();
   const statusHistory = [...(existingDraft?.statusHistory || [])];
+  const problemIndex = resolveProblemIndex(
+    submission.problemIndex,
+    existingDraft?.problemIndex ?? 50
+  );
 
   statusHistory.push(
     buildStatusHistoryEntry('draft_submitted', {
@@ -104,6 +118,8 @@ function buildRuleDraftRecord({ existingDraft, author, submission, assessment })
     enforcementAction: assessment.compiledRule?.enforcement?.action || null,
     bypassAllowed: assessment.compiledRule?.bypass?.allowed ?? false,
     bypassFeeModel: assessment.compiledRule?.bypass?.feeModel || 'none',
+    problemIndex,
+    lockedStakeLamports: calculateLockedStake(problemIndex),
     confidenceScore: assessment.confidenceScore,
     validationNotes: assessment.validationNotes || [],
     createdAt: existingDraft?.createdAt || timestamp,
@@ -111,8 +127,18 @@ function buildRuleDraftRecord({ existingDraft, author, submission, assessment })
   };
 }
 
-function buildUserRuleRecord({ author, source, status = 'active', template = null, config = {}, compiledRule, draftId }) {
+function buildUserRuleRecord({
+  author,
+  source,
+  status = 'active',
+  template = null,
+  config = {},
+  compiledRule,
+  draftId,
+  problemIndex = 50
+}) {
   const timestamp = new Date().toISOString();
+  const normalizedProblemIndex = resolveProblemIndex(problemIndex);
 
   return {
     ruleId: randomUUID(),
@@ -127,6 +153,8 @@ function buildUserRuleRecord({ author, source, status = 'active', template = nul
     status,
     title: template?.title || compiledRule.summary,
     summary: compiledRule.summary,
+    problemIndex: normalizedProblemIndex,
+    lockedStakeLamports: calculateLockedStake(normalizedProblemIndex),
     config,
     compiledRule,
     bypassPolicy: compiledRule.bypass,
@@ -140,18 +168,28 @@ function buildUserRuleRecord({ author, source, status = 'active', template = nul
   };
 }
 
-function buildEditHistoryEntry({ timingQuote, actor, previousSummary, nextSummary, status }) {
+function buildEditHistoryEntry({
+  timingQuote,
+  actor,
+  previousSummary,
+  nextSummary,
+  previousProblemIndex,
+  nextProblemIndex,
+  status
+}) {
   return {
     editId: randomUUID(),
     status,
     timingOption: timingQuote.timingOption,
-    feeAmountUsd: timingQuote.feeAmountUsd,
+    feeSol: timingQuote.feeSol,
     paymentRequired: timingQuote.paymentRequired,
     requestedAt: timingQuote.requestedAt,
     effectiveAt: timingQuote.effectiveAt,
     requestedByEmail: actor.email,
     previousSummary,
-    nextSummary
+    nextSummary,
+    previousProblemIndex,
+    nextProblemIndex
   };
 }
 
@@ -172,6 +210,9 @@ async function materializeDueRuleEdit(userRule) {
     compiledRule: userRule.pendingEdit.compiledRule,
     bypassPolicy: userRule.pendingEdit.compiledRule.bypass,
     enforcementSurfaces: inferRuntimeSurfaces(userRule.pendingEdit.compiledRule),
+    problemIndex: userRule.pendingEdit.problemIndex ?? userRule.problemIndex,
+    lockedStakeLamports:
+      userRule.pendingEdit.lockedStakeLamports ?? userRule.lockedStakeLamports,
     pendingEdit: null,
     updatedAt: userRule.pendingEdit.effectiveAt,
     editHistory: [
@@ -180,13 +221,15 @@ async function materializeDueRuleEdit(userRule) {
         editId: randomUUID(),
         status: 'applied',
         timingOption: userRule.pendingEdit.timingOption,
-        feeAmountUsd: userRule.pendingEdit.feeAmountUsd,
+        feeSol: userRule.pendingEdit.feeSol,
         paymentRequired: userRule.pendingEdit.paymentRequired,
         requestedAt: userRule.pendingEdit.requestedAt,
         effectiveAt: userRule.pendingEdit.effectiveAt,
         requestedByEmail: userRule.pendingEdit.requestedByEmail,
         previousSummary: userRule.summary,
-        nextSummary: userRule.pendingEdit.summary
+        nextSummary: userRule.pendingEdit.summary,
+        previousProblemIndex: userRule.problemIndex,
+        nextProblemIndex: userRule.pendingEdit.problemIndex ?? userRule.problemIndex
       }
     ]
   };
@@ -195,20 +238,31 @@ async function materializeDueRuleEdit(userRule) {
   return nextRule;
 }
 
-async function attachRuleRuntimeSnapshot(userRule) {
+async function attachRuleRuntimeSnapshot(userRule, options = {}) {
   const resolvedRule = await materializeDueRuleEdit(userRule);
   const latestEvent = (await listRuleRuntimeEvents({ ruleId: resolvedRule.ruleId }))[0] || null;
+  const pendingRuleChangeRequests =
+    options.pendingRequestsByRuleId?.[resolvedRule.ruleId] || {
+      override: null,
+      deactivation: null
+    };
 
   return {
     ...resolvedRule,
     statusLabel: RULE_USER_RULE_STATUS_LABELS[resolvedRule.status] || resolvedRule.status,
-    latestRuntimeEvent: latestEvent
+    latestRuntimeEvent: latestEvent,
+    pendingRuleChangeRequests
   };
 }
 
-async function publishOwnerRuleState(ownerUserId, ownerEmail, eventName, payload = {}) {
+export async function publishOwnerRuleState(ownerUserId, ownerEmail, eventName, payload = {}) {
   const storedRules = await listStoredUserRules({ ownerUserId });
-  const rules = await Promise.all(storedRules.map(attachRuleRuntimeSnapshot));
+  const pendingRequestsByRuleId = await listPendingRuleChangeRequestsByRuleId(
+    storedRules.map((rule) => rule.ruleId)
+  );
+  const rules = await Promise.all(
+    storedRules.map((rule) => attachRuleRuntimeSnapshot(rule, { pendingRequestsByRuleId }))
+  );
   const drafts = await listStoredRuleDrafts({ authorUserId: ownerUserId });
   const activeRules = rules.filter((rule) => rule.status === 'active');
 
@@ -309,7 +363,12 @@ export async function listUserRules(payload = {}) {
   const actor = await resolveRuleActor(payload.actor);
   const owner = await resolveRequestedRuleOwner(actor, payload.ownerEmail);
   const storedRules = await listStoredUserRules({ ownerUserId: owner.id });
-  const rules = await Promise.all(storedRules.map(attachRuleRuntimeSnapshot));
+  const pendingRequestsByRuleId = await listPendingRuleChangeRequestsByRuleId(
+    storedRules.map((rule) => rule.ruleId)
+  );
+  const rules = await Promise.all(
+    storedRules.map((rule) => attachRuleRuntimeSnapshot(rule, { pendingRequestsByRuleId }))
+  );
   const drafts = await listStoredRuleDrafts({ authorUserId: owner.id });
   const owners = await listManageableRuleOwners(actor);
 
@@ -338,7 +397,8 @@ export async function createUserRuleFromTemplate(payload = {}) {
     source: 'template',
     template,
     config: { ...template.defaultConfig, ...(payload.config || {}) },
-    compiledRule
+    compiledRule,
+    problemIndex: payload.problemIndex
   });
 
   await saveUserRule(userRule);
@@ -349,7 +409,9 @@ export async function createUserRuleFromTemplate(payload = {}) {
   return {
     ok: true,
     owner: author,
-    rule: await attachRuleRuntimeSnapshot(userRule)
+    rule: await attachRuleRuntimeSnapshot(userRule, {
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([userRule.ruleId])
+    })
   };
 }
 
@@ -372,7 +434,8 @@ export async function publishRuleDraft(payload = {}) {
     author,
     source: 'ai_authored',
     compiledRule: draft.compiledRule,
-    draftId: draft.id
+    draftId: draft.id,
+    problemIndex: draft.problemIndex
   });
 
   await saveUserRule(userRule);
@@ -384,7 +447,9 @@ export async function publishRuleDraft(payload = {}) {
   return {
     ok: true,
     owner: author,
-    rule: await attachRuleRuntimeSnapshot(userRule),
+    rule: await attachRuleRuntimeSnapshot(userRule, {
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([userRule.ruleId])
+    }),
     draft
   };
 }
@@ -403,6 +468,23 @@ export async function updateUserRuleStatus(payload = {}) {
 
   assertRuleRecordAccess(actor, userRule.ownerEmail);
 
+  if (
+    userRule.status === 'active' &&
+    ['paused', 'archived'].includes(payload.status)
+  ) {
+    const error = new Error(
+      'Active rules must go through the sleep-on-it deactivation flow before they can be paused or archived.'
+    );
+    error.status = 409;
+    error.payload = {
+      ok: false,
+      code: 'DEACTIVATION_REQUEST_REQUIRED',
+      message:
+        'Active rules must go through the sleep-on-it deactivation flow before they can be paused or archived.'
+    };
+    throw error;
+  }
+
   const nextRule = {
     ...userRule,
     status: payload.status,
@@ -417,7 +499,9 @@ export async function updateUserRuleStatus(payload = {}) {
 
   return {
     ok: true,
-    rule: await attachRuleRuntimeSnapshot(nextRule)
+    rule: await attachRuleRuntimeSnapshot(nextRule, {
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId])
+    })
   };
 }
 
@@ -456,6 +540,8 @@ export async function editUserRule(payload = {}) {
   const nextCompiledRule = buildCompiledRuleFromTemplate(template, nextConfig);
   const timingQuote = getRuleEditTimingQuote(payload.editTimingOption, new Date());
   const nextSummary = nextCompiledRule.summary;
+  const nextProblemIndex = resolveProblemIndex(payload.problemIndex, userRule.problemIndex);
+  const nextLockedStakeLamports = calculateLockedStake(nextProblemIndex);
 
   const nextRule =
     timingQuote.delayHours === 0
@@ -467,6 +553,8 @@ export async function editUserRule(payload = {}) {
           compiledRule: nextCompiledRule,
           bypassPolicy: nextCompiledRule.bypass,
           enforcementSurfaces: inferRuntimeSurfaces(nextCompiledRule),
+          problemIndex: nextProblemIndex,
+          lockedStakeLamports: nextLockedStakeLamports,
           pendingEdit: null,
           updatedAt: timingQuote.requestedAt,
           editHistory: [
@@ -476,6 +564,8 @@ export async function editUserRule(payload = {}) {
               actor,
               previousSummary: userRule.summary,
               nextSummary,
+              previousProblemIndex: userRule.problemIndex,
+              nextProblemIndex,
               status: 'applied'
             })
           ]
@@ -484,7 +574,7 @@ export async function editUserRule(payload = {}) {
           ...userRule,
           pendingEdit: {
             timingOption: timingQuote.timingOption,
-            feeAmountUsd: timingQuote.feeAmountUsd,
+            feeSol: timingQuote.feeSol,
             paymentRequired: timingQuote.paymentRequired,
             requestedAt: timingQuote.requestedAt,
             effectiveAt: timingQuote.effectiveAt,
@@ -492,7 +582,9 @@ export async function editUserRule(payload = {}) {
             title: template.title,
             summary: nextSummary,
             config: nextConfig,
-            compiledRule: nextCompiledRule
+            compiledRule: nextCompiledRule,
+            problemIndex: nextProblemIndex,
+            lockedStakeLamports: nextLockedStakeLamports
           },
           updatedAt: timingQuote.requestedAt,
           editHistory: [
@@ -502,6 +594,8 @@ export async function editUserRule(payload = {}) {
               actor,
               previousSummary: userRule.summary,
               nextSummary,
+              previousProblemIndex: userRule.problemIndex,
+              nextProblemIndex,
               status: 'scheduled'
             })
           ]
@@ -516,7 +610,9 @@ export async function editUserRule(payload = {}) {
   return {
     ok: true,
     editQuote: timingQuote,
-    rule: await attachRuleRuntimeSnapshot(nextRule)
+    rule: await attachRuleRuntimeSnapshot(nextRule, {
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId])
+    })
   };
 }
 

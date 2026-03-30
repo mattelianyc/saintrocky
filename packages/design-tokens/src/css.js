@@ -37,6 +37,8 @@ function toCssVars(mode, tokens) {
     `  --ui-shell-accent-strong: ${tokens.shell.accentStrong};`,
     `  --ui-shell-shadow: ${tokens.shell.shadow};`,
     `  --ui-shell-glow: ${tokens.shell.glow};`,
+    `  --ui-gradient-problem-start: ${tokens.gradients.problemStart};`,
+    `  --ui-gradient-problem-end: ${tokens.gradients.problemEnd};`,
     `  --ui-desktop-background-start: ${tokens.desktop.backgroundStart};`,
     `  --ui-desktop-background-end: ${tokens.desktop.backgroundEnd};`,
     `  --ui-desktop-surface: ${tokens.desktop.surface};`,

@@ -5,10 +5,13 @@ import { createActivityClient } from "./modules/activity.js";
 import { createAlertsClient } from "./modules/alerts.js";
 import { createAuthClient } from "./modules/auth.js";
 import { createBillingClient } from "./modules/billing.js";
+import { createCampaignsClient } from "./modules/campaigns.js";
 import { createDashboardClient } from "./modules/dashboard.js";
 import { createDesktopSessionsClient } from "./modules/desktop-sessions.js";
 import { createDevicesClient } from "./modules/devices.js";
 import { createExtensionSessionsClient } from "./modules/extension-sessions.js";
+import { createFriendsClient } from "./modules/friends.js";
+import { createMessagesClient } from "./modules/messages.js";
 import { createPoliciesClient } from "./modules/policies.js";
 import { createRulesClient } from "./modules/rules.js";
 import { createUsersClient } from "./modules/users.js";
@@ -27,6 +30,9 @@ export function createApiClient(options = {}) {
     alerts: createAlertsClient(httpClient),
     workflows: createWorkflowsClient(httpClient),
     policies: createPoliciesClient(httpClient),
+    friends: createFriendsClient(httpClient),
+    messages: createMessagesClient(httpClient),
+    campaigns: createCampaignsClient(httpClient),
     rules: createRulesClient(httpClient),
     billing: createBillingClient(httpClient),
     dashboard: createDashboardClient(httpClient),

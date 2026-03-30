@@ -2,6 +2,7 @@ import "@saintrocky/ui/base.scss";
 import "@saintrocky/ui/primitives.scss";
 import "@saintrocky/ui/layout.scss";
 import "@saintrocky/ui/compounds.scss";
+import "@saintrocky/ui/widgets.scss";
 
 import localFont from "next/font/local";
 import { saintRockyBranding } from "@saintrocky/branding";

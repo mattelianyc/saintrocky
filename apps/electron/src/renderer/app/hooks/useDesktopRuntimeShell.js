@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import {
+  cancelRuntimeOverride,
+  confirmRuntimeOverride,
   getRuntimeHubSnapshot,
   getRuntimeInfo,
   getSession,
@@ -227,10 +229,36 @@ export function useDesktopRuntimeShell() {
     }
 
     setRuntimeHub(response.runtimeHub);
-    setBanner({
-      message: action === 'pay_to_bypass' ? 'Override activated for this rule.' : 'Violation marked as complied.',
-      tone: 'success'
-    });
+    if (action === 'pay_to_bypass' && response.runtimeHub?.pendingOverrideRequest) {
+      setBanner({ message: 'Override countdown started.', tone: 'success' });
+    } else {
+      setBanner({
+        message: action === 'pay_to_bypass' ? 'Override activated for this rule.' : 'Violation marked as complied.',
+        tone: 'success'
+      });
+    }
+  }
+
+  async function handleConfirmOverride() {
+    const response = await confirmRuntimeOverride();
+    if (!response.ok) {
+      setBanner({ message: response.message, tone: 'error' });
+      return;
+    }
+
+    setRuntimeHub(response.runtimeHub);
+    setBanner({ message: 'Override confirmed. Rule bypassed.', tone: 'success' });
+  }
+
+  async function handleCancelOverride() {
+    const response = await cancelRuntimeOverride();
+    if (!response.ok) {
+      setBanner({ message: response.message, tone: 'error' });
+      return;
+    }
+
+    setRuntimeHub(response.runtimeHub);
+    setBanner({ message: 'Override request cancelled.', tone: 'success' });
   }
 
   return {
@@ -247,6 +275,8 @@ export function useDesktopRuntimeShell() {
     view,
     actions: {
       handleArmToggle,
+      handleCancelOverride,
+      handleConfirmOverride,
       handleLogin,
       handleLogout,
       handlePreferenceToggle,

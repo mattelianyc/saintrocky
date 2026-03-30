@@ -162,10 +162,33 @@
   pointer-events: none;
 }
 
+.c-BrandHeroParallax__treeReveal {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  transform-origin: bottom center;
+  will-change: opacity, transform, clip-path;
+}
+
+.c-BrandHeroParallax__treeImage {
+  position: absolute;
+  right: 0;
+  bottom: 20%;
+  top: 0;
+  left: 5%;
+  width: min(94vw, 58rem);
+  max-width: none;
+  height: auto;
+  opacity: 0.78;
+  filter: saturate(1.02);
+}
+
 .c-BrandHeroParallax__dogImage {
   position: relative;
+  z-index: 1;
   bottom: -38%;
-  width: min(42vw, 34rem);
+  width: min(56vw, 44rem);
   max-width: none;
   height: auto;
   will-change: transform;
@@ -235,6 +258,11 @@
     bottom: -34%;
   }
 
+  .c-BrandHeroParallax__treeImage {
+    right: -14%;
+    width: min(50vw, 32rem);
+  }
+
   .c-BrandHeroParallax__wordmark {
     width: calc(100vw - (2 * clamp(0.875rem, 4vw, 2rem)));
     font-size: clamp(2rem, 9.4vw, 5.8rem);
@@ -276,6 +304,13 @@
   .c-BrandHeroParallax__dogImage {
     width: min(44vw, 14rem);
     bottom: -22%;
+  }
+
+  .c-BrandHeroParallax__treeImage {
+    right: -18%;
+    bottom: 4%;
+    width: min(54vw, 16rem);
+    opacity: 0.72;
   }
 
   .c-BrandHeroParallax__wordmark {

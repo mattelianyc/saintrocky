@@ -190,6 +190,33 @@ export async function getTodayTradeCount(walletAddress) {
   return ChainTrade.countDocuments({ walletAddress, timestamp: { $gte: startOfDay } });
 }
 
+function normalizeRecentTrade(trade) {
+  const primaryViolation = trade.violationDetails?.[0] || null;
+  return {
+    signature: trade.signature,
+    walletAddress: trade.walletAddress,
+    timestamp: trade.timestamp,
+    platform: getProgramLabel(trade.programId),
+    programId: trade.programId,
+    tokenMint: trade.tokenMint,
+    tokenSymbol: trade.raw?.tokenSymbol || null,
+    side: trade.direction,
+    direction: trade.direction,
+    amount: trade.solAmount,
+    solAmount: trade.solAmount,
+    fee: trade.fee,
+    isViolation: trade.isViolation,
+    violatedRuleId: primaryViolation?.ruleId || null,
+    violatedRuleSummary: primaryViolation?.ruleSummary || null,
+    violationReason: primaryViolation?.reason || null,
+    violationCount: trade.violationIds?.length || 0
+  };
+}
+
 export async function getRecentTrades(walletAddress, limit = 20) {
-  return ChainTrade.find({ walletAddress }).sort({ timestamp: -1 }).limit(limit).lean();
+  const trades = await ChainTrade.find({ walletAddress })
+    .sort({ timestamp: -1 })
+    .limit(limit)
+    .lean();
+  return trades.map(normalizeRecentTrade);
 }

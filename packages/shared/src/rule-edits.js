@@ -10,22 +10,22 @@ export const RULE_EDIT_TIMING_OPTION_LABELS = {
 const RULE_EDIT_TIMING_QUOTE_MAP = {
   instant: {
     delayHours: 0,
-    feeAmountUsd: 24,
+    feeSol: 0.24,
     description: 'Edit goes live immediately for the highest priority fee.'
   },
   delay_1h: {
     delayHours: 1,
-    feeAmountUsd: 8,
+    feeSol: 0.08,
     description: 'Edit goes live in one hour for a smaller fee.'
   },
   delay_6h: {
     delayHours: 6,
-    feeAmountUsd: 3,
+    feeSol: 0.03,
     description: 'Edit goes live later today for a minimal fee.'
   },
   delay_24h: {
     delayHours: 24,
-    feeAmountUsd: 0,
+    feeSol: 0,
     description: 'Edit goes live after 24 hours for free.'
   }
 };
@@ -44,9 +44,8 @@ export function getRuleEditTimingQuote(timingOption = 'delay_24h', requestedAt =
     timingOption: normalizedTimingOption,
     label: RULE_EDIT_TIMING_OPTION_LABELS[normalizedTimingOption],
     delayHours: quote.delayHours,
-    feeAmountUsd: quote.feeAmountUsd,
-    feeAmountCents: quote.feeAmountUsd * 100,
-    paymentRequired: quote.feeAmountUsd > 0,
+    feeSol: quote.feeSol,
+    paymentRequired: quote.feeSol > 0,
     requestedAt: requestedAtDate.toISOString(),
     effectiveAt: effectiveAtDate.toISOString(),
     description: quote.description

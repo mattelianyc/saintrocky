@@ -15,19 +15,22 @@ export const HERO_BLACK_TRIANGLE_INITIAL_TIP_X_COVERAGE = -50;
 export const HERO_BLACK_TRIANGLE_INITIAL_TIP_Y_COVERAGE = 25;
 export const HERO_BLACK_PANEL_FINAL_SPLIT_COVERAGE = 50;
 export const HERO_DOG_IMAGE_SRC = "/images/dawgfull.png";
+export const HERO_TREE_IMAGE_SRC = "/images/flowerbg.png";
 export const HERO_INTRO_LOGO_SRC = "/images/logoAlt_shorthand.webp";
 export const HERO_INTRO_WORDMARK = "$TANDARD DEVIANT$";
 export const HERO_DOG_REVEAL_START_PROGRESS = 0.88;
 export const HERO_DOG_REVEAL_END_PROGRESS = 1;
+export const HERO_TREE_REVEAL_START_PROGRESS = 0.12;
+export const HERO_TREE_REVEAL_END_PROGRESS = 0.48;
 export const HERO_INTRO_REVEAL_START_PROGRESS = 0.62;
 export const HERO_INTRO_REVEAL_END_PROGRESS = 0.86;
 export const HERO_INTRO_LINES = [
   "I'm the patron saint of dawgs, invalids, falsely accused people, bachelors, and several other things according to Wikipedia.",
-  "Calling day traders dumb money does not quite qualify as false accusation, but most of you do seem comfortably covered by one of the other categories.",
-  "My assignment is simple: get you to honor the standards you set before the bell instead of free-styling into deviant behavior by 9:37 a.m.",
-  "No judgment. It takes one to know one. Miracles are rare. Bad entries, tragically, are not."
+  "When Wall St. refers to us as 'dumb money' it doesn't quite qualify as a false accusation, but that's neither here nor there...",
+  "I'm here to help those interested in helping themselves keep their hard-earned 'dumb money' because it's still legal tender",
+  "My assignment is simple: get you to honor the standards you set for yourself before you inevitably spiral into deviant behavior before you finish your first cup of coffee.",
 ];
-export const HERO_INTRO_SIGNOFF_LINES = ["Man's best friend,", "Rocky"];
+export const HERO_INTRO_SIGNOFF_LINES = ["- Saint Rocky"];
 export const OUTRO_SCROLL_DISTANCE_FACTOR = 0.68;
 export const MINIMUM_OUTRO_LIFT_VIEWPORT_FACTOR = 0.62;
 export const DECAY_RATE = 0.21;

@@ -62,6 +62,34 @@ export function createEscrowClient({ connection, wallet, idl }) {
     return { transaction };
   }
 
+  async function lockStake(amountLamports) {
+    const [userVault] = findUserVaultAddress(wallet.publicKey);
+
+    const transaction = await program.methods
+      .lockStake(new BN(amountLamports))
+      .accounts({
+        userVault,
+        owner: wallet.publicKey
+      })
+      .rpc();
+
+    return { transaction };
+  }
+
+  async function unlockStake(amountLamports) {
+    const [userVault] = findUserVaultAddress(wallet.publicKey);
+
+    const transaction = await program.methods
+      .unlockStake(new BN(amountLamports))
+      .accounts({
+        userVault,
+        owner: wallet.publicKey
+      })
+      .rpc();
+
+    return { transaction };
+  }
+
   async function recordPenalty(vaultOwnerPublicKey, amountLamports, violationId) {
     const [platformConfig] = findPlatformConfigAddress();
     const [userVault] = findUserVaultAddress(vaultOwnerPublicKey);
@@ -118,16 +146,21 @@ export function createEscrowClient({ connection, wallet, idl }) {
     const [userVault] = findUserVaultAddress(ownerPublicKey || wallet.publicKey);
     try {
       const account = await program.account.userVault.fetch(userVault);
+      const lockedLamports = account.lockedLamports?.toNumber?.() ?? 0;
+      const lastWithdrawalAt = account.lastWithdrawalAt?.toNumber?.() ?? 0;
       return {
         address: userVault.toBase58(),
         owner: account.owner.toBase58(),
         balanceLamports: account.balanceLamports.toNumber(),
+        lockedLamports,
+        availableLamports: account.balanceLamports.toNumber() - lockedLamports,
         totalDeposited: account.totalDeposited.toNumber(),
         totalPenalties: account.totalPenalties.toNumber(),
         totalRewards: account.totalRewards.toNumber(),
         penaltyCount: account.penaltyCount.toNumber(),
         lastDepositAt: account.lastDepositAt.toNumber(),
-        lastPenaltyAt: account.lastPenaltyAt.toNumber()
+        lastPenaltyAt: account.lastPenaltyAt.toNumber(),
+        lastWithdrawalAt
       };
     } catch {
       return null;
@@ -173,6 +206,8 @@ export function createEscrowClient({ connection, wallet, idl }) {
     initializePlatform,
     createUserVault,
     deposit,
+    lockStake,
+    unlockStake,
     recordPenalty,
     distributeRewards,
     withdraw,

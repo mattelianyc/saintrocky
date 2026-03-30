@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import { WalletLink } from '../models/wallet-link.model.js';
 import { env } from '../config/env.js';
+import { isValidSolanaPublicKey } from '../utils/solana.js';
 
 export async function listWalletLinks(userEmail) {
   const wallets = await WalletLink.find({ userEmail: String(userEmail).toLowerCase() }).lean();
@@ -13,6 +14,10 @@ export async function getWalletLinkByAddress(walletAddress) {
 }
 
 export async function linkWallet({ userId, userEmail, walletAddress, label }) {
+  if (!(await isValidSolanaPublicKey(walletAddress))) {
+    throw Object.assign(new Error('Enter a valid Solana wallet address.'), { status: 400 });
+  }
+
   const existing = await WalletLink.findOne({ walletAddress });
   if (existing) {
     throw Object.assign(new Error('This wallet is already linked to an account.'), { status: 409 });

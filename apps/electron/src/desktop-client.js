@@ -1,5 +1,10 @@
 import { createApiClient, setUnauthorizedHandler } from '@saintrocky/api-client';
-import { buildExtensionSessionsChannel, buildRuntimeChannel, createRealtimeClient } from '@saintrocky/realtime';
+import {
+  buildExtensionSessionsChannel,
+  buildRulesChannel,
+  buildRuntimeChannel,
+  createRealtimeClient
+} from '@saintrocky/realtime';
 import { ipcRenderer } from 'electron';
 
 import { createRuntimeHub } from './runtime-hub.js';
@@ -26,6 +31,7 @@ const realtimeClient = createRealtimeClient({
   }
 });
 let cleanupExtensionSessionsSubscription = null;
+let cleanupRulesSubscription = null;
 const runtimeHub = createRuntimeHub({
   listAssignments(ownerEmail) {
     return apiClient.rules.listRuntimeAssignments(
@@ -53,6 +59,15 @@ const runtimeHub = createRuntimeHub({
 
       listener(message.payload?.assignments || []);
     });
+  },
+  requestOverride(ruleId) {
+    return apiClient.rules.requestOverride(ruleId);
+  },
+  confirmOverride(ruleId, requestId) {
+    return apiClient.rules.confirmOverrideRequest(ruleId, requestId);
+  },
+  cancelOverride(ruleId, requestId) {
+    return apiClient.rules.cancelOverrideRequest(ruleId, requestId);
   }
 });
 const runtimeHubListeners = new Set();
@@ -79,6 +94,18 @@ realtimeClient.onConnectionStateChange((connection) => {
       }
 
       runtimeHub.replaceExtensionSessions(message.payload?.sessions || []);
+    }
+  );
+
+  cleanupRulesSubscription?.();
+  cleanupRulesSubscription = realtimeClient.subscribe(
+    buildRulesChannel(sessionUser.email),
+    (message) => {
+      if (message.type !== 'channel.snapshot') {
+        return;
+      }
+
+      runtimeHub.replaceRules(message.payload?.rules || []);
     }
   );
 });
@@ -136,6 +163,8 @@ function ensureRealtimeConnection() {
 function disconnectRealtimeConnection() {
   cleanupExtensionSessionsSubscription?.();
   cleanupExtensionSessionsSubscription = null;
+  cleanupRulesSubscription?.();
+  cleanupRulesSubscription = null;
   realtimeClient.disconnect();
 }
 
@@ -478,5 +507,29 @@ export async function resolveRuntimeViolation(action) {
     };
   } catch (error) {
     return buildErrorResponse(error, 'Failed to resolve violation');
+  }
+}
+
+export async function confirmRuntimeOverride() {
+  await loadPersistedAuthState();
+  try {
+    return {
+      ok: true,
+      runtimeHub: await runtimeHub.confirmPendingOverride()
+    };
+  } catch (error) {
+    return buildErrorResponse(error, 'Failed to confirm override');
+  }
+}
+
+export async function cancelRuntimeOverride() {
+  await loadPersistedAuthState();
+  try {
+    return {
+      ok: true,
+      runtimeHub: await runtimeHub.cancelPendingOverride()
+    };
+  } catch (error) {
+    return buildErrorResponse(error, 'Failed to cancel override');
   }
 }

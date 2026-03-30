@@ -42,5 +42,3 @@ export function createStyles(theme) {
     }
   });
 }
-
-

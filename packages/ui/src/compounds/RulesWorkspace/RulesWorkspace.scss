@@ -3,6 +3,15 @@
   gap: 1.5rem;
 }
 
+.c-RulesWorkspace__tabList {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+}
+
+.c-RulesWorkspace__content {
+  min-height: 200px;
+}
+
 .c-RulesWorkspace__header {
   display: grid;
   gap: 0.75rem;
@@ -242,13 +251,47 @@
 
 .c-RulesWorkspaceEditor__fieldGrid,
 .c-RulesWorkspaceDraftGrid,
-.c-RulesWorkspaceEditor__timingOptions {
+.c-RulesWorkspaceEditor__timingOptions,
+.c-RulesWorkspaceEditor__requestGrid {
   display: grid;
   gap: 1rem;
 }
 
 .c-RulesWorkspaceEditor__timingOptions {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.c-RulesWorkspaceEditor__requestGrid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.c-RulesWorkspaceEditor__requestCard {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--ui-shell-text) 10%, transparent);
+  border-radius: var(--ui-radius);
+  background: color-mix(in srgb, var(--ui-shell-accent) 4%, transparent);
+}
+
+.c-RulesWorkspaceEditor__requestCardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.c-RulesWorkspaceEditor__requestCardHeader h4,
+.c-RulesWorkspaceEditor__requestCardHeader p,
+.c-RulesWorkspaceEditor__requestCardText,
+.c-RulesWorkspaceEditor__requestCardMeta {
+  margin: 0;
+}
+
+.c-RulesWorkspaceEditor__requestCardText,
+.c-RulesWorkspaceEditor__requestCardMeta {
+  color: var(--ui-shell-text-muted);
+  line-height: 1.6;
 }
 
 .c-RulesWorkspaceEditor__empty {

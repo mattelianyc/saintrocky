@@ -5,6 +5,10 @@ import {
   RULE_ENFORCEMENT_ACTIONS,
   RULE_ENFORCEMENT_SURFACES
 } from '@saintrocky/shared';
+import {
+  PROBLEM_INDEX_MAX,
+  PROBLEM_INDEX_MIN
+} from '@saintrocky/fuckyoupayme';
 import { validateCompiledRule } from './rules-runtime.js';
 
 function buildResult(ok, errors = []) {
@@ -25,6 +29,15 @@ function isNonEmptyString(value) {
 
 function isValidConfidenceScore(value) {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;
+}
+
+function isValidProblemIndex(value) {
+  return (
+    typeof value === 'number' &&
+    Number.isFinite(value) &&
+    value >= PROBLEM_INDEX_MIN &&
+    value <= PROBLEM_INDEX_MAX
+  );
 }
 
 function validateStringArray(value, field, errors) {
@@ -79,6 +92,14 @@ export function validateRuleDraftSubmission(payload) {
 
   if (payload.authorEmail != null && !isNonEmptyString(payload.authorEmail)) {
     addError(errors, 'authorEmail', 'authorEmail must be a non-empty string');
+  }
+
+  if (payload.problemIndex != null && !isValidProblemIndex(payload.problemIndex)) {
+    addError(
+      errors,
+      'problemIndex',
+      `problemIndex must be a number between ${PROBLEM_INDEX_MIN} and ${PROBLEM_INDEX_MAX}`
+    );
   }
 
   if (payload.clarificationAnswers != null) {

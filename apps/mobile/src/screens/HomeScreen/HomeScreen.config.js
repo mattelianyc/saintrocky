@@ -1,5 +1,3 @@
 export const HomeScreenConfig = {
-  heading: 'Standard Deviants mobile'
+  heading: 'Command center'
 };
-
-

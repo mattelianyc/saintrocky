@@ -6,16 +6,16 @@
   padding: var(--ui-space-section-vertical-padding) 1.25rem;
 }
 
+.c-MarketingOverviewSection__section--leaderboard {
+  background: rgb(10 10 12);
+  color: rgb(255 255 255 / 0.96);
+}
+
 .c-MarketingOverviewSection__section--economics {
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--ui-shell-accent) 6%, white), transparent 62%),
     var(--ui-shell-background-strong);
   color: var(--ui-shell-text);
-}
-
-.c-MarketingOverviewSection__section--leaderboard {
-  background: rgb(10 10 12);
-  color: rgb(255 255 255 / 0.96);
 }
 
 .c-MarketingOverviewSection__section--ecosystem {
@@ -33,9 +33,9 @@
 }
 
 .c-MarketingOverviewSection__inner--leaderboard {
-  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
   gap: 3rem;
-  align-items: center;
+  align-items: start;
 }
 
 .c-MarketingOverviewSection__copyColumn {
@@ -63,18 +63,47 @@
   line-height: 1.7;
 }
 
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__eyebrow,
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__label,
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__rank,
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__leaderboardScore,
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__livePill {
+.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__eyebrow {
   color: var(--ui-shell-accent);
 }
 
 .c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__summary,
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__leaderboardHeader,
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__leaderboardRow {
+.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__leaderboardCopy p {
   color: rgb(255 255 255 / 0.72);
+}
+
+.c-MarketingOverviewSection__leaderboardCopy {
+  display: grid;
+  gap: 1rem;
+  align-self: start;
+  position: sticky;
+  top: 6rem;
+}
+
+.c-MarketingOverviewSection__valuePropList {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-MarketingOverviewSection__valuePropList li {
+  position: relative;
+  padding-left: 1.1rem;
+  color: rgb(255 255 255 / 0.82);
+  line-height: 1.65;
+}
+
+.c-MarketingOverviewSection__valuePropList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ui-shell-accent);
 }
 
 .c-MarketingOverviewSection__actionRow {
@@ -83,20 +112,15 @@
   gap: 0.75rem;
 }
 
+.c-MarketingOverviewSection__subheading {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2.3rem);
+}
+
 .c-MarketingOverviewSection__pillarGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2rem;
-}
-
-.c-MarketingOverviewSection__leaderboardCopy {
-  display: grid;
-  gap: 1rem;
-}
-
-.c-MarketingOverviewSection__subheading {
-  margin: 0;
-  font-size: clamp(1.4rem, 3vw, 2.3rem);
 }
 
 .c-MarketingOverviewSection__pillar {
@@ -121,96 +145,21 @@
   line-height: 1.65;
 }
 
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__cardStack p,
-.c-MarketingOverviewSection__section--leaderboard .c-MarketingOverviewSection__leaderboardCopy p {
-  color: rgb(255 255 255 / 0.72);
-}
-
-.c-MarketingOverviewSection__label,
-.c-MarketingOverviewSection__leaderboardHeader,
-.c-MarketingOverviewSection__rank {
+.c-MarketingOverviewSection__label {
   color: var(--ui-shell-accent);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.78rem;
 }
 
-.c-MarketingOverviewSection__leaderboardCard {
-  display: grid;
-  gap: 1.1rem;
-}
-
-.c-MarketingOverviewSection__leaderboardHeader,
-.c-MarketingOverviewSection__leaderboardRow {
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1.4fr) minmax(88px, 0.7fr) minmax(110px, 0.9fr) 56px;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.c-MarketingOverviewSection__leaderboardHeader {
-  padding-bottom: 0.5rem;
-}
-
-.c-MarketingOverviewSection__livePill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 1.35rem;
-  padding: 0 0.4rem;
-  border-radius: var(--ui-radius);
-  background: color-mix(in srgb, var(--ui-shell-accent) 18%, transparent);
-  color: var(--ui-shell-accent);
-}
-
-.c-MarketingOverviewSection__leaderboardRows {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.c-MarketingOverviewSection__leaderboardRow {
-  padding: 1.1rem 0;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--ui-shell-accent) 4%, transparent), transparent 42%),
-    transparent;
-  color: var(--ui-shell-text-muted);
-  transition: transform 180ms ease, background 180ms ease, color 180ms ease;
-}
-
-.c-MarketingOverviewSection__leaderboardRow.is-hot {
-  transform: translateX(4px);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--ui-shell-accent) 14%, transparent), transparent 42%),
-    transparent;
-}
-
-.c-MarketingOverviewSection__leaderboardRow.is-watch {
-  opacity: 0.82;
-}
-
-.c-MarketingOverviewSection__leaderboardIdentity {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-  color: var(--ui-shell-text);
-}
-
-.c-MarketingOverviewSection__rank {
-  flex: 0 0 auto;
-}
-
-.c-MarketingOverviewSection__leaderboardScore {
-  justify-self: end;
-  font-variant-numeric: tabular-nums;
-  color: var(--ui-shell-accent);
-}
-
 @media (max-width: 900px) {
   .c-MarketingOverviewSection__inner--leaderboard,
-  .c-MarketingOverviewSection__pillarGrid,
-  .c-MarketingOverviewSection__leaderboardSection {
+  .c-MarketingOverviewSection__pillarGrid {
     grid-template-columns: 1fr;
+  }
+
+  .c-MarketingOverviewSection__leaderboardCopy {
+    position: static;
   }
 }
 
@@ -218,17 +167,5 @@
   .c-MarketingOverviewSection__section {
     padding-inline: 1rem;
     padding-block: clamp(5rem, 12vw, var(--ui-space-section-vertical-padding));
-  }
-
-  .c-MarketingOverviewSection__leaderboardHeader,
-  .c-MarketingOverviewSection__leaderboardRow {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .c-MarketingOverviewSection__leaderboardHeader > :nth-child(4),
-  .c-MarketingOverviewSection__leaderboardHeader > :nth-child(5),
-  .c-MarketingOverviewSection__leaderboardRow > :nth-child(4),
-  .c-MarketingOverviewSection__leaderboardRow > :nth-child(5) {
-    justify-self: start;
   }
 }

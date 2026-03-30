@@ -5,7 +5,16 @@ import { RuleDraft } from '@saintrocky/api/models/rule-draft';
 import { RuleRuntimeEvent } from '@saintrocky/api/models/rule-runtime-event';
 import { UserRule } from '@saintrocky/api/models/user-rule';
 import { User } from '@saintrocky/api/models/user';
-import { MEMBER_ROLE, buildCompiledRuleFromTemplate, foundationalRuleTemplates, getRuleEditTimingQuote } from '@saintrocky/shared';
+import {
+  MEMBER_ROLE,
+  buildCompiledRuleFromTemplate,
+  foundationalRuleTemplates,
+  getRuleEditTimingQuote
+} from '@saintrocky/shared';
+import {
+  calculateLockedStake,
+  clampProblemIndex
+} from '@saintrocky/fuckyoupayme';
 import { loadSeedEnvironment, requireMongoUri, runSeedScript } from './seed-support.mjs';
 
 const timezones = ['America/New_York', 'America/Chicago', 'America/Los_Angeles', 'Europe/London'];
@@ -22,6 +31,18 @@ const walletAppSets = [
   'Phantom, Backpack',
   'Solflare, Backpack'
 ];
+
+const templateProblemIndexMap = {
+  'max-trades-per-day': 62,
+  'max-position-size': 74,
+  'no-trading-during-hours': 56,
+  'no-fomo-buys': 81,
+  'cooldown-after-loss': 69,
+  'max-daily-loss': 77,
+  'manual-trading-lock': 88,
+  'block-domains-on-schedule': 41,
+  'block-apps-on-schedule': 36
+};
 
 function getTemplate(templateId) {
   return foundationalRuleTemplates.find((template) => template.templateId === templateId);
@@ -85,10 +106,20 @@ function inferSurfaces(compiledRule) {
   return surfaces;
 }
 
+function resolveProblemIndex(template, index, status) {
+  const baseline = templateProblemIndexMap[template.key] ?? 50;
+  const variance = ((index * 17) % 19) - 9;
+  const statusOffset =
+    status === 'archived' ? -10 : status === 'paused' ? -5 : 0;
+  return clampProblemIndex(baseline + variance + statusOffset);
+}
+
 function buildUserRule({ member, template, index, status }) {
   const timestamp = new Date(Date.now() - index * 60_000).toISOString();
   const config = buildTemplateConfig(template, member, index);
   const compiledRule = buildCompiledRuleFromTemplate(template, config);
+  const problemIndex = resolveProblemIndex(template, index, status);
+  const lockedStakeLamports = calculateLockedStake(problemIndex);
 
   return {
     ruleId: randomUUID(),
@@ -103,6 +134,8 @@ function buildUserRule({ member, template, index, status }) {
     status,
     title: template.title,
     summary: compiledRule.summary,
+    problemIndex,
+    lockedStakeLamports,
     config,
     compiledRule,
     bypassPolicy: compiledRule.bypass,
@@ -120,6 +153,8 @@ function buildDraft({ member, template, index, status }) {
   const timestamp = new Date(Date.now() - index * 45_000).toISOString();
   const config = buildTemplateConfig(template, member, index);
   const compiledRule = status === 'ready_for_activation' ? buildCompiledRuleFromTemplate(template, config) : null;
+  const problemIndex = resolveProblemIndex(template, index, status === 'ready_for_activation' ? 'active' : 'paused');
+  const lockedStakeLamports = calculateLockedStake(problemIndex);
 
   return {
     id: randomUUID(),
@@ -134,7 +169,7 @@ function buildDraft({ member, template, index, status }) {
     ],
     naturalLanguageDraft:
       status === 'ready_for_activation'
-        ? `${template.title} for ${member.name} with escrow deduction bypass.`
+        ? `${template.title} for ${member.name} using the sleep-on-it override model.`
         : `Create a stricter version of "${template.title}" for ${member.name}.`,
     clarificationAnswers: [],
     clarificationQuestions:
@@ -142,10 +177,12 @@ function buildDraft({ member, template, index, status }) {
         ? []
         : [{ id: `question-${index}`, question: 'Which exact tokens or domains should this rule cover?' }],
     compiledRule,
-    enforcementSurfaces: compiledRule ? inferSurfaces(compiledRule) : [],
+    enforcementSurface: compiledRule ? inferSurfaces(compiledRule)[0] || null : null,
     enforcementAction: compiledRule?.enforcement?.action || null,
     bypassAllowed: compiledRule?.bypass?.allowed ?? false,
     bypassFeeModel: compiledRule?.bypass?.feeModel || 'none',
+    problemIndex,
+    lockedStakeLamports,
     confidenceScore: status === 'ready_for_activation' ? 1 : 0.62,
     validationNotes:
       status === 'ready_for_activation' ? [] : ['Need a more explicit target list before activation.'],
@@ -223,15 +260,18 @@ export async function seedRules() {
       const scheduledQuote = getRuleEditTimingQuote('delay_24h', new Date(Date.now() - 2 * 60 * 60 * 1000));
       const scheduledConfig = buildTemplateConfig(maxTradesTemplate, member, index + 900);
       const scheduledCompiledRule = buildCompiledRuleFromTemplate(maxTradesTemplate, scheduledConfig);
+      const scheduledProblemIndex = resolveProblemIndex(maxTradesTemplate, index + 900, 'active');
       seededRules[0].pendingEdit = {
         timingOption: scheduledQuote.timingOption,
-        feeAmountUsd: scheduledQuote.feeAmountUsd,
+        feeSol: scheduledQuote.feeSol,
         paymentRequired: scheduledQuote.paymentRequired,
         requestedAt: scheduledQuote.requestedAt,
         effectiveAt: scheduledQuote.effectiveAt,
         requestedByEmail: member.email,
         title: maxTradesTemplate.title,
         summary: scheduledCompiledRule.summary,
+        problemIndex: scheduledProblemIndex,
+        lockedStakeLamports: calculateLockedStake(scheduledProblemIndex),
         config: scheduledConfig,
         compiledRule: scheduledCompiledRule
       };

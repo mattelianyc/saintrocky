@@ -29,10 +29,12 @@ pub struct UserVault {
     pub last_deposit_at: i64,
     pub last_penalty_at: i64,
     pub bump: u8,
+    pub locked_lamports: u64,
+    pub last_withdrawal_at: i64,
 }
 
 impl UserVault {
-    pub const LEN: usize = 8 + 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 1;
+    pub const LEN: usize = 8 + 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 1;
     pub const SEED: &'static [u8] = b"user_vault";
 }
 

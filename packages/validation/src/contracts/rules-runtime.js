@@ -8,6 +8,10 @@ import {
   RULE_USER_RULE_STATUSES,
   getRuleTemplateById
 } from '@saintrocky/shared';
+import {
+  PROBLEM_INDEX_MAX,
+  PROBLEM_INDEX_MIN
+} from '@saintrocky/fuckyoupayme';
 
 function buildResult(ok, errors = []) {
   return { ok, errors };
@@ -23,6 +27,15 @@ function isPlainObject(value) {
 
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isValidProblemIndex(value) {
+  return (
+    typeof value === 'number' &&
+    Number.isFinite(value) &&
+    value >= PROBLEM_INDEX_MIN &&
+    value <= PROBLEM_INDEX_MAX
+  );
 }
 
 function validateTargets(targets, errors) {
@@ -155,6 +168,14 @@ export function validateTemplateRuleCreation(payload) {
     addError(errors, 'config', 'config must be an object');
   }
 
+  if (payload.problemIndex != null && !isValidProblemIndex(payload.problemIndex)) {
+    addError(
+      errors,
+      'problemIndex',
+      `problemIndex must be a number between ${PROBLEM_INDEX_MIN} and ${PROBLEM_INDEX_MAX}`
+    );
+  }
+
   return buildResult(errors.length === 0, errors);
 }
 
@@ -193,6 +214,14 @@ export function validateUserRuleEdit(payload) {
 
   if (!RULE_EDIT_TIMING_OPTIONS.includes(payload.editTimingOption)) {
     addError(errors, 'editTimingOption', `editTimingOption must be one of: ${RULE_EDIT_TIMING_OPTIONS.join(', ')}`);
+  }
+
+  if (payload.problemIndex != null && !isValidProblemIndex(payload.problemIndex)) {
+    addError(
+      errors,
+      'problemIndex',
+      `problemIndex must be a number between ${PROBLEM_INDEX_MIN} and ${PROBLEM_INDEX_MAX}`
+    );
   }
 
   return buildResult(errors.length === 0, errors);

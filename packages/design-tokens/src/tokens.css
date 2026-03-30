@@ -33,6 +33,8 @@
   --ui-shell-accent-strong: #e8b8c8;
   --ui-shell-shadow: 0 24px 60px rgba(13, 18, 17, 0.08);
   --ui-shell-glow: rgba(232, 184, 200, 0.18);
+  --ui-gradient-problem-start: #6ddfb8;
+  --ui-gradient-problem-end: #e8b8c8;
   --ui-desktop-background-start: #ffffff;
   --ui-desktop-background-end: #eef9f3;
   --ui-desktop-surface: rgba(255, 255, 255, 0.86);
@@ -96,6 +98,8 @@
   --ui-shell-accent-strong: #e3a7bc;
   --ui-shell-shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
   --ui-shell-glow: rgba(227, 167, 188, 0.14);
+  --ui-gradient-problem-start: #6ddfb8;
+  --ui-gradient-problem-end: #e3a7bc;
   --ui-desktop-background-start: #050807;
   --ui-desktop-background-end: #0d1512;
   --ui-desktop-surface: rgba(255, 255, 255, 0.04);

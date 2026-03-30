@@ -16,7 +16,9 @@ export function DesktopRuntimeShell({
   onPreferenceToggle,
   onRuntimeRefresh,
   onSidebarNavigate,
-  onViolationAction
+  onViolationAction,
+  onConfirmOverride,
+  onCancelOverride
 }) {
   return (
     <div className="desktop-App">
@@ -43,6 +45,8 @@ export function DesktopRuntimeShell({
             onPreferenceToggle={onPreferenceToggle}
             onRuntimeRefresh={onRuntimeRefresh}
             onViolationAction={onViolationAction}
+            onConfirmOverride={onConfirmOverride}
+            onCancelOverride={onCancelOverride}
           />
         </>
       </PageLayout>

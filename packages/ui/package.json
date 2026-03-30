@@ -11,7 +11,8 @@
     "./base.scss": "./src/base.scss",
     "./primitives.scss": "./src/primitives.scss",
     "./compounds.scss": "./src/compounds.scss",
-    "./layout.scss": "./src/layout.scss"
+    "./layout.scss": "./src/layout.scss",
+    "./widgets.scss": "./src/widgets.scss"
   },
   "scripts": {
     "lint": "eslint .",
@@ -36,6 +37,7 @@
     "@saintrocky/branding": "0.1.0",
     "@saintrocky/chatbot": "0.1.0",
     "@saintrocky/design-tokens": "0.1.0",
+    "@saintrocky/fuckyoupayme": "0.1.0",
     "@saintrocky/realtime": "0.1.0",
     "@saintrocky/storage": "0.1.0",
     "@saintrocky/shared": "0.1.0",

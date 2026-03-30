@@ -31,7 +31,12 @@ export const RULE_ENFORCEMENT_SURFACE_LABELS = {
 };
 
 export const RULE_ENFORCEMENT_ACTIONS = ['block', 'warn', 'log_only', 'step_up'];
-export const RULE_BYPASS_FEE_MODELS = ['none', 'dynamic_override_fee', 'escrow_deduction'];
+export const RULE_BYPASS_FEE_MODELS = [
+  'none',
+  'dynamic_override_fee',
+  'escrow_deduction',
+  'sleep_on_it'
+];
 export const RULE_CONFIDENCE_THRESHOLD = 1;
 
 export function isKnownRuleDraftStatus(status) {

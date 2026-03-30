@@ -58,3 +58,21 @@
   color: var(--ui-shell-text-muted, var(--ui-muted));
   line-height: 1.7;
 }
+
+.c-DashboardOverviewPage {
+  display: grid;
+  gap: 2rem;
+}
+
+.c-DashboardOverviewPage__widgets {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .c-DashboardOverviewPage__widgets {
+    grid-template-columns: 1fr;
+  }
+}

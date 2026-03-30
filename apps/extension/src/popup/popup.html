@@ -41,9 +41,19 @@
         <div id="violation-card" class="violation hidden">
           <strong id="violation-title"></strong>
           <p id="violation-summary"></p>
-          <div class="actions">
+          <div id="violation-actions-default" class="actions">
             <button id="comply-button" class="button button-secondary" type="button">Stay blocked</button>
-            <button id="bypass-button" class="button" type="button">Pay to bypass</button>
+            <button id="bypass-button" class="button" type="button">Start override</button>
+          </div>
+          <div id="violation-override" class="override-state hidden">
+            <div class="override-fee-row">
+              <span id="override-fee-label" class="override-fee-amount"></span>
+              <span id="override-countdown-label" class="override-countdown"></span>
+            </div>
+            <div class="actions">
+              <button id="confirm-override-button" class="button" type="button">Confirm override</button>
+              <button id="cancel-override-button" class="button button-secondary" type="button">Cancel</button>
+            </div>
           </div>
         </div>
       </section>

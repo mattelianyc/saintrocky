@@ -1,10 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { RootNavigator } from '@/navigation/RootNavigator.jsx';
 import { bootstrapEnv } from '@/bootstrap/env.js';
 import { analytics } from '@/analytics/client.js';
 import { notifications } from '@/notifications/client.js';
+import {
+  registerForPushNotifications,
+  addNotificationResponseListener,
+  parseNotificationNavigation
+} from '@/notifications/push.js';
+import { connectRealtime, disconnectRealtime } from '@/realtime/client.js';
 import { api, setUnauthorizedHandler } from '@saintrocky/api-client';
 import { AnalyticsEvents, trackEvent } from '@saintrocky/analytics';
 import { saintRockyBranding } from '@saintrocky/branding';
@@ -13,15 +19,18 @@ import { createNavigationTheme, ThemeProvider, useTheme } from '@saintrocky/ui-n
 
 function AppShell() {
   const { theme } = useTheme();
+  const navigationRef = useRef(null);
   bootstrapEnv();
-  // Mobile doesn’t have i18n wired yet; use shared validation translations for now.
   initValidation({ t: createValidationT('en') });
 
   const [status, setStatus] = useState('loading');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    setUnauthorizedHandler(() => setUser(null));
+    setUnauthorizedHandler(() => {
+      setUser(null);
+      disconnectRealtime();
+    });
   }, []);
 
   useEffect(() => {
@@ -40,6 +49,27 @@ function AppShell() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    connectRealtime();
+    registerForPushNotifications().catch(() => {});
+
+    return () => {
+      disconnectRealtime();
+    };
+  }, [user]);
+
+  useEffect(() => {
+    const subscription = addNotificationResponseListener((response) => {
+      const nav = parseNotificationNavigation(response.notification);
+      if (nav && navigationRef.current) {
+        navigationRef.current.navigate(nav.screen, nav.params);
+      }
+    });
+    return () => subscription?.remove();
   }, []);
 
   const auth = useMemo(() => {
@@ -68,6 +98,7 @@ function AppShell() {
             message: error?.message || 'Unable to log out right now.'
           });
         } finally {
+          disconnectRealtime();
           setUser(null);
         }
       }
@@ -77,8 +108,8 @@ function AppShell() {
   const navigationTheme = useMemo(() => createNavigationTheme(theme), [theme]);
 
   return (
-    <NavigationContainer theme={navigationTheme}>
-      <RootNavigator auth={auth} />
+    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+      <RootNavigator auth={auth} navigationRef={navigationRef} />
     </NavigationContainer>
   );
 }
@@ -90,5 +121,3 @@ export default function App() {
     </ThemeProvider>
   );
 }
-
-

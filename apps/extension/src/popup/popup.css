@@ -106,3 +106,31 @@ h1,
 .hidden {
   display: none;
 }
+
+.override-state {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.override-fee-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  background: rgba(0, 208, 132, 0.08);
+  border-radius: 4px;
+}
+
+.override-fee-amount {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #00a66d;
+  font-variant-numeric: tabular-nums;
+}
+
+.override-countdown {
+  font-size: 0.75rem;
+  color: rgba(17, 17, 17, 0.55);
+  font-variant-numeric: tabular-nums;
+}

@@ -12,10 +12,11 @@ function buildInitialState() {
     ownerEmail: '',
     monitorStatus: 'idle',
     isArmed: false,
-    overrideUntil: null,
     assignments: [],
+    rules: [],
     recentEvents: [],
     pendingViolation: null,
+    pendingOverrideRequest: null,
     extensionSessions: [],
     lastAssignmentSyncAt: null,
     lastProcessScanAt: null,
@@ -48,7 +49,7 @@ function buildMonitorStatus(state) {
   if (!state.ownerEmail) return 'disconnected';
   if (state.enforcementGap) return 'enforcementGap';
   if (state.pendingViolation) return 'awaitingBypassDecision';
-  if (state.overrideUntil && new Date(state.overrideUntil).getTime() > Date.now()) return 'overrideActive';
+  if (state.pendingOverrideRequest) return 'overrideCountdown';
   if (!state.isArmed) return 'idle';
   return state.assignments.length ? 'armed' : 'idle';
 }
@@ -69,7 +70,14 @@ function buildViolationRecord(assignment, matches) {
   };
 }
 
-export function createRuntimeHub({ listAssignments, reportRuntimeEvent, subscribeToAssignments }) {
+export function createRuntimeHub({
+  listAssignments,
+  reportRuntimeEvent,
+  subscribeToAssignments,
+  requestOverride,
+  confirmOverride,
+  cancelOverride
+}) {
   const state = buildInitialState();
   let processScanTimer = null;
   let unsubscribeAssignments = null;
@@ -122,6 +130,20 @@ export function createRuntimeHub({ listAssignments, reportRuntimeEvent, subscrib
     return buildSnapshot(state);
   }
 
+  function replaceRules(rules = []) {
+    state.rules = Array.isArray(rules) ? rules : [];
+    syncPendingOverrideFromRules();
+    emitState();
+    return buildSnapshot(state);
+  }
+
+  function syncPendingOverrideFromRules() {
+    if (!state.pendingViolation) return;
+    const rule = state.rules.find((r) => r.ruleId === state.pendingViolation.ruleId);
+    if (!rule?.pendingRuleChangeRequests) return;
+    state.pendingOverrideRequest = rule.pendingRuleChangeRequests.override || null;
+  }
+
   function detectBrowserEvasion() {
     const hasDomainRules = state.isArmed && state.assignments.some(
       (assignment) => (assignment.compiledRule?.targets || []).some((target) => target.type === 'domain')
@@ -154,11 +176,6 @@ export function createRuntimeHub({ listAssignments, reportRuntimeEvent, subscrib
 
   async function evaluateViolations() {
     if (!state.ownerEmail || !state.isArmed || state.pendingViolation) {
-      emitState();
-      return buildSnapshot(state);
-    }
-
-    if (state.overrideUntil && new Date(state.overrideUntil).getTime() > Date.now()) {
       emitState();
       return buildSnapshot(state);
     }
@@ -205,6 +222,7 @@ export function createRuntimeHub({ listAssignments, reportRuntimeEvent, subscrib
     ];
 
     state.pendingViolation = buildViolationRecord(violationAssignment, matchedTargets);
+    syncPendingOverrideFromRules();
     await addEvent('rule_triggered', violationAssignment, { matchedTargets });
     await addEvent('bypass_offered', violationAssignment, { matchedTargets });
     emitState();
@@ -252,11 +270,12 @@ export function createRuntimeHub({ listAssignments, reportRuntimeEvent, subscrib
     },
     replaceAssignments,
     replaceExtensionSessions,
+    replaceRules,
     async setArmed(isArmed) {
       state.isArmed = Boolean(isArmed);
       if (!state.isArmed) {
         state.pendingViolation = null;
-        state.overrideUntil = null;
+        state.pendingOverrideRequest = null;
         state.enforcementGap = null;
       }
       emitState();
@@ -276,6 +295,7 @@ export function createRuntimeHub({ listAssignments, reportRuntimeEvent, subscrib
       started = false;
       state.isArmed = false;
       state.pendingViolation = null;
+      state.pendingOverrideRequest = null;
       state.enforcementGap = null;
       emitState();
       return buildSnapshot(state);
@@ -285,18 +305,60 @@ export function createRuntimeHub({ listAssignments, reportRuntimeEvent, subscrib
       const assignment = state.assignments.find((item) => item.ruleId === state.pendingViolation.ruleId);
       if (!assignment) {
         state.pendingViolation = null;
+        state.pendingOverrideRequest = null;
         emitState();
         return buildSnapshot(state);
       }
 
       if (action === 'pay_to_bypass') {
-        state.overrideUntil = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+        if (typeof requestOverride === 'function') {
+          try {
+            const result = await requestOverride(state.pendingViolation.ruleId);
+            if (result?.request) {
+              state.pendingOverrideRequest = result.request;
+              emitState();
+              return buildSnapshot(state);
+            }
+          } catch {}
+        }
         await addEvent('bypass_accepted', assignment, { matchedTargets: state.pendingViolation.matchedTargets });
       } else {
         await addEvent('rule_blocked', assignment, { matchedTargets: state.pendingViolation.matchedTargets });
       }
 
       state.pendingViolation = null;
+      state.pendingOverrideRequest = null;
+      emitState();
+      return buildSnapshot(state);
+    },
+    async confirmPendingOverride() {
+      if (!state.pendingViolation || !state.pendingOverrideRequest) return buildSnapshot(state);
+      const ruleId = state.pendingViolation.ruleId;
+      const requestId = state.pendingOverrideRequest.requestId;
+
+      if (typeof confirmOverride === 'function') {
+        try {
+          await confirmOverride(ruleId, requestId);
+        } catch {}
+      }
+
+      state.pendingViolation = null;
+      state.pendingOverrideRequest = null;
+      emitState();
+      return buildSnapshot(state);
+    },
+    async cancelPendingOverride() {
+      if (!state.pendingViolation || !state.pendingOverrideRequest) return buildSnapshot(state);
+      const ruleId = state.pendingViolation.ruleId;
+      const requestId = state.pendingOverrideRequest.requestId;
+
+      if (typeof cancelOverride === 'function') {
+        try {
+          await cancelOverride(ruleId, requestId);
+        } catch {}
+      }
+
+      state.pendingOverrideRequest = null;
       emitState();
       return buildSnapshot(state);
     }

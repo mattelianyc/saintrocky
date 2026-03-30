@@ -38,4 +38,13 @@ manifest.content_scripts = (manifest.content_scripts || []).map((contentScript) 
   js: ["assets/content.js"]
 }));
 
+if (manifest.web_accessible_resources) {
+  manifest.web_accessible_resources = manifest.web_accessible_resources.map((entry) => ({
+    ...entry,
+    resources: (entry.resources || []).map((resource) =>
+      resource.startsWith("assets/") ? resource : resource
+    )
+  }));
+}
+
 await fs.writeFile(path.resolve(distDirectory, "manifest.json"), JSON.stringify(manifest, null, 2));

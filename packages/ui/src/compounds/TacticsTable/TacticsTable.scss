@@ -1,0 +1,510 @@
+.c-TacticsTable {
+  display: grid;
+  gap: var(--ui-space-medium);
+}
+
+.c-TacticsTable__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-small);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.c-TacticsTable__filterInput {
+  max-width: 280px;
+}
+
+.c-TacticsTable__count {
+  color: var(--ui-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.c-TacticsTable__tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+}
+
+.c-TacticsTable__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.c-TacticsTable__table th,
+.c-TacticsTable__table td {
+  text-align: left;
+  padding: var(--ui-space-small) var(--ui-space-medium);
+  border-bottom: 1px solid var(--ui-border);
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.c-TacticsTable__table thead th {
+  background: color-mix(in srgb, var(--ui-fg) 3%, var(--ui-bg));
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ui-muted);
+}
+
+.c-TacticsTable__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.c-TacticsTable__headerButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-xsmall);
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: default;
+}
+
+.c-TacticsTable__headerButton.is-sortable {
+  cursor: pointer;
+}
+
+.c-TacticsTable__sort {
+  color: var(--ui-primary);
+  font-size: 12px;
+}
+
+.c-TacticsTable__empty {
+  text-align: center;
+  color: var(--ui-muted);
+  padding: var(--ui-space-large);
+}
+
+.c-TacticsTable__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-small);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.c-TacticsTable__summary {
+  color: var(--ui-muted);
+  font-size: 13px;
+}
+
+.c-TacticsTable__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-small);
+  align-items: center;
+}
+
+.c-TacticsTable__pageSize {
+  padding: var(--ui-space-xsmall) var(--ui-space-small);
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-border);
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  font: inherit;
+  font-size: 13px;
+}
+
+.c-TacticsTable__statusBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--ui-muted) 16%, transparent);
+  color: var(--ui-muted);
+}
+
+.c-TacticsTable__statusBadge--active {
+  background: color-mix(in srgb, var(--ui-shell-accent) 14%, transparent);
+  color: var(--ui-shell-accent);
+}
+
+.c-TacticsTable__statusBadge--paused {
+  background: color-mix(in srgb, var(--ui-muted) 16%, transparent);
+  color: var(--ui-muted);
+}
+
+.c-TacticsTable__statusBadge--archived {
+  background: color-mix(in srgb, var(--ui-muted) 10%, transparent);
+  color: var(--ui-muted);
+}
+
+.c-TacticsTable__statusBadge--ready {
+  background: color-mix(in srgb, var(--ui-primary) 14%, transparent);
+  color: var(--ui-primary);
+}
+
+.c-TacticsTable__actions {
+  display: flex;
+  gap: var(--ui-space-xsmall);
+  align-items: center;
+}
+
+.c-TacticsTable__eyebrow {
+  margin: 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ui-shell-accent);
+  font-weight: 400;
+}
+
+.c-TacticsTable__titleCell {
+  display: grid;
+  gap: 2px;
+}
+
+.c-TacticsTable__titleCell strong {
+  font-weight: 600;
+}
+
+.c-TacticsTableDialog__popup {
+  width: min(80vw, calc(100vw - 32px));
+}
+
+.c-TacticsTableDialog {
+  display: grid;
+  gap: var(--ui-space-medium);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.c-TacticsTableDialog__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--ui-space-medium);
+}
+
+.c-TacticsTableDialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ui-space-xsmall);
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  background: transparent;
+  color: var(--ui-muted);
+  cursor: pointer;
+}
+
+.c-TacticsTableDialog__close:hover {
+  background: color-mix(in srgb, var(--ui-fg) 8%, transparent);
+}
+
+.c-RuleWizard {
+  display: grid;
+  gap: var(--ui-space-medium);
+}
+
+.c-RuleWizard__nav {
+  display: flex;
+  gap: 2px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  overflow: hidden;
+}
+
+.c-RuleWizard__navItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-xsmall);
+  padding: var(--ui-space-small) var(--ui-space-medium);
+  border: 0;
+  background: transparent;
+  color: var(--ui-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.c-RuleWizard__navItem:not(:last-child) {
+  border-right: 1px solid var(--ui-border);
+}
+
+.c-RuleWizard__navItem:hover {
+  background: color-mix(in srgb, var(--ui-fg) 4%, transparent);
+}
+
+.c-RuleWizard__navItem.is-active {
+  background: color-mix(in srgb, var(--ui-shell-accent) 10%, transparent);
+  color: var(--ui-shell-accent);
+  font-weight: 600;
+}
+
+.c-RuleWizard__navItem.is-completed {
+  color: var(--ui-fg);
+}
+
+.c-RuleWizard__navNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--ui-fg) 8%, transparent);
+  color: var(--ui-muted);
+  flex-shrink: 0;
+}
+
+.c-RuleWizard__navItem.is-active .c-RuleWizard__navNumber {
+  background: var(--ui-shell-accent);
+  color: var(--ui-bg);
+}
+
+.c-RuleWizard__navItem.is-completed .c-RuleWizard__navNumber {
+  background: color-mix(in srgb, var(--ui-shell-accent) 30%, transparent);
+  color: var(--ui-shell-accent);
+}
+
+.c-RuleWizard__stepContent {
+  display: grid;
+  gap: var(--ui-space-medium);
+}
+
+.c-RuleWizard__overviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--ui-space-medium);
+}
+
+.c-RuleWizard__title {
+  margin: var(--ui-space-xxsmall) 0 0;
+  font-size: 1.25rem;
+}
+
+.c-RuleWizard__summary {
+  margin: var(--ui-space-xxsmall) 0 0;
+  color: var(--ui-muted);
+  line-height: 1.6;
+}
+
+.c-RuleWizard__metaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--ui-space-medium);
+}
+
+.c-RuleWizard__metaItem {
+  display: grid;
+  gap: 4px;
+}
+
+.c-RuleWizard__metaItem span {
+  color: var(--ui-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.c-RuleWizard__metaItem strong {
+  font-size: 15px;
+}
+
+.c-RuleWizard__pendingBanner {
+  display: grid;
+  gap: var(--ui-space-xsmall);
+  padding: var(--ui-space-medium);
+  border: 1px solid color-mix(in srgb, var(--ui-shell-accent) 20%, transparent);
+  border-radius: var(--ui-radius);
+  background: color-mix(in srgb, var(--ui-shell-accent) 4%, transparent);
+}
+
+.c-RuleWizard__pendingBanner strong {
+  margin: 0;
+}
+
+.c-RuleWizard__pendingBanner p {
+  margin: 0;
+  color: var(--ui-muted);
+  line-height: 1.5;
+}
+
+.c-RuleWizard__pendingBanner span {
+  color: var(--ui-muted);
+  font-size: 13px;
+}
+
+.c-RuleWizard__fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--ui-space-medium);
+}
+
+.c-RuleWizard__field {
+  display: grid;
+  gap: var(--ui-space-xsmall);
+}
+
+.c-RuleWizard__field span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ui-muted);
+}
+
+.c-RuleWizard__input {
+  width: 100%;
+  padding: var(--ui-space-small) var(--ui-space-medium);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  font: inherit;
+  font-size: 14px;
+}
+
+.c-RuleWizard__input:focus {
+  outline: none;
+  border-color: var(--ui-shell-accent);
+  box-shadow: var(--ui-ring);
+}
+
+.c-RuleWizard__stepHeading {
+  margin: var(--ui-space-xxsmall) 0 0;
+}
+
+.c-RuleWizard__timingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--ui-space-small);
+}
+
+.c-RuleWizard__timingCard {
+  display: grid;
+  gap: var(--ui-space-xsmall);
+  padding: var(--ui-space-medium);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.c-RuleWizard__timingCard:hover {
+  background: color-mix(in srgb, var(--ui-fg) 3%, transparent);
+}
+
+.c-RuleWizard__timingCard.is-selected {
+  border-color: var(--ui-shell-accent);
+  background: color-mix(in srgb, var(--ui-shell-accent) 6%, transparent);
+}
+
+.c-RuleWizard__timingCard strong {
+  font-size: 15px;
+}
+
+.c-RuleWizard__timingCard span {
+  color: var(--ui-muted);
+  font-size: 13px;
+}
+
+.c-RuleWizard__timingDesc {
+  line-height: 1.5;
+}
+
+.c-RuleWizard__quoteBar {
+  display: grid;
+  gap: var(--ui-space-xsmall);
+  padding: var(--ui-space-medium);
+  border-radius: var(--ui-radius);
+  background: color-mix(in srgb, var(--ui-fg) 3%, transparent);
+}
+
+.c-RuleWizard__quoteBar span {
+  color: var(--ui-muted);
+  font-size: 13px;
+}
+
+.c-RuleWizard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-small);
+}
+
+.c-RuleWizard__deactivationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--ui-space-medium);
+}
+
+.c-RuleWizard__emptyStep {
+  display: grid;
+  gap: var(--ui-space-xsmall);
+  padding: var(--ui-space-large) 0;
+  text-align: center;
+}
+
+.c-RuleWizard__emptyStep h4 {
+  margin: 0;
+}
+
+.c-RuleWizard__emptyStep p {
+  margin: 0;
+  color: var(--ui-muted);
+  line-height: 1.6;
+}
+
+.c-RuleWizard__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ui-space-small);
+  padding-top: var(--ui-space-small);
+  border-top: 1px solid var(--ui-border);
+}
+
+@media (max-width: 720px) {
+  .c-TacticsTable__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .c-TacticsTable__filterInput {
+    max-width: none;
+  }
+
+  .c-RuleWizard__nav {
+    flex-direction: column;
+  }
+
+  .c-RuleWizard__navItem:not(:last-child) {
+    border-right: 0;
+    border-bottom: 1px solid var(--ui-border);
+  }
+
+  .c-RuleWizard__navLabel {
+    display: none;
+  }
+
+  .c-RuleWizard__metaGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .c-RuleWizard__timingGrid {
+    grid-template-columns: 1fr;
+  }
+}

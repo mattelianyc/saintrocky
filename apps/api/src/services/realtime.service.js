@@ -81,7 +81,15 @@ function unregisterSocketForUser(socket) {
 
 function canAccessChannel(socket, channel) {
   const parsedChannel = parseRealtimeChannel(channel);
-  if (!parsedChannel || !socket.sessionUser?.email) {
+  if (!parsedChannel) {
+    return false;
+  }
+
+  if (parsedChannel.type === "leaderboard") {
+    return true;
+  }
+
+  if (!socket.sessionUser?.email) {
     return false;
   }
 

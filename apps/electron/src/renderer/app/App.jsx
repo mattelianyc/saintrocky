@@ -53,6 +53,8 @@ export function App() {
       onRuntimeRefresh={actions.handleRuntimeRefresh}
       onSidebarNavigate={actions.handleSidebarNavigate}
       onViolationAction={actions.handleViolationAction}
+      onConfirmOverride={actions.handleConfirmOverride}
+      onCancelOverride={actions.handleCancelOverride}
     />
   );
 }

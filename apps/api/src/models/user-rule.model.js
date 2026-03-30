@@ -16,6 +16,8 @@ const UserRuleSchema = new mongoose.Schema(
     status: { type: String, required: true, index: true },
     title: { type: String, default: '' },
     summary: { type: String, default: '' },
+    problemIndex: { type: Number, default: 50, min: 0, max: 100 },
+    lockedStakeLamports: { type: Number, default: 0 },
     config: { type: Mixed, default: {} },
     compiledRule: { type: Mixed, default: null },
     bypassPolicy: { type: Mixed, default: null },

@@ -12,10 +12,13 @@ import { AppSidebar, Button } from "@saintrocky/ui";
 import { useAuthSession } from "@/src/auth/auth-session.jsx";
 
 const sectionIconMap = {
-  rules: "lock",
+  tactics: "tactics",
+  strategy: "strategy",
   wallet: "wallet",
   trades: "trades",
-  leaderboard: "trophy"
+  friends: "users",
+  messages: "chat",
+  campaigns: "calendar"
 };
 
 const navigationItems = [

@@ -7,7 +7,7 @@ pub mod state;
 use errors::EscrowError;
 use state::{FeePool, PlatformConfig, UserVault};
 
-declare_id!("EXNdWwQipapxRhAMdYk15BLiiS1zZ2Wp3yCSF5jWdnwx");
+declare_id!("CT1KzU4EtRSHyjTmFtemKcJGXcTQWc6K6He1PfpZuqsU");
 
 #[program]
 pub mod saintrocky_escrow {
@@ -32,6 +32,8 @@ pub mod saintrocky_escrow {
     pub fn create_user_vault(ctx: Context<CreateUserVault>) -> Result<()> {
         let vault = &mut ctx.accounts.user_vault;
         vault.owner = ctx.accounts.owner.key();
+        vault.locked_lamports = 0;
+        vault.last_withdrawal_at = 0;
         vault.bump = ctx.bumps.user_vault;
         Ok(())
     }
@@ -58,6 +60,38 @@ pub mod saintrocky_escrow {
         Ok(())
     }
 
+    pub fn lock_stake(ctx: Context<LockStake>, amount: u64) -> Result<()> {
+        require!(amount > 0, EscrowError::ZeroStakeAmount);
+
+        let vault = &mut ctx.accounts.user_vault;
+        let unlocked_lamports = vault
+            .balance_lamports
+            .checked_sub(vault.locked_lamports)
+            .unwrap();
+        require!(
+            unlocked_lamports >= amount,
+            EscrowError::InsufficientUnlockedBalance
+        );
+
+        vault.locked_lamports = vault.locked_lamports.checked_add(amount).unwrap();
+
+        Ok(())
+    }
+
+    pub fn unlock_stake(ctx: Context<UnlockStake>, amount: u64) -> Result<()> {
+        require!(amount > 0, EscrowError::ZeroStakeAmount);
+
+        let vault = &mut ctx.accounts.user_vault;
+        require!(
+            vault.locked_lamports >= amount,
+            EscrowError::ExcessiveStakeUnlock
+        );
+
+        vault.locked_lamports = vault.locked_lamports.checked_sub(amount).unwrap();
+
+        Ok(())
+    }
+
     pub fn record_penalty(
         ctx: Context<RecordPenalty>,
         amount: u64,
@@ -72,6 +106,9 @@ pub mod saintrocky_escrow {
         );
 
         vault.balance_lamports = vault.balance_lamports.checked_sub(amount).unwrap();
+        if vault.locked_lamports > vault.balance_lamports {
+            vault.locked_lamports = vault.balance_lamports;
+        }
         vault.total_penalties = vault.total_penalties.checked_add(amount).unwrap();
         vault.penalty_count = vault.penalty_count.checked_add(1).unwrap();
         vault.last_penalty_at = Clock::get()?.unix_timestamp;
@@ -85,6 +122,12 @@ pub mod saintrocky_escrow {
             .total_penalties_collected
             .checked_add(amount)
             .unwrap();
+
+        transfer_program_owned_lamports(
+            &ctx.accounts.user_vault.to_account_info(),
+            &ctx.accounts.fee_pool.to_account_info(),
+            amount,
+        )?;
 
         Ok(())
     }
@@ -114,6 +157,12 @@ pub mod saintrocky_escrow {
             .checked_add(amount)
             .unwrap();
 
+        transfer_program_owned_lamports(
+            &ctx.accounts.fee_pool.to_account_info(),
+            &ctx.accounts.user_vault.to_account_info(),
+            amount,
+        )?;
+
         Ok(())
     }
 
@@ -121,12 +170,17 @@ pub mod saintrocky_escrow {
         require!(amount > 0, EscrowError::ZeroWithdrawal);
 
         let vault = &mut ctx.accounts.user_vault;
+        let unlocked_lamports = vault
+            .balance_lamports
+            .checked_sub(vault.locked_lamports)
+            .unwrap();
         require!(
-            vault.balance_lamports >= amount,
+            unlocked_lamports >= amount,
             EscrowError::ExcessiveWithdrawal
         );
 
         vault.balance_lamports = vault.balance_lamports.checked_sub(amount).unwrap();
+        vault.last_withdrawal_at = Clock::get()?.unix_timestamp;
 
         let vault_account_info = vault.to_account_info();
         let owner_account_info = ctx.accounts.owner.to_account_info();
@@ -136,6 +190,16 @@ pub mod saintrocky_escrow {
 
         Ok(())
     }
+}
+
+fn transfer_program_owned_lamports<'info>(
+    from: &AccountInfo<'info>,
+    to: &AccountInfo<'info>,
+    amount: u64,
+) -> Result<()> {
+    **from.try_borrow_mut_lamports()? -= amount;
+    **to.try_borrow_mut_lamports()? += amount;
+    Ok(())
 }
 
 #[derive(Accounts)]
@@ -195,6 +259,34 @@ pub struct Deposit<'info> {
     pub owner: Signer<'info>,
 
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct LockStake<'info> {
+    #[account(
+        mut,
+        seeds = [UserVault::SEED, owner.key().as_ref()],
+        bump = user_vault.bump,
+        constraint = user_vault.owner == owner.key() @ EscrowError::UnauthorizedOwner
+    )]
+    pub user_vault: Account<'info, UserVault>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct UnlockStake<'info> {
+    #[account(
+        mut,
+        seeds = [UserVault::SEED, owner.key().as_ref()],
+        bump = user_vault.bump,
+        constraint = user_vault.owner == owner.key() @ EscrowError::UnauthorizedOwner
+    )]
+    pub user_vault: Account<'info, UserVault>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
 }
 
 #[derive(Accounts)]

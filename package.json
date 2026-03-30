@@ -30,6 +30,7 @@
     "seed:rules": "yarn workspace @saintrocky/api seed:rules",
     "seed:blog": "yarn workspace @saintrocky/api seed:blog",
     "seed:wallets": "yarn workspace @saintrocky/api seed:wallets",
+    "seed:social": "yarn workspace @saintrocky/api seed:social",
     "seed:all": "yarn workspace @saintrocky/api seed:all",
     "escrow:init": "node apps/blockchain/scripts/initialize-platform.mjs"
   },

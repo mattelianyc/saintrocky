@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { api } from "@saintrocky/api-client";
 import { RULE_TEMPLATE_CATEGORY_LABELS } from "@saintrocky/shared";
@@ -9,6 +10,19 @@ import { Button } from "../../primitives/Button/Button.jsx";
 import { Card } from "../../primitives/Card/Card.jsx";
 import { Spinner } from "../../primitives/Spinner/Spinner.jsx";
 import { StatusBanner } from "../StatusBanner/StatusBanner.jsx";
+
+const STAGGER_ITEM = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.18 }
+};
+
+const CONFIG_REVEAL = {
+  initial: { opacity: 0, x: 16 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -8 },
+  transition: { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
+};
 
 function getFieldInputProps(field) {
   if (field.type === "number") {
@@ -22,7 +36,7 @@ function getFieldInputProps(field) {
   return { type: "text" };
 }
 
-export function RuleTemplatesPanel({ onRuleCreated }) {
+export function RuleTemplatesPanel({ problemIndex = 50, onProblemIndexChange, onRuleCreated }) {
   const [owners, setOwners] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [selectedOwnerEmail, setSelectedOwnerEmail] = useState("");
@@ -48,6 +62,7 @@ export function RuleTemplatesPanel({ onRuleCreated }) {
         setSelectedOwnerEmail(response.authors?.[0]?.email || "");
         setSelectedTemplateId(response.templates?.[0]?.templateId || "");
         setConfig(response.templates?.[0]?.defaultConfig || {});
+        onProblemIndexChange?.(50);
         setStatus("idle");
       } catch (error) {
         setStatus("error");
@@ -59,11 +74,9 @@ export function RuleTemplatesPanel({ onRuleCreated }) {
   }, []);
 
   useEffect(() => {
-    if (!selectedTemplate) {
-      return;
-    }
-
+    if (!selectedTemplate) return;
     setConfig(selectedTemplate.defaultConfig || {});
+    onProblemIndexChange?.(50);
   }, [selectedTemplate?.templateId]);
 
   async function handleCreateRule() {
@@ -74,7 +87,8 @@ export function RuleTemplatesPanel({ onRuleCreated }) {
       await api.rules.createFromTemplate({
         ownerEmail: selectedOwnerEmail || undefined,
         templateId: selectedTemplate.templateId,
-        config
+        config,
+        problemIndex
       });
       setStatus("idle");
       setMessage("Template added to current rules.");
@@ -126,64 +140,68 @@ export function RuleTemplatesPanel({ onRuleCreated }) {
         <div className="c-RulesWorkspacePanel__grid">
           <section className="c-RulesWorkspacePanel__stack">
             <h3>Template library</h3>
-            {templates.map((template) => (
-              <button
+            {templates.map((template, index) => (
+              <motion.button
                 key={template.templateId}
                 type="button"
                 className={`c-RulesWorkspacePanel__templateButton ${
                   template.templateId === selectedTemplateId ? "is-selected" : ""
                 }`}
                 onClick={() => setSelectedTemplateId(template.templateId)}
+                {...STAGGER_ITEM}
+                transition={{ ...STAGGER_ITEM.transition, delay: index * 0.04 }}
               >
                 <span>{RULE_TEMPLATE_CATEGORY_LABELS[template.category] || template.category}</span>
                 <strong>{template.title}</strong>
                 <span>{template.summary}</span>
-              </button>
+              </motion.button>
             ))}
           </section>
 
-          <section className="c-RulesWorkspacePanel__stack">
+          <AnimatePresence mode="wait">
             {selectedTemplate ? (
-              <Card className="c-RulesWorkspacePanel__item">
-                <div className="c-RulesWorkspacePanel__itemHeader">
-                  <div>
-                    <p className="c-RulesWorkspacePanel__itemEyebrow">
-                      {RULE_TEMPLATE_CATEGORY_LABELS[selectedTemplate.category] || selectedTemplate.category}
-                    </p>
-                    <strong>{selectedTemplate.title}</strong>
+              <motion.section key={selectedTemplate.templateId} className="c-RulesWorkspacePanel__stack" {...CONFIG_REVEAL}>
+                <Card className="c-RulesWorkspacePanel__item">
+                  <div className="c-RulesWorkspacePanel__itemHeader">
+                    <div>
+                      <p className="c-RulesWorkspacePanel__itemEyebrow">
+                        {RULE_TEMPLATE_CATEGORY_LABELS[selectedTemplate.category] || selectedTemplate.category}
+                      </p>
+                      <strong>{selectedTemplate.title}</strong>
+                    </div>
                   </div>
-                </div>
-                <p>{selectedTemplate.summary}</p>
-                <div className="c-RulesWorkspacePanel__fieldGrid">
-                  {selectedTemplate.inputSchema.fields.map((field) => (
-                    <label key={field.key} className="c-RulesWorkspacePanel__field">
-                      <span>{field.label}</span>
-                      <input
-                        className="c-RulesWorkspacePanel__input"
-                        {...getFieldInputProps(field)}
-                        value={config[field.key] ?? ""}
-                        onChange={(event) =>
-                          setConfig((currentValue) => ({
-                            ...currentValue,
-                            [field.key]: event.target.value
-                          }))
-                        }
-                      />
-                    </label>
-                  ))}
-                </div>
-                <div className="c-RulesWorkspacePanel__actions">
-                  <Button
-                    onClick={handleCreateRule}
-                    loading={status === "submitting"}
-                    loadingLabel="Creating rule"
-                  >
-                    Add to current rules
-                  </Button>
-                </div>
-              </Card>
+                  <p>{selectedTemplate.summary}</p>
+                  <div className="c-RulesWorkspacePanel__fieldGrid">
+                    {selectedTemplate.inputSchema.fields.map((field) => (
+                      <label key={field.key} className="c-RulesWorkspacePanel__field">
+                        <span>{field.label}</span>
+                        <input
+                          className="c-RulesWorkspacePanel__input"
+                          {...getFieldInputProps(field)}
+                          value={config[field.key] ?? ""}
+                          onChange={(event) =>
+                            setConfig((currentValue) => ({
+                              ...currentValue,
+                              [field.key]: event.target.value
+                            }))
+                          }
+                        />
+                      </label>
+                    ))}
+                  </div>
+                  <div className="c-RulesWorkspacePanel__actions">
+                    <Button
+                      onClick={handleCreateRule}
+                      loading={status === "submitting"}
+                      loadingLabel="Creating rule"
+                    >
+                      Add to current rules
+                    </Button>
+                  </div>
+                </Card>
+              </motion.section>
             ) : null}
-          </section>
+          </AnimatePresence>
         </div>
       )}
     </div>

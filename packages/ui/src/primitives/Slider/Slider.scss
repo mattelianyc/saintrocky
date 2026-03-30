@@ -10,6 +10,10 @@
   padding: 8px 0;
 }
 
+.ui-SliderControl--fullWidth {
+  width: 100%;
+}
+
 .ui-SliderTrack {
   height: 10px;
   border-radius: 999px;
@@ -18,9 +22,21 @@
   overflow: hidden;
 }
 
+.ui-SliderTrack--prominent {
+  height: 14px;
+}
+
 .ui-SliderIndicator {
   height: 100%;
   background: var(--ui-fg);
+}
+
+.ui-SliderIndicator--gradient {
+  background: linear-gradient(
+    to right,
+    var(--ui-gradient-problem-start),
+    var(--ui-gradient-problem-end)
+  );
 }
 
 .ui-SliderThumb {
@@ -35,5 +51,3 @@
   outline: none;
   box-shadow: var(--ui-ring);
 }
-
-

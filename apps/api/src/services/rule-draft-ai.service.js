@@ -141,7 +141,7 @@ function buildAssessmentMessages({ naturalLanguageDraft, clarificationAnswers })
             summary: '', targets: [{ type: 'domain|app', value: '' }],
             chainConstraints: null, schedule: { type: 'always' },
             enforcement: { action: '', userMessage: '' },
-            bypass: { allowed: true, feeModel: 'escrow_deduction', escrowDeductionBps: 100 },
+            bypass: { allowed: true, feeModel: 'sleep_on_it' },
             telemetry: { source: 'ai_authored' }
           },
           clarificationQuestions: [], validationNotes: []
@@ -214,7 +214,7 @@ function buildFallbackAssessment({ naturalLanguageDraft, clarificationAnswers })
         action,
         userMessage: `This action violates your rule for ${targetDescription}. Pay to override.`
       },
-      bypass: { allowed: true, feeModel: 'escrow_deduction', escrowDeductionBps: 100 },
+      bypass: { allowed: true, feeModel: 'sleep_on_it' },
       telemetry: { source: 'ai_authored' }
     },
     clarificationQuestions: [],

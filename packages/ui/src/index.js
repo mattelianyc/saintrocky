@@ -15,6 +15,7 @@ export { Field } from './primitives/Field/Field.jsx';
 export { Fieldset } from './primitives/Fieldset/Fieldset.jsx';
 export { Form } from './primitives/Form/Form.jsx';
 export { Input } from './primitives/Input/Input.jsx';
+export { Textarea } from './primitives/Input/Textarea.jsx';
 export { Menu } from './primitives/Menu/Menu.jsx';
 export { Menubar } from './primitives/Menubar/Menubar.jsx';
 export { Meter } from './primitives/Meter/Meter.jsx';
@@ -54,8 +55,16 @@ export { LocaleSelect } from './compounds/LocaleSelect/LocaleSelect.jsx';
 export { LoginView } from './compounds/LoginView/LoginView.jsx';
 export { TimezoneSelect } from './compounds/TimezoneSelect/TimezoneSelect.jsx';
 export { FormErrorSummary } from './compounds/FormErrorSummary/FormErrorSummary.jsx';
+export { ProblemIndexSlider } from './compounds/ProblemIndexSlider/ProblemIndexSlider.jsx';
 export { StatusBanner } from './compounds/StatusBanner/StatusBanner.jsx';
-export { RulesWorkspace } from './compounds/RulesWorkspace/RulesWorkspace.jsx';
+export { RuleChangeRequestCard } from './compounds/RulesWorkspace/RuleChangeRequestCard.jsx';
+export { RuntimesPanel } from './compounds/RulesWorkspace/RuntimesPanel.jsx';
+export { StrategyWorkspace } from './compounds/RulesWorkspace/StrategyWorkspace.jsx';
+export { TacticsWorkspace } from './compounds/RulesWorkspace/TacticsWorkspace.jsx';
+export { TacticsTable } from './compounds/TacticsTable/TacticsTable.jsx';
+export { RuleInspectDialog } from './compounds/TacticsTable/RuleInspectDialog.jsx';
+export { RuleDeactivateDialog } from './compounds/TacticsTable/RuleDeactivateDialog.jsx';
+export { DraftInspectDialog } from './compounds/TacticsTable/DraftInspectDialog.jsx';
 export { BookingCalendarDay } from './compounds/BookingCalendarDay/BookingCalendarDay.jsx';
 export { TimeSlotPicker } from './compounds/TimeSlotPicker/TimeSlotPicker.jsx';
 export { BookingSummaryCard } from './compounds/BookingSummaryCard/BookingSummaryCard.jsx';
@@ -68,6 +77,9 @@ export { ResourceListCard } from './compounds/ResourceListCard/ResourceListCard.
 export { ResourceListItem } from './compounds/ResourceListItem/ResourceListItem.jsx';
 export { SummaryGrid } from './compounds/SummaryGrid/SummaryGrid.jsx';
 export { TerminalTransitionOverlay } from './compounds/TerminalTransitionOverlay/TerminalTransitionOverlay.jsx';
+export { FriendsDashboard } from './compounds/SocialDashboards/FriendsDashboard.jsx';
+export { MessagesDashboard } from './compounds/SocialDashboards/MessagesDashboard.jsx';
+export { CampaignsDashboard } from './compounds/SocialDashboards/CampaignsDashboard.jsx';
 
 export { AppHeader, AppHeaderAction } from './layout/AppHeader/AppHeader.jsx';
 export { AppFooter } from './layout/AppFooter/AppFooter.jsx';
@@ -78,6 +90,8 @@ export { NestedTabNavigator } from './layout/NestedTabNavigator/NestedTabNavigat
 export { Section } from './layout/Section/Section.jsx';
 export { SectionBand } from './layout/SectionBand/SectionBand.jsx';
 export { PageLayout } from './layout/PageLayout/PageLayout.jsx';
+
+export { LeaderboardWidget } from './widgets/LeaderboardWidget/LeaderboardWidget.jsx';
 
 export {
   applyThemePreference,

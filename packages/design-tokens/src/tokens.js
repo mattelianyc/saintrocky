@@ -37,6 +37,10 @@ export const lightTokens = {
     shadow: '0 24px 60px rgba(13, 18, 17, 0.08)',
     glow: 'rgba(232, 184, 200, 0.18)'
   },
+  gradients: {
+    problemStart: '#6ddfb8',
+    problemEnd: '#e8b8c8'
+  },
   desktop: {
     backgroundStart: '#ffffff',
     backgroundEnd: '#eef9f3',
@@ -115,6 +119,10 @@ export const darkTokens = {
     accentStrong: '#e3a7bc',
     shadow: '0 24px 60px rgba(0, 0, 0, 0.34)',
     glow: 'rgba(227, 167, 188, 0.14)'
+  },
+  gradients: {
+    problemStart: '#6ddfb8',
+    problemEnd: '#e3a7bc'
   },
   desktop: {
     backgroundStart: '#050807',

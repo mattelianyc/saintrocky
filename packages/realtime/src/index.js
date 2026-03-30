@@ -1,6 +1,14 @@
-export const REALTIME_CLIENT_TYPES = ["web", "electron", "extension"];
+export const REALTIME_CLIENT_TYPES = ["web", "electron", "extension", "mobile"];
 
-export const REALTIME_CHANNEL_TYPES = ["rules", "runtime", "extension_sessions"];
+export const REALTIME_CHANNEL_TYPES = [
+  "rules",
+  "runtime",
+  "extension_sessions",
+  "friends",
+  "direct_messages",
+  "campaigns",
+  "leaderboard"
+];
 
 export const REALTIME_INBOUND_MESSAGE_TYPES = {
   authenticate: "auth.authenticate",
@@ -32,6 +40,22 @@ export function buildExtensionSessionsChannel(ownerEmail) {
   return `extension-sessions:${String(ownerEmail || "").trim().toLowerCase()}`;
 }
 
+export function buildFriendsChannel(ownerEmail) {
+  return `friends:${String(ownerEmail || "").trim().toLowerCase()}`;
+}
+
+export function buildDirectMessagesChannel(ownerEmail) {
+  return `direct-messages:${String(ownerEmail || "").trim().toLowerCase()}`;
+}
+
+export function buildCampaignsChannel(ownerEmail) {
+  return `campaigns:${String(ownerEmail || "").trim().toLowerCase()}`;
+}
+
+export function buildLeaderboardChannel() {
+  return "leaderboard:public";
+}
+
 export function parseRealtimeChannel(channel) {
   const [channelType, ownerEmail = "", runtimeSurface = ""] = String(channel || "").split(":");
 
@@ -45,6 +69,22 @@ export function parseRealtimeChannel(channel) {
 
   if (channelType === "extension-sessions" && ownerEmail) {
     return { type: "extension_sessions", ownerEmail };
+  }
+
+  if (channelType === "friends" && ownerEmail) {
+    return { type: "friends", ownerEmail };
+  }
+
+  if (channelType === "direct-messages" && ownerEmail) {
+    return { type: "direct_messages", ownerEmail };
+  }
+
+  if (channelType === "campaigns" && ownerEmail) {
+    return { type: "campaigns", ownerEmail };
+  }
+
+  if (channelType === "leaderboard") {
+    return { type: "leaderboard", ownerEmail: ownerEmail || "public" };
   }
 
   return null;
@@ -124,6 +164,12 @@ export function createRealtimeClient(options = {}) {
   }
 
   function authenticate() {
+    if (options.skipAuthentication) {
+      emitConnectionState({ state: "connected" });
+      subscribeAll();
+      return;
+    }
+
     const token =
       typeof options.getAuthToken === "function" ? options.getAuthToken() : options.authToken || "";
 
@@ -281,7 +327,8 @@ export function createRealtimeClient(options = {}) {
       handlers.add(handler);
       channelHandlers.set(channel, handlers);
 
-      if (isAuthenticated) {
+      const canSend = isAuthenticated || options.skipAuthentication;
+      if (canSend) {
         send({
           type: REALTIME_INBOUND_MESSAGE_TYPES.subscribe,
           channel
@@ -297,7 +344,8 @@ export function createRealtimeClient(options = {}) {
         currentHandlers.delete(handler);
         if (currentHandlers.size === 0) {
           channelHandlers.delete(channel);
-          if (isAuthenticated) {
+          const canUnsub = isAuthenticated || options.skipAuthentication;
+          if (canUnsub) {
             send({
               type: REALTIME_INBOUND_MESSAGE_TYPES.unsubscribe,
               channel

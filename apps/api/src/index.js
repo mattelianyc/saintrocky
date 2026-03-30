@@ -8,6 +8,7 @@ import { logger } from '@saintrocky/api/logger';
 import { createApiApp } from '@saintrocky/api/app';
 import { attachRealtimeServer } from "./services/realtime.service.js";
 import { setEscrowClient } from "./services/escrow.service.js";
+import { startCron } from "./cron/index.js";
 
 const app = createApiApp();
 const port = env.port || 4000;
@@ -17,6 +18,7 @@ attachRealtimeServer(httpServer);
 
 httpServer.listen(port, () => {
   logger.info(`API listening on :${port}`);
+  startCron();
   bootstrapEscrowClient();
 });
 

@@ -10,6 +10,9 @@ import {
   HERO_DOG_IMAGE_SRC,
   HERO_DOG_REVEAL_END_PROGRESS,
   HERO_DOG_REVEAL_START_PROGRESS,
+  HERO_TREE_IMAGE_SRC,
+  HERO_TREE_REVEAL_END_PROGRESS,
+  HERO_TREE_REVEAL_START_PROGRESS,
   HERO_INTRO_LINES,
   HERO_INTRO_LOGO_SRC,
   HERO_INTRO_REVEAL_END_PROGRESS,
@@ -140,6 +143,14 @@ export function BrandHeroParallax() {
     : clamp(
         (panelProgress - HERO_DOG_REVEAL_START_PROGRESS) /
           (HERO_DOG_REVEAL_END_PROGRESS - HERO_DOG_REVEAL_START_PROGRESS),
+        0,
+        1
+      );
+  const treeRevealProgress = shouldReduceMotion
+    ? 1
+    : clamp(
+        (panelProgress - HERO_TREE_REVEAL_START_PROGRESS) /
+          (HERO_TREE_REVEAL_END_PROGRESS - HERO_TREE_REVEAL_START_PROGRESS),
         0,
         1
       );
@@ -280,6 +291,24 @@ export function BrandHeroParallax() {
             animate={{ opacity: dogRevealProgress }}
             transition={{ duration: 0.18, ease: "linear" }}
           >
+            <motion.div
+              className="c-BrandHeroParallax__treeReveal"
+              initial={false}
+              animate={{
+                opacity: treeRevealProgress,
+                clipPath: `inset(${(1 - treeRevealProgress) * 100}% 0 0 0 round 0)`,
+                scale: 0.9 + treeRevealProgress * 0.1,
+                y: `${(1 - treeRevealProgress) * 10}%`
+              }}
+              transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <img
+                src={HERO_TREE_IMAGE_SRC}
+                alt=""
+                aria-hidden="true"
+                className="c-BrandHeroParallax__treeImage"
+              />
+            </motion.div>
             <motion.img
               src={HERO_DOG_IMAGE_SRC}
               alt=""
@@ -383,7 +412,7 @@ export function BrandHeroParallax() {
                 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               >
-                <p className="c-BrandHeroParallax__introEyebrow">Saint Rocky, more or less</p>
+                <p className="c-BrandHeroParallax__introEyebrow">DUMB MONEY IS STILL LEGAL TENDER</p>
                 <motion.div
                   className="c-BrandHeroParallax__introBrandStack"
                   initial={false}
@@ -394,13 +423,6 @@ export function BrandHeroParallax() {
                   }}
                   transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <img
-                    src={HERO_INTRO_LOGO_SRC}
-                    alt=""
-                    aria-hidden="true"
-                    className="c-BrandHeroParallax__introLogo"
-                  />
-                  <p className="c-BrandHeroParallax__introWordmark">{HERO_INTRO_WORDMARK}</p>
                 </motion.div>
                 {HERO_INTRO_LINES.map((line, index) => (
                   <motion.p
