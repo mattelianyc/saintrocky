@@ -3,18 +3,13 @@ import "@saintrocky/ui/primitives.scss";
 import "@saintrocky/ui/layout.scss";
 import "@saintrocky/ui/compounds.scss";
 import "@saintrocky/ui/widgets.scss";
+import "./web-fonts.css";
 
-import localFont from "next/font/local";
 import { saintRockyBranding } from "@saintrocky/branding";
 import { loadWebRuntimeConfig } from "@saintrocky/config";
 import { AuthSessionProvider } from "@/src/auth/auth-session.jsx";
 
 const runtimeConfig = loadWebRuntimeConfig(process.env);
-const silkaMonoFont = localFont({
-  src: "./fonts/silkamono-regular.ttf",
-  variable: "--font-silka-mono",
-  display: "swap"
-});
 
 export const metadata = {
   title: saintRockyBranding.title,
@@ -34,7 +29,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className={`sr-WebBody ${silkaMonoFont.variable}`}>
+      <body className="sr-WebBody">
         <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>
