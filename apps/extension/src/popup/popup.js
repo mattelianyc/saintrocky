@@ -3,24 +3,16 @@ import {
   formatFeeSol,
   formatRemainingDuration
 } from "@saintrocky/fuckyoupayme";
+import { BROWSER_EXTENSION_MESSAGE_TYPES } from "@saintrocky/shared";
 
 const STORAGE_KEY = "saintRockyExtensionRuntime";
-const MESSAGE_TYPES = {
-  getState: "SAINTROCKY_EXTENSION_GET_STATE",
-  setArmed: "SAINTROCKY_EXTENSION_SET_ARMED",
-  resolveViolation: "SAINTROCKY_EXTENSION_RESOLVE_VIOLATION",
-  requestOverride: "SAINTROCKY_EXTENSION_REQUEST_OVERRIDE",
-  confirmOverride: "SAINTROCKY_EXTENSION_CONFIRM_OVERRIDE",
-  cancelOverride: "SAINTROCKY_EXTENSION_CANCEL_OVERRIDE",
-  signOut: "SAINTROCKY_EXTENSION_SIGN_OUT"
-};
+const MESSAGE_TYPES = BROWSER_EXTENSION_MESSAGE_TYPES;
 
 const connectionSummaryElement = document.getElementById("connection-summary");
 const monitorStatusElement = document.getElementById("monitor-status");
 const assignmentCountElement = document.getElementById("assignment-count");
 const tradingViewStatusElement = document.getElementById("tradingview-status");
 const assignmentListElement = document.getElementById("assignment-list");
-const armToggleElement = document.getElementById("arm-toggle");
 const signOutButtonElement = document.getElementById("sign-out-button");
 const violationEmptyElement = document.getElementById("violation-empty");
 const violationCardElement = document.getElementById("violation-card");
@@ -132,7 +124,6 @@ function renderState(runtimeState = {}) {
   monitorStatusElement.textContent = runtimeState.connectionState || "idle";
   assignmentCountElement.textContent = String(runtimeState.assignments?.length || 0);
   tradingViewStatusElement.textContent = runtimeState.assignments?.length > 0 ? "monitoring" : "idle";
-  armToggleElement.textContent = runtimeState.isArmed ? "Disable enforcement" : "Enable enforcement";
   renderAssignments(runtimeState.assignments || []);
   renderViolation(
     runtimeState.pendingViolation || null,
@@ -144,14 +135,6 @@ async function loadInitialState() {
   const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.getState });
   renderState(response.state || {});
 }
-
-armToggleElement.addEventListener("click", async () => {
-  const response = await chrome.runtime.sendMessage({
-    type: MESSAGE_TYPES.setArmed,
-    payload: { isArmed: armToggleElement.textContent !== "Disable enforcement" }
-  });
-  handleExtensionResponse(response);
-});
 
 signOutButtonElement.addEventListener("click", async () => {
   const response = await chrome.runtime.sendMessage({

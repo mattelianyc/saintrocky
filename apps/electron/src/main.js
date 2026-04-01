@@ -43,7 +43,11 @@ function getRendererBuildHtmlPath() {
 }
 
 function getTrayIconPath() {
-  return path.join(currentDirectoryPath, '..', '..', 'web', 'public', 'images', 'logonav.png');
+  return path.join(currentDirectoryPath, '..', 'resources', 'tray-icon.png');
+}
+
+function getWindowIconPath() {
+  return path.join(currentDirectoryPath, '..', 'resources', 'icon.png');
 }
 
 function isRendererDevelopmentMode() {
@@ -136,6 +140,7 @@ function createMainWindow() {
     autoHideMenuBar: true,
     title: buildWindowTitle(),
     backgroundColor: '#081018',
+    icon: getWindowIconPath(),
     webPreferences: {
       preload: getPreloadPath(),
       contextIsolation: true,

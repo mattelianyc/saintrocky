@@ -1,7 +1,6 @@
-const path = require('node:path');
-const dotenv = require('dotenv');
+const { loadEnvFiles } = require('@saintrocky/config/load-env-files');
 
-dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
+loadEnvFiles();
 
 module.exports = ({ config }) => {
   const extra = { ...(config.extra || {}) };

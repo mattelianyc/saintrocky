@@ -1,16 +1,14 @@
-import path from 'node:path';
-import dotenv from 'dotenv';
-
 import { defineSchema, loadApiRuntimeConfig, loadConfig, rules } from '@saintrocky/config';
+import { loadEnvFiles } from '@saintrocky/config/load-env-files';
 
-// Load shared root .env (no per-app env files allowed)
-dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
+loadEnvFiles();
 
 const schema = defineSchema({
   NODE_ENV: rules.optionalString('development'),
   PORT: rules.optionalNumber(),
   API_PORT: rules.optionalNumber(4000),
   LOG_LEVEL: rules.optionalString('info'),
+  CORS_ALLOWED_ORIGINS: rules.optionalString(''),
 
   MONGODB_URI: rules.optionalString(),
   JWT_SECRET: rules.optionalString(),
@@ -48,10 +46,52 @@ const schema = defineSchema({
 const runtimeConfig = loadApiRuntimeConfig(process.env);
 const cfg = loadConfig(process.env, schema);
 
+function isWeakJwtSecret(secret) {
+  const normalizedSecret = String(secret || '').trim().toLowerCase();
+  return !normalizedSecret || ['change_me', 'changeme', 'secret', 'jwt_secret'].includes(normalizedSecret);
+}
+
+function isPlaceholderPublicUrl(value) {
+  const normalizedValue = String(value || '').trim().toLowerCase();
+  return !normalizedValue || normalizedValue.includes('your-app.herokuapp.com') || normalizedValue.includes('localhost');
+}
+
+if (cfg.NODE_ENV === 'production') {
+  const missingKeys = [];
+
+  if (!cfg.MONGODB_URI) {
+    missingKeys.push('MONGODB_URI');
+  }
+
+  if (!cfg.JWT_SECRET) {
+    missingKeys.push('JWT_SECRET');
+  }
+
+  if (!cfg.PUBLIC_API_URL) {
+    missingKeys.push('PUBLIC_API_URL');
+  }
+
+  if (missingKeys.length) {
+    throw new Error(`Missing required production env vars: ${missingKeys.join(', ')}`);
+  }
+
+  if (isWeakJwtSecret(cfg.JWT_SECRET)) {
+    throw new Error('JWT_SECRET must be set to a non-placeholder value in production.');
+  }
+
+  if (isPlaceholderPublicUrl(cfg.PUBLIC_API_URL)) {
+    throw new Error('PUBLIC_API_URL must be set to a non-placeholder production URL.');
+  }
+}
+
 export const env = {
   nodeEnv: cfg.NODE_ENV,
   port: cfg.PORT || runtimeConfig.API_PORT || cfg.API_PORT,
   logLevel: cfg.LOG_LEVEL,
+  corsAllowedOrigins: String(cfg.CORS_ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
 
   mongodbUri: cfg.MONGODB_URI,
   jwtSecret: cfg.JWT_SECRET,

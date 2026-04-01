@@ -77,13 +77,6 @@ export function HomeScreen({ auth, navigation }) {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
       }
     >
-      <ScreenHeader
-        showLogo
-        showWatermark
-        kicker="COMMAND CENTER"
-        title={auth.user?.displayName || auth.user?.email || saintRockyBranding.shortProductName}
-      />
-
       {loading ? (
         <LoadingSkeleton rows={4} />
       ) : (

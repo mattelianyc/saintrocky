@@ -93,6 +93,10 @@ runtimeHub.onStateChange((snapshot) => {
 });
 
 runtimeHub.onNotifiableEvent((event) => {
+  const notificationsEnabled = runtimeHub.getSnapshot().preferences?.notificationsEnabled ?? true;
+  if (!notificationsEnabled) {
+    return;
+  }
   fireNativeNotification(event.title, event.body);
 });
 

@@ -103,6 +103,13 @@ export {
   buildConversationId
 } from './social.js';
 
+export {
+  BROWSER_EXTENSION_MESSAGE_TYPES,
+  isAllowedOrigin,
+  normalizeOrigin,
+  parseAllowedOrigins
+} from './browser-extension.js';
+
 export { useTerminalTyping } from './marketing/index.js';
 
 

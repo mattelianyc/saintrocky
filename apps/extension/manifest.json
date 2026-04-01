@@ -1,16 +1,26 @@
 {
   "manifest_version": 3,
   "name": "Saint Rocky - Standard Deviants",
-  "description": "Browser workflows and quick actions for the Saint Rocky control plane.",
+  "description": "Enforces user-configured trading discipline rules by blocking sites and gating overrides.",
   "version": "0.1.0",
-  "permissions": ["storage", "activeTab", "scripting", "tabs"],
+  "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": ["<all_urls>"],
+  "homepage_url": "https://saintrocky.com",
+  "icons": {
+    "16": "extension-icon-16.png",
+    "48": "extension-icon-48.png",
+    "128": "extension-icon-128.png"
+  },
   "background": {
     "service_worker": "src/background/background.js",
     "type": "module"
   },
   "action": {
     "default_title": "Standard Deviants",
+    "default_icon": {
+      "16": "extension-icon-16.png",
+      "48": "extension-icon-48.png"
+    },
     "default_popup": "src/popup/popup.html"
   },
   "content_scripts": [
@@ -18,12 +28,6 @@
       "matches": ["<all_urls>"],
       "js": ["src/content/content.js"],
       "run_at": "document_idle"
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["paywalldog.png", "assets/paywalldog.png"],
-      "matches": ["<all_urls>"]
     }
   ]
 }

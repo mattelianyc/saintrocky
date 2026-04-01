@@ -21,6 +21,7 @@ const apiRuntimeSchema = defineSchema({
 
 const webRuntimeSchema = defineSchema({
   NEXT_PUBLIC_API_BASE_URL: rules.optionalString("http://localhost:4000"),
+  NEXT_PUBLIC_SOLANA_RPC_URL: rules.optionalString("http://localhost:8899"),
   NEXT_PUBLIC_SITE_URL: rules.optionalString(""),
   NEXT_PUBLIC_APP_NAME: rules.optionalString("Saint Rocky"),
   NEXT_PUBLIC_PRODUCT_NAME: rules.optionalString("Standard Deviants")
@@ -36,6 +37,7 @@ const mobileRuntimeSchema = defineSchema({
 
 const extensionRuntimeSchema = defineSchema({
   EXTENSION_API_BASE_URL: rules.optionalString("http://localhost:4000"),
+  EXTENSION_ALLOWED_ORIGINS: rules.optionalString("http://localhost:5173"),
   EXTENSION_APP_NAME: rules.optionalString("Saint Rocky")
 });
 

@@ -1,85 +1,20 @@
-const LAMPORTS_PER_SOL = 1_000_000_000;
-const LAMPORTS_PER_POINT = 10_000_000;
-const MAX_OVERRIDE_FEE_RATIO = 0.5;
-const FREE_OVERRIDE_AFTER_HOURS = 24;
-const OVERRIDE_DECAY_RATE = 5;
-const PROBLEM_INDEX_MIN = 0;
-const PROBLEM_INDEX_MAX = 100;
+import {
+  calculateOverrideFee,
+  formatFeeSol,
+  formatRemainingDuration
+} from "@saintrocky/fuckyoupayme";
+import {
+  BROWSER_EXTENSION_MESSAGE_TYPES,
+  isAllowedOrigin
+} from "@saintrocky/shared";
 
-function clampProblemIndex(value) {
-  const numericValue = Number(value);
-  if (!Number.isFinite(numericValue)) return PROBLEM_INDEX_MIN;
-  return Math.min(PROBLEM_INDEX_MAX, Math.max(PROBLEM_INDEX_MIN, Math.round(numericValue)));
-}
-
-function calculateLockedStake(problemIndex) {
-  return clampProblemIndex(problemIndex) * LAMPORTS_PER_POINT;
-}
-
-function calculateOverrideDecayFactor(elapsedHours) {
-  const normalized = Math.max(0, Number(elapsedHours) || 0);
-  if (normalized >= FREE_OVERRIDE_AFTER_HOURS) return 0;
-  const numerator =
-    Math.exp((-OVERRIDE_DECAY_RATE * normalized) / FREE_OVERRIDE_AFTER_HOURS) -
-    Math.exp(-OVERRIDE_DECAY_RATE);
-  const denominator = 1 - Math.exp(-OVERRIDE_DECAY_RATE);
-  return Math.max(0, Math.min(1, numerator / denominator));
-}
-
-function calculateOverrideFee({ problemIndex, lockedStakeLamports, requestedAt, now = new Date() } = {}) {
-  const normalizedProblemIndex = clampProblemIndex(problemIndex);
-  const resolvedStake =
-    lockedStakeLamports != null
-      ? Math.max(0, Math.round(Number(lockedStakeLamports) || 0))
-      : calculateLockedStake(normalizedProblemIndex);
-  const requestedAtDate = requestedAt ? new Date(requestedAt) : new Date();
-  const nowDate = now instanceof Date ? now : new Date(now);
-  const elapsedMs = Math.max(0, nowDate.getTime() - requestedAtDate.getTime());
-  const elapsedHours = elapsedMs / (60 * 60 * 1000);
-  const decayFactor = calculateOverrideDecayFactor(elapsedHours);
-  const maxFeeLamports = Math.round(resolvedStake * MAX_OVERRIDE_FEE_RATIO);
-  const feeLamports = Math.round(maxFeeLamports * decayFactor);
-  const freeAtDate = new Date(requestedAtDate.getTime() + FREE_OVERRIDE_AFTER_HOURS * 60 * 60 * 1000);
-  return { feeLamports, freeAt: freeAtDate.toISOString(), isFree: feeLamports === 0 };
-}
-
-function formatFeeSol(lamports, fractionDigits = 4) {
-  return ((Number(lamports) || 0) / LAMPORTS_PER_SOL).toFixed(fractionDigits);
-}
-
-function formatRemainingDuration(freeAt, now = new Date()) {
-  const freeAtDate = freeAt instanceof Date ? freeAt : new Date(freeAt);
-  const nowDate = now instanceof Date ? now : new Date(now);
-  const totalMs = Math.max(0, freeAtDate.getTime() - nowDate.getTime());
-  const totalSeconds = Math.floor(totalMs / 1000);
-  const totalMinutes = Math.floor(totalSeconds / 60);
-  const totalHours = Math.floor(totalMinutes / 60);
-  const days = Math.floor(totalHours / 24);
-  const hours = totalHours % 24;
-  const minutes = totalMinutes % 60;
-  const seconds = totalSeconds % 60;
-  if (totalMs === 0) return "0m";
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m ${seconds}s`;
-}
-
-const MESSAGE_TYPES = {
-  authHandoff: "SAINTROCKY_EXTENSION_AUTH_HANDOFF",
-  pageContext: "SAINTROCKY_EXTENSION_PAGE_CONTEXT",
-  renderBlock: "SAINTROCKY_EXTENSION_RENDER_BLOCK",
-  clearBlock: "SAINTROCKY_EXTENSION_CLEAR_BLOCK",
-  resolveViolation: "SAINTROCKY_EXTENSION_RESOLVE_VIOLATION",
-  requestOverride: "SAINTROCKY_EXTENSION_REQUEST_OVERRIDE",
-  confirmOverride: "SAINTROCKY_EXTENSION_CONFIRM_OVERRIDE",
-  cancelOverride: "SAINTROCKY_EXTENSION_CANCEL_OVERRIDE",
-  renderOverrideCountdown: "SAINTROCKY_EXTENSION_RENDER_OVERRIDE_COUNTDOWN"
-};
+const MESSAGE_TYPES = BROWSER_EXTENSION_MESSAGE_TYPES;
 
 const OVERLAY_ID = "saintrocky-extension-overlay";
 const OVERLAY_STYLE_ID = "saintrocky-extension-overlay-style";
 
 let countdownTimerId = null;
+const allowedOrigins = __SAINTROCKY_EXTENSION_ALLOWED_ORIGINS__;
 
 function getOverlay() {
   return document.getElementById(OVERLAY_ID);
@@ -95,15 +30,6 @@ function stopCountdownTimer() {
     clearInterval(countdownTimerId);
     countdownTimerId = null;
   }
-}
-
-function getPaywallDogUrl() {
-  try {
-    const rootAssetUrl = chrome.runtime.getURL("paywalldog.png");
-    const assetsDirectoryUrl = chrome.runtime.getURL("assets/paywalldog.png");
-    return rootAssetUrl || assetsDirectoryUrl;
-  }
-  catch { return ""; }
 }
 
 function ensureOverlayStyles() {
@@ -264,11 +190,6 @@ function renderOverlay(payload = {}) {
   const card = document.createElement("div");
   card.className = "saintrocky-overlay-card";
 
-  const mascotUrl = getPaywallDogUrl();
-  if (mascotUrl) {
-    card.style.backgroundImage = `url("${mascotUrl}")`;
-  }
-
   const body = document.createElement("div");
   body.className = "saintrocky-overlay-body";
 
@@ -314,11 +235,6 @@ function renderOverrideCountdown(payload = {}) {
 
   const card = document.createElement("div");
   card.className = "saintrocky-overlay-card";
-
-  const mascotUrl = getPaywallDogUrl();
-  if (mascotUrl) {
-    card.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12)), url("${mascotUrl}")`;
-  }
 
   const body = document.createElement("div");
   body.className = "saintrocky-overlay-body";
@@ -413,7 +329,11 @@ function instrumentHistory() {
 }
 
 window.addEventListener("message", (event) => {
-  if (event.source !== window || event.data?.type !== MESSAGE_TYPES.authHandoff) {
+  if (
+    event.source !== window ||
+    event.data?.type !== MESSAGE_TYPES.authHandoff ||
+    !isAllowedOrigin(event.origin, allowedOrigins)
+  ) {
     return;
   }
 

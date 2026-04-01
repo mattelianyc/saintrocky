@@ -18,8 +18,8 @@ const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 function getCookieOptions(maxAge) {
   return {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    sameSite: env.nodeEnv === "production" ? "none" : "lax",
+    secure: env.nodeEnv === "production",
     maxAge,
     path: "/"
   };

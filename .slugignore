@@ -1,0 +1,9 @@
+apps/mobile/
+apps/electron/
+apps/extension/
+apps/blockchain/
+coverage/
+docs/
+storybook-static/
+agent-transcripts/
+*.log

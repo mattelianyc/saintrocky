@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 
 import { api, setUnauthorizedHandler } from "@saintrocky/api-client";
 import { createRealtimeClient } from "@saintrocky/realtime";
+import { BROWSER_EXTENSION_MESSAGE_TYPES } from "@saintrocky/shared";
 
 const AuthSessionContext = createContext(undefined);
 
@@ -100,6 +101,20 @@ export function AuthSessionProvider({ children }) {
         });
         realtimeClientRef.current = realtimeClient;
         realtimeClient.connect();
+
+        const targetOrigin = globalThis.window?.location?.origin;
+        if (targetOrigin) {
+          globalThis.window?.postMessage(
+            {
+              type: BROWSER_EXTENSION_MESSAGE_TYPES.authHandoff,
+              payload: {
+                token: runtimeAuth.token,
+                user: runtimeAuth.user
+              }
+            },
+            targetOrigin
+          );
+        }
       } catch {
         // Let normal HTTP session bootstrap handle auth failures.
       }

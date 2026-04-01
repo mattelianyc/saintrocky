@@ -1,7 +1,6 @@
-import path from "node:path";
-import dotenv from "dotenv";
+import { loadEnvFiles } from "@saintrocky/config/load-env-files";
 
-dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
+loadEnvFiles();
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {

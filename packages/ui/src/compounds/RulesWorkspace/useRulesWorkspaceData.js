@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { api } from "@saintrocky/api-client";
 import { buildExtensionSessionsChannel, buildRulesChannel, createRealtimeClient } from "@saintrocky/realtime";
-import { RULE_USER_RULE_STATUS_LABELS } from "@saintrocky/shared";
+import { BROWSER_EXTENSION_MESSAGE_TYPES, RULE_USER_RULE_STATUS_LABELS } from "@saintrocky/shared";
 
 export function useRulesWorkspaceData({ refreshToken = 0 } = {}) {
   const realtimeClientRef = useRef(null);
@@ -71,14 +71,10 @@ export function useRulesWorkspaceData({ refreshToken = 0 } = {}) {
 
         globalThis.window?.postMessage(
           {
-            type: "SAINTROCKY_EXTENSION_AUTH_HANDOFF",
+            type: BROWSER_EXTENSION_MESSAGE_TYPES.authHandoff,
             payload: {
               token: auth.token,
-              user: auth.user,
-              apiBaseUrl:
-                globalThis.window?.__SAINTROCKY_API_BASE_URL__ ||
-                globalThis.window?.__NEXT_PUBLIC_API_BASE_URL__ ||
-                globalThis.window?.location?.origin
+              user: auth.user
             }
           },
           globalThis.window?.location?.origin || "*"

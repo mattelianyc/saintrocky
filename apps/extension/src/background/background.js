@@ -1,22 +1,9 @@
 import { createApiClient, setUnauthorizedHandler } from "@saintrocky/api-client";
 import { buildRulesChannel, buildRuntimeChannel, createRealtimeClient } from "@saintrocky/realtime";
-import { isScheduleActive } from "@saintrocky/shared";
+import { BROWSER_EXTENSION_MESSAGE_TYPES, isScheduleActive } from "@saintrocky/shared";
 
 const STORAGE_KEY = "saintRockyExtensionRuntime";
-const MESSAGE_TYPES = {
-  authHandoff: "SAINTROCKY_EXTENSION_AUTH_HANDOFF",
-  getState: "SAINTROCKY_EXTENSION_GET_STATE",
-  pageContext: "SAINTROCKY_EXTENSION_PAGE_CONTEXT",
-  renderBlock: "SAINTROCKY_EXTENSION_RENDER_BLOCK",
-  clearBlock: "SAINTROCKY_EXTENSION_CLEAR_BLOCK",
-  setArmed: "SAINTROCKY_EXTENSION_SET_ARMED",
-  resolveViolation: "SAINTROCKY_EXTENSION_RESOLVE_VIOLATION",
-  signOut: "SAINTROCKY_EXTENSION_SIGN_OUT",
-  requestOverride: "SAINTROCKY_EXTENSION_REQUEST_OVERRIDE",
-  confirmOverride: "SAINTROCKY_EXTENSION_CONFIRM_OVERRIDE",
-  cancelOverride: "SAINTROCKY_EXTENSION_CANCEL_OVERRIDE",
-  renderOverrideCountdown: "SAINTROCKY_EXTENSION_RENDER_OVERRIDE_COUNTDOWN"
-};
+const MESSAGE_TYPES = BROWSER_EXTENSION_MESSAGE_TYPES;
 
 let state = null;
 let hasLoadedState = false;
@@ -40,7 +27,7 @@ function buildInitialState() {
     blockedTabIds: [],
     latestPageContext: null,
     runtimeConfig: {
-      apiBaseUrl: "http://localhost:4000"
+      apiBaseUrl: __SAINTROCKY_EXTENSION_API_BASE_URL__
     }
   };
 }
@@ -48,7 +35,17 @@ function buildInitialState() {
 async function ensureState() {
   if (hasLoadedState) return state;
   const stored = await chrome.storage.local.get(STORAGE_KEY);
-  state = { ...buildInitialState(), ...(stored?.[STORAGE_KEY] || {}) };
+  const initialState = buildInitialState();
+  state = {
+    ...initialState,
+    ...(stored?.[STORAGE_KEY] || {}),
+    isArmed: true,
+    runtimeConfig: {
+      ...initialState.runtimeConfig,
+      ...stored?.[STORAGE_KEY]?.runtimeConfig,
+      apiBaseUrl: initialState.runtimeConfig.apiBaseUrl
+    }
+  };
   hasLoadedState = true;
   return state;
 }
@@ -78,7 +75,11 @@ async function clearAuthState() {
   await Promise.all(tabs.map((tab) => sendTabMessage(tab.id, { type: MESSAGE_TYPES.clearBlock })));
 }
 
-setUnauthorizedHandler(() => { clearAuthState().catch(() => {}); });
+setUnauthorizedHandler(() => {
+  clearAuthState().catch((error) => {
+    console.error("Failed to clear browser extension auth state after unauthorized response.", error);
+  });
+});
 
 function getApiClient() {
   if (!apiClient) {
@@ -125,7 +126,9 @@ async function reportRuntimeEvent(eventType, assignment, details = {}) {
       occurredAt: new Date().toISOString(),
       details
     });
-  } catch {}
+  } catch (error) {
+    console.error("Failed to report browser extension runtime event.", error);
+  }
 }
 
 async function publishExtensionSession() {
@@ -213,7 +216,11 @@ async function connectRealtime() {
     clientType: "extension",
     baseUrl: state.runtimeConfig.apiBaseUrl,
     authToken: state.sessionToken,
-    onAuthRevoked() { clearAuthState().catch(() => {}); }
+    onAuthRevoked() {
+      clearAuthState().catch((error) => {
+        console.error("Failed to clear browser extension auth state after realtime revocation.", error);
+      });
+    }
   });
   realtimeClient.onConnectionStateChange(async (connection) => {
     state.connectionState = connection.state;
@@ -230,7 +237,11 @@ async function connectRealtime() {
 
 async function sendTabMessage(tabId, payload) {
   if (!tabId) return;
-  try { await chrome.tabs.sendMessage(tabId, payload); } catch {}
+  try {
+    await chrome.tabs.sendMessage(tabId, payload);
+  } catch (error) {
+    console.error("Failed to send browser extension tab message.", error);
+  }
 }
 
 async function sendOverrideCountdownToBlockedTabs() {
@@ -399,14 +410,17 @@ async function handleCancelOverride() {
 async function handleAuthHandoff(payload = {}) {
   state.sessionToken = payload.token || "";
   state.sessionUser = payload.user || null;
-  state.runtimeConfig.apiBaseUrl = payload.apiBaseUrl || state.runtimeConfig.apiBaseUrl;
   rebuildApiClient();
   await persistState();
   await connectRealtime();
 }
 
 async function signOutEverywhere() {
-  try { await getApiClient().auth.logout(); } catch {}
+  try {
+    await getApiClient().auth.logout();
+  } catch (error) {
+    console.error("Failed to sign out browser extension session.", error);
+  }
   await clearAuthState();
   return state;
 }
@@ -423,7 +437,9 @@ ensureState()
       await connectRealtime();
     }
   })
-  .catch(() => {});
+  .catch((error) => {
+    console.error("Failed to bootstrap browser extension state.", error);
+  });
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status !== "complete" || !tab?.url) return;
@@ -451,18 +467,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       if (message?.type === MESSAGE_TYPES.getState) {
-        sendResponse({ ok: true, state });
-        return;
-      }
-
-      if (message?.type === MESSAGE_TYPES.setArmed) {
-        state.isArmed = Boolean(message.payload?.isArmed);
-        if (!state.isArmed) {
-          state.pendingViolation = null;
-          state.pendingOverrideRequest = null;
-        }
-        await persistState();
-        await publishExtensionSession();
         sendResponse({ ok: true, state });
         return;
       }
