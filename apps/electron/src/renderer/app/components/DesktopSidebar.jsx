@@ -17,7 +17,7 @@ export function DesktopSidebar({ activePath, monitorStatus, onNavigate, onLogout
       onNavigate={onNavigate}
       brand={
         <div className="desktop-SidebarBrand">
-          <span className="desktop-SidebarEyebrow">Saint Rocky desktop runtime</span>
+          <span className="desktop-SidebarEyebrow">Saint Rocky sentinel</span>
           <strong className="desktop-SidebarWordmark">std/dev</strong>
           <span className="desktop-SidebarHint">{formatMonitorLabel(monitorStatus || 'idle')}</span>
         </div>

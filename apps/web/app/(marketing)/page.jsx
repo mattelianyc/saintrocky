@@ -1,11 +1,11 @@
 import { saintRockyBranding } from "@saintrocky/branding";
 import {
   BackgroundScrollTransition,
-  BrandHeroParallax,
   BrandHeroReprisal
 } from "@saintrocky/ui/web";
 
 import MarketingOverviewSessionSection from "./MarketingOverviewSessionSection.jsx";
+import MarketingOverviewContentSection from "./MarketingOverviewContentSection.jsx";
 
 export const metadata = {
   title: `${saintRockyBranding.companyName} | ${saintRockyBranding.productName}`,
@@ -16,8 +16,8 @@ export default function MarketingPage() {
   return (
     <main>
       <BackgroundScrollTransition />
-      <BrandHeroParallax />
       <MarketingOverviewSessionSection />
+      <MarketingOverviewContentSection />
       <BrandHeroReprisal />
     </main>
   );

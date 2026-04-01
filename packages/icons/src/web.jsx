@@ -6,7 +6,9 @@ import {
   mdiArchiveArrowDownOutline,
   mdiArrowLeft,
   mdiArrowRight,
+  mdiBellOutline,
   mdiCalendar,
+  mdiCellphone,
   mdiChartLine,
   mdiCheck,
   mdiChevronLeft,
@@ -15,17 +17,21 @@ import {
   mdiClose,
   mdiCog,
   mdiCreditCardOutline,
+  mdiDesktopClassic,
   mdiEmail,
   mdiEyeOutline,
   mdiFileDocumentOutline,
   mdiHome,
   mdiInformation,
+  mdiKeyVariant,
   mdiLightbulbOutline,
   mdiLock,
   mdiLogout,
+  mdiMonitorShimmer,
   mdiPauseCircleOutline,
   mdiPencilOutline,
   mdiPlayCircleOutline,
+  mdiPuzzleOutline,
   mdiSend,
   mdiMagnify,
   mdiMenu,
@@ -36,7 +42,8 @@ import {
   mdiTagOutline,
   mdiTrophy,
   mdiViewDashboard,
-  mdiWallet
+  mdiWallet,
+  mdiWeb
 } from '@mdi/js';
 
 const iconPathMap = {
@@ -65,6 +72,7 @@ const iconPathMap = {
   email: mdiEmail,
   alert: mdiAlertCircle,
   info: mdiInformation,
+  key: mdiKeyVariant,
   analytics: mdiChartLine,
   payments: mdiCreditCardOutline,
   seo: mdiMagnify,
@@ -81,7 +89,13 @@ const iconPathMap = {
   inspect: mdiEyeOutline,
   pause: mdiPauseCircleOutline,
   activate: mdiPlayCircleOutline,
-  archive: mdiArchiveArrowDownOutline
+  archive: mdiArchiveArrowDownOutline,
+  notifications: mdiBellOutline,
+  globe: mdiWeb,
+  monitor: mdiMonitorShimmer,
+  desktop: mdiDesktopClassic,
+  phone: mdiCellphone,
+  extension: mdiPuzzleOutline
 };
 
 export const iconNames = Object.keys(iconPathMap);

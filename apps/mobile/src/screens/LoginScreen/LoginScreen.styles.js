@@ -1,44 +1,108 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       flex: 1,
-      padding: 16,
-      justifyContent: 'center',
-      backgroundColor: theme.colors.background
+      backgroundColor: '#060a09'
+    },
+    backgroundImage: {
+      position: 'absolute',
+      width: '100%',
+      height: SCREEN_HEIGHT * 0.6,
+      top: 0,
+      opacity: 0.3
+    },
+    backgroundOverlay: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(6,10,9,0.4)'
+    },
+    keyboardView: {
+      flex: 1
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'flex-end',
+      paddingHorizontal: spacing.large
+    },
+    topSection: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      paddingLeft: spacing.large,
+      paddingTop: spacing.large
+    },
+    navLogo: {
+      width: 28,
+      height: 28,
+      opacity: 0.6
+    },
+    brandArea: {
+      alignItems: 'center',
+      marginBottom: spacing.xlarge
+    },
+    mascot: {
+      width: 100,
+      height: 100,
+      marginBottom: spacing.medium,
+      opacity: 0.9
     },
     heading: {
-      fontSize: 22,
-      fontWeight: '700',
-      color: theme.colors.foreground,
-      marginBottom: 12
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXlarge,
+      fontWeight: typography.weightBlack,
+      color: '#f5faf7',
+      letterSpacing: typography.letterSpacingTight,
+      textAlign: 'center'
     },
     summary: {
-      color: theme.colors.muted,
-      lineHeight: 20,
-      marginBottom: 16
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXsmall,
+      letterSpacing: typography.letterSpacingWide,
+      color: 'rgba(245, 250, 247, 0.45)',
+      textAlign: 'center',
+      marginTop: spacing.xsmall,
+      textTransform: 'uppercase'
     },
-    themeToggleRow: {
-      marginTop: 16,
+    formArea: {
+      gap: spacing.small
+    },
+    submitArea: {
+      marginTop: spacing.medium
+    },
+    footerRow: {
       flexDirection: 'row',
+      justifyContent: 'center',
       alignItems: 'center',
-      justifyContent: 'space-between'
+      marginTop: spacing.xlarge,
+      gap: spacing.xsmall
     },
-    themeToggleLabel: {
-      color: theme.colors.muted,
-      fontSize: 13
+    themeToggle: {
+      paddingVertical: spacing.xxsmall,
+      paddingHorizontal: spacing.xsmall
     },
-    themeToggleButton: {
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 10
+    themeToggleText: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightSemibold,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: 'rgba(245, 250, 247, 0.35)'
     },
-    themeToggleButtonText: {
-      color: theme.colors.foreground,
-      fontWeight: '600'
+    footerDivider: {
+      color: 'rgba(245, 250, 247, 0.2)',
+      fontSize: typography.sizeXsmall
+    },
+    footerVersion: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: 'rgba(245, 250, 247, 0.2)'
     }
   });
 }

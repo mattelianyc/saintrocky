@@ -16,12 +16,13 @@ export function useRealtimeChannel(channel, { onSnapshot, onEvent } = {}) {
 
     const client = getMobileRealtimeClient();
     const unsubscribe = client.subscribe(channel, (message) => {
+      const payload = message?.payload ?? null;
       if (message.type === 'channel.snapshot') {
-        setData(message.data);
-        onSnapshotRef.current?.(message.data);
+        setData(payload);
+        onSnapshotRef.current?.(payload, message);
       }
       if (message.type === 'channel.event') {
-        onEventRef.current?.(message);
+        onEventRef.current?.(payload, message);
       }
     });
 

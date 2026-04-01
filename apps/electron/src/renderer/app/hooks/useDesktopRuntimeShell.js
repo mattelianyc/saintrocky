@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   cancelRuntimeOverride,
@@ -8,10 +8,10 @@ import {
   getSession,
   login,
   logout,
+  onNavigateFromMain,
   resolveRuntimeViolation,
   setRuntimeArmed,
   setRuntimePreferences,
-  showNativeNotification,
   subscribeRuntimeHub,
   updateNativeRuntimeState
 } from '../../bridge.js';
@@ -28,7 +28,6 @@ export function useDesktopRuntimeShell() {
   const [authLoading, setAuthLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [activePath, setActivePath] = useState('#home');
-  const lastViolationIdRef = useRef('');
 
   const activeSectionId = resolveDesktopSectionId(activePath);
 
@@ -48,35 +47,35 @@ export function useDesktopRuntimeShell() {
   }, []);
 
   useEffect(() => {
-    if (!runtimeHub) {
-      return;
-    }
+    onNavigateFromMain((target) => {
+      if (target) {
+        const nextPath = resolveDesktopNavigationPath(`#${target}`);
+        setActivePath(nextPath);
+        if (globalThis.location) {
+          globalThis.location.hash = nextPath;
+        }
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!runtimeHub) return;
 
     updateNativeRuntimeState({
       monitorStatus: runtimeHub.monitorStatus,
-      pendingViolationCount: runtimeHub.pendingViolation ? 1 : 0
+      pendingViolationCount: runtimeHub.pendingViolation ? 1 : 0,
+      chainViolationCount: runtimeHub.chainViolations?.length || 0,
+      hideToTrayOnClose: runtimeHub.preferences?.hideToTrayOnClose ?? true
     });
-  }, [runtimeHub?.monitorStatus, runtimeHub?.pendingViolation?.violationId]);
+  }, [
+    runtimeHub?.monitorStatus,
+    runtimeHub?.pendingViolation?.violationId,
+    runtimeHub?.chainViolations?.length,
+    runtimeHub?.preferences?.hideToTrayOnClose
+  ]);
 
   useEffect(() => {
-    const violation = runtimeHub?.pendingViolation;
-    if (!violation || violation.violationId === lastViolationIdRef.current) {
-      return;
-    }
-
-    lastViolationIdRef.current = violation.violationId;
-    if (runtimeHub.preferences?.notificationsEnabled) {
-      showNativeNotification({
-        title: 'Rule triggered',
-        body: violation.summary
-      }).catch(() => {});
-    }
-  }, [runtimeHub?.pendingViolation?.violationId, runtimeHub?.preferences?.notificationsEnabled]);
-
-  useEffect(() => {
-    if (view !== 'shell') {
-      return undefined;
-    }
+    if (view !== 'shell') return undefined;
 
     return subscribeRuntimeHub((nextRuntimeHub) => {
       setRuntimeHub(nextRuntimeHub);

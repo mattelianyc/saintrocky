@@ -4,6 +4,14 @@
   display: grid;
   gap: 0;
   font-variant-numeric: tabular-nums;
+  --w-LeaderboardWidget-columns: minmax(72px, 1fr) minmax(0, 1.7fr) minmax(72px, 1fr) minmax(112px, 1.35fr);
+}
+
+.w-LeaderboardWidget--hero,
+.w-LeaderboardWidget--heroLight {
+  width: 100%;
+  height: 100%;
+  grid-template-rows: auto 1fr;
 }
 
 /* ── Hero variant (dark bg, marketing landing) ── */
@@ -12,6 +20,13 @@
   background: rgb(10 10 12);
   color: rgb(255 255 255 / 0.92);
   border-radius: var(--ui-radius);
+  overflow: hidden;
+}
+
+.w-LeaderboardWidget--heroLight {
+  background: rgb(255 255 255);
+  color: rgb(10 10 12 / 0.92);
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -28,7 +43,7 @@
 
 .w-LeaderboardWidget__header {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1.6fr) 72px 72px minmax(100px, 1fr) 80px;
+  grid-template-columns: var(--w-LeaderboardWidget-columns);
   gap: 0.75rem;
   align-items: center;
   padding: 0.85rem 1.25rem;
@@ -43,6 +58,10 @@
   font-size: 0.7rem;
 }
 
+.w-LeaderboardWidget--heroLight .w-LeaderboardWidget__header {
+  color: rgb(10 10 12 / 0.48);
+}
+
 /* ── Rows ── */
 
 .w-LeaderboardWidget__rows {
@@ -51,7 +70,7 @@
 
 .w-LeaderboardWidget__row {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1.6fr) 72px 72px minmax(100px, 1fr) 80px;
+  grid-template-columns: var(--w-LeaderboardWidget-columns);
   gap: 0.75rem;
   align-items: center;
   padding: 0.9rem 1.25rem;
@@ -69,6 +88,13 @@
   border-bottom: 1px solid var(--ui-shell-border);
 }
 
+.w-LeaderboardWidget--heroLight .w-LeaderboardWidget__row {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--ui-shell-accent) 5%, transparent), transparent 40%),
+    transparent;
+  border-bottom: 1px solid rgb(10 10 12 / 0.06);
+}
+
 .w-LeaderboardWidget__row.is-hot {
   transform: translateX(3px);
   background:
@@ -83,21 +109,52 @@
 /* ── Cell styles ── */
 
 .w-LeaderboardWidget__rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   color: var(--ui-shell-accent);
-  font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
+  font-weight: 800;
+  font-size: 0.96rem;
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
 .w-LeaderboardWidget__trader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: rgb(255 255 255 / 0.96);
 }
 
+.w-LeaderboardWidget__traderName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .w-LeaderboardWidget--compact .w-LeaderboardWidget__trader {
   color: var(--ui-shell-text);
+}
+
+.w-LeaderboardWidget--heroLight .w-LeaderboardWidget__trader {
+  color: rgb(10 10 12 / 0.92);
+}
+
+.w-LeaderboardWidget__streakBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
+  margin-left: 0.1rem;
+  font-size: 0.78em;
+  font-weight: 600;
+  color: var(--ui-shell-accent);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .w-LeaderboardWidget__score {
@@ -105,26 +162,9 @@
   color: var(--ui-shell-accent);
 }
 
-.w-LeaderboardWidget__streak {
-  color: rgb(255 255 255 / 0.6);
-}
-
-.w-LeaderboardWidget--compact .w-LeaderboardWidget__streak {
-  color: var(--ui-shell-text-muted);
-}
-
 .w-LeaderboardWidget__earnings {
   color: var(--ui-shell-accent);
   font-weight: 600;
-}
-
-.w-LeaderboardWidget__staked {
-  color: rgb(255 255 255 / 0.52);
-  text-align: right;
-}
-
-.w-LeaderboardWidget--compact .w-LeaderboardWidget__staked {
-  color: var(--ui-shell-text-muted);
 }
 
 /* ── Live pill ── */
@@ -149,6 +189,11 @@
   color: var(--ui-shell-accent);
 }
 
+.w-LeaderboardWidget--heroLight .w-LeaderboardWidget__livePill {
+  background: rgb(10 10 12 / 0.05);
+  color: rgb(10 10 12 / 0.38);
+}
+
 .w-LeaderboardWidget__livePill.is-live::before {
   content: "";
   width: 6px;
@@ -163,6 +208,32 @@
   50% { opacity: 0.3; }
 }
 
+/* ── Skeleton loading ── */
+
+.w-LeaderboardWidget__skeletonRow {
+  animation: leaderboardSkeletonPulse 1.6s ease-in-out infinite;
+}
+
+.w-LeaderboardWidget__skeletonBlock {
+  display: inline-block;
+  height: 0.75em;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.w-LeaderboardWidget--heroLight .w-LeaderboardWidget__skeletonBlock {
+  background: rgb(10 10 12 / 0.07);
+}
+
+.w-LeaderboardWidget--compact .w-LeaderboardWidget__skeletonBlock {
+  background: var(--ui-shell-border);
+}
+
+@keyframes leaderboardSkeletonPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
 /* ── Empty state ── */
 
 .w-LeaderboardWidget__empty {
@@ -173,6 +244,10 @@
 
 .w-LeaderboardWidget--compact .w-LeaderboardWidget__empty {
   color: var(--ui-shell-text-muted);
+}
+
+.w-LeaderboardWidget--heroLight .w-LeaderboardWidget__empty {
+  color: rgb(10 10 12 / 0.42);
 }
 
 /* ── SlotCounter ── */
@@ -209,26 +284,64 @@
 
 /* ── Responsive ── */
 
+@media (max-width: 1024px) {
+  .w-LeaderboardWidget {
+    --w-LeaderboardWidget-columns: 64px minmax(0, 14rem) 72px minmax(100px, 1fr);
+  }
+}
+
 @media (max-width: 720px) {
+  .w-LeaderboardWidget {
+    --w-LeaderboardWidget-columns: 48px minmax(0, 1.4fr) 56px minmax(80px, 1fr);
+  }
+
   .w-LeaderboardWidget__header,
   .w-LeaderboardWidget__row {
-    grid-template-columns: 48px minmax(0, 1.4fr) 56px 56px minmax(80px, 1fr) 64px;
     gap: 0.5rem;
     padding-inline: 0.75rem;
     font-size: 0.82rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .w-LeaderboardWidget__header,
   .w-LeaderboardWidget__row {
-    grid-template-columns: 40px 1fr 48px 1fr;
+    gap: 0.45rem;
+    padding-inline: 0.65rem;
   }
 
-  .w-LeaderboardWidget__header > :nth-child(4),
-  .w-LeaderboardWidget__header > :nth-child(6),
-  .w-LeaderboardWidget__row > :nth-child(4),
-  .w-LeaderboardWidget__row > :nth-child(6) {
-    display: none;
+  .w-LeaderboardWidget__header {
+    padding-block: 0.65rem;
+    font-size: 0.66rem;
+  }
+
+  .w-LeaderboardWidget__row {
+    padding-block: 0.72rem;
+    font-size: 0.78rem;
+  }
+
+  .w-LeaderboardWidget__rank {
+    font-size: 0.84rem;
+  }
+
+  .w-LeaderboardWidget__livePill {
+    min-height: 1.2rem;
+    padding: 0 0.35rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .w-LeaderboardWidget__empty {
+    padding: 1.25rem 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .w-LeaderboardWidget {
+    --w-LeaderboardWidget-columns: 40px 1fr 48px 1fr;
+  }
+
+  .w-LeaderboardWidget__header,
+  .w-LeaderboardWidget__row {
   }
 }

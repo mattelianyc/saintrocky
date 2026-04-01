@@ -1,10 +1,11 @@
+import { useMemo } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { Icon } from '@saintrocky/icons';
 import { useTheme } from '../theme.js';
 
 export function IconButton({
   name,
-  size = 22,
+  size = 20,
   color,
   onPress,
   disabled = false,
@@ -34,8 +35,7 @@ export function IconButton({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
-    borderRadius: 20,
+    padding: 10,
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     opacity: 0.6
   },
   disabled: {
-    opacity: 0.4
+    opacity: 0.35
   }
 });

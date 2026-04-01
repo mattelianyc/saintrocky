@@ -1,89 +1,161 @@
 import { StyleSheet } from 'react-native';
 
 export function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.background
     },
     content: {
-      paddingBottom: 40
+      paddingBottom: spacing.jumbo
     },
     profileHeader: {
       alignItems: 'center',
-      paddingVertical: 28,
-      paddingHorizontal: 16
+      paddingVertical: spacing.large,
+      paddingHorizontal: spacing.medium
     },
     displayName: {
+      fontSize: typography.sizeXlarge,
+      fontWeight: typography.weightBlack,
       color: theme.colors.foreground,
-      fontSize: 20,
-      fontWeight: '800',
-      marginTop: 12,
-      marginBottom: 4
+      letterSpacing: typography.letterSpacingTight,
+      marginTop: spacing.small
     },
     email: {
-      color: theme.colors.muted,
-      fontSize: 14,
-      marginBottom: 8
+      fontSize: typography.sizeSmall,
+      color: theme.shell.textMuted,
+      marginTop: 2
     },
-    walletCard: {
-      marginHorizontal: 16
+    roleBadge: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightMedium,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: theme.colors.accent,
+      marginTop: spacing.xsmall
     },
-    escrowRow: {
+    escrowMetrics: {
+      flexDirection: 'row',
+      paddingHorizontal: spacing.medium,
+      gap: spacing.large,
+      marginTop: spacing.medium
+    },
+    sectionKicker: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightSemibold,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: theme.colors.accent,
+      textTransform: 'uppercase',
+      paddingHorizontal: spacing.medium,
+      paddingTop: spacing.xlarge,
+      paddingBottom: spacing.xsmall
+    },
+    walletRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center'
+      alignItems: 'center',
+      paddingHorizontal: spacing.medium,
+      paddingVertical: spacing.medium,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.shell.border
     },
-    escrowLabel: {
-      color: theme.colors.muted,
-      fontSize: 14
+    walletLabel: {
+      fontSize: typography.sizeBase,
+      color: theme.colors.foreground,
+      fontWeight: typography.weightSemibold
     },
-    escrowValue: {
-      color: theme.colors.accent,
-      fontSize: 20,
-      fontWeight: '800'
+    walletAddress: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXsmall,
+      color: theme.shell.textMuted,
+      letterSpacing: typography.letterSpacingWide,
+      marginTop: 2
+    },
+    walletRight: {
+      alignItems: 'flex-end',
+      gap: 4
     },
     walletBalance: {
-      color: theme.colors.accent,
-      fontSize: 14,
-      fontWeight: '700'
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeSmall,
+      fontWeight: typography.weightBold,
+      color: theme.colors.accent
     },
-    tradesCard: {
-      marginHorizontal: 16
+    selectedDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: theme.colors.accent
+    },
+    pressed: {
+      opacity: 0.7
     },
     tradeRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 8,
+      paddingVertical: spacing.small,
+      paddingHorizontal: spacing.medium,
       borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border
+      borderBottomColor: theme.shell.border
     },
     tradeInfo: {
       flex: 1
     },
     tradeToken: {
       color: theme.colors.foreground,
-      fontSize: 14,
-      fontWeight: '600'
+      fontSize: typography.sizeBase,
+      fontWeight: typography.weightSemibold
     },
     tradeMeta: {
-      color: theme.colors.muted,
-      fontSize: 12,
+      fontFamily: typography.fontFamilyMono,
+      color: theme.shell.textMuted,
+      fontSize: typography.sizeXxsmall,
+      letterSpacing: typography.letterSpacingWide,
+      textTransform: 'uppercase',
       marginTop: 2
     },
-    tradeStatus: {
-      marginLeft: 12
+    tradeDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginLeft: spacing.small
+    },
+    settingsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.medium,
+      paddingVertical: spacing.medium,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.shell.border
+    },
+    settingsLabel: {
+      fontSize: typography.sizeBase,
+      color: theme.colors.foreground,
+      fontWeight: typography.weightSemibold
+    },
+    settingsValue: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXsmall,
+      color: theme.shell.textMuted,
+      letterSpacing: typography.letterSpacingWide,
+      marginTop: 2
     },
     logoutSection: {
-      paddingHorizontal: 16,
-      paddingTop: 24,
+      paddingHorizontal: spacing.medium,
+      paddingTop: spacing.xlarge,
       alignItems: 'center',
-      gap: 12
+      gap: spacing.small
     },
     versionText: {
-      color: theme.colors.muted,
-      fontSize: 12
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      letterSpacing: typography.letterSpacingWide,
+      color: theme.shell.textMuted
     }
   });
 }

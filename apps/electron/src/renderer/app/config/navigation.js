@@ -1,6 +1,6 @@
 export const desktopNavigationItems = [
-  { id: 'home', label: 'Home', href: '#home', iconName: 'dashboard' },
-  { id: 'rules', label: 'Active rules', href: '#rules', iconName: 'lock' },
+  { id: 'home', label: 'Dashboard', href: '#home', iconName: 'dashboard' },
+  { id: 'rules', label: 'Enforcement', href: '#rules', iconName: 'lock' },
   { id: 'violations', label: 'Violations', href: '#violations', iconName: 'alert' },
   { id: 'activity', label: 'Activity', href: '#activity', iconName: 'analytics' },
   { id: 'settings', label: 'Settings', href: '#settings', iconName: 'settings' }

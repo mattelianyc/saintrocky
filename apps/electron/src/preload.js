@@ -17,6 +17,7 @@ import {
   getWorkflows,
   login,
   logout,
+  refreshDesktopDashboard,
   reportRuleRuntimeEvent,
   resolveRuntimeViolation,
   setRuntimeArmed,
@@ -45,10 +46,20 @@ contextBridge.exposeInMainWorld('saintRockyDesktop', {
   resolveRuntimeViolation,
   confirmRuntimeOverride,
   cancelRuntimeOverride,
+  refreshDesktopDashboard,
   updateNativeRuntimeState(payload) {
     ipcRenderer.send('desktop-runtime:update-state', payload);
   },
   showNativeNotification(payload) {
     return ipcRenderer.invoke('desktop-runtime:show-notification', payload);
+  },
+  getOpenAtLogin() {
+    return ipcRenderer.invoke('desktop-runtime:get-open-at-login');
+  },
+  setOpenAtLogin(enabled) {
+    return ipcRenderer.invoke('desktop-runtime:set-open-at-login', enabled);
+  },
+  onNavigateFromMain(callback) {
+    ipcRenderer.on('desktop-runtime:navigate', (_event, target) => callback(target));
   }
 });

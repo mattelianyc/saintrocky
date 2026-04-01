@@ -29,12 +29,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "EXPO_PUBLIC_APP_ENV": "development",
-      "EXPO_PUBLIC_API_URL": "http://localhost:4000",
-      "eas": {
-        "projectId": "05f407ad-90d5-4e62-8bfc-cca481290367"
-      }
-    }
+    "plugins": ["expo-notifications"]
   }
 }

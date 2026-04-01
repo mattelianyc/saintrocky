@@ -5,9 +5,9 @@ import { Icon } from '@saintrocky/icons';
 import { useTheme } from '../theme.js';
 
 const sizeTokens = {
-  sm: { paddingVertical: 8, paddingHorizontal: 12, fontSize: 14, iconSize: 16 },
-  md: { paddingVertical: 10, paddingHorizontal: 14, fontSize: 16, iconSize: 18 },
-  lg: { paddingVertical: 12, paddingHorizontal: 16, fontSize: 17, iconSize: 20 }
+  sm: { paddingVertical: 8, paddingHorizontal: 14, fontSize: 13, iconSize: 14 },
+  md: { paddingVertical: 10, paddingHorizontal: 16, fontSize: 15, iconSize: 16 },
+  lg: { paddingVertical: 14, paddingHorizontal: 20, fontSize: 16, iconSize: 18 }
 };
 
 const variants = ['primary', 'secondary', 'outline', 'ghost', 'subtle', 'danger', 'link'];
@@ -49,15 +49,19 @@ export function Button({
     >
       <View style={styles.content}>
         {leadingIconName ? (
-          <View style={[styles.icon, styles.iconLeading]}>
+          <View style={styles.iconLeading}>
             <Icon name={leadingIconName} size={iconSize} color={iconColor} />
           </View>
         ) : null}
-        <Text style={[styles.label, styles[`${resolvedSize}Label`], styles[`${resolvedVariant}Label`]]}>
+        <Text style={[
+          styles.label,
+          styles[`${resolvedSize}Label`],
+          styles[`${resolvedVariant}Label`]
+        ]}>
           {children}
         </Text>
         {trailingIconName ? (
-          <View style={[styles.icon, styles.iconTrailing]}>
+          <View style={styles.iconTrailing}>
             <Icon name={trailingIconName} size={iconSize} color={iconColor} />
           </View>
         ) : null}
@@ -67,10 +71,12 @@ export function Button({
 }
 
 function createStyles(theme) {
+  const mono = theme.typography?.fontFamilyMono || 'System';
+
   return StyleSheet.create({
     base: {
-      borderRadius: 12,
-      borderWidth: 1,
+      borderRadius: 2,
+      borderWidth: 0,
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'row'
@@ -80,115 +86,47 @@ function createStyles(theme) {
       alignItems: 'center'
     },
     label: {
-      fontWeight: '600'
+      fontFamily: mono,
+      fontWeight: '600',
+      letterSpacing: 0.6
     },
-    icon: {
+    iconLeading: {
+      marginRight: 8,
       alignItems: 'center',
       justifyContent: 'center'
     },
-    iconLeading: {
-      marginRight: 8
-    },
     iconTrailing: {
-      marginLeft: 8
+      marginLeft: 8,
+      alignItems: 'center',
+      justifyContent: 'center'
     },
-    smLabel: {
-      fontSize: sizeTokens.sm.fontSize
-    },
-    mdLabel: {
-      fontSize: sizeTokens.md.fontSize
-    },
-    lgLabel: {
-      fontSize: sizeTokens.lg.fontSize
-    },
-    sm: {
-      paddingVertical: sizeTokens.sm.paddingVertical,
-      paddingHorizontal: sizeTokens.sm.paddingHorizontal
-    },
-    md: {
-      paddingVertical: sizeTokens.md.paddingVertical,
-      paddingHorizontal: sizeTokens.md.paddingHorizontal
-    },
-    lg: {
-      paddingVertical: sizeTokens.lg.paddingVertical,
-      paddingHorizontal: sizeTokens.lg.paddingHorizontal
-    },
-    primary: {
-      backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.primary
-    },
-    primaryPressed: {
-      opacity: 0.9
-    },
-    primaryLabel: {
-      color: theme.colors.primaryText
-    },
-    secondary: {
-      backgroundColor: theme.colors.background,
-      borderColor: theme.colors.borderStrong
-    },
-    secondaryPressed: {
-      backgroundColor: theme.colors.inputBackground
-    },
-    secondaryLabel: {
-      color: theme.colors.foreground
-    },
-    outline: {
-      backgroundColor: 'transparent',
-      borderColor: theme.colors.borderStrong
-    },
-    outlinePressed: {
-      backgroundColor: theme.colors.inputBackground
-    },
-    outlineLabel: {
-      color: theme.colors.foreground
-    },
-    ghost: {
-      backgroundColor: 'transparent',
-      borderColor: 'transparent'
-    },
-    ghostPressed: {
-      backgroundColor: theme.colors.inputBackground
-    },
-    ghostLabel: {
-      color: theme.colors.foreground
-    },
-    subtle: {
-      backgroundColor: theme.colors.inputBackground,
-      borderColor: theme.colors.border
-    },
-    subtlePressed: {
-      backgroundColor: theme.colors.border
-    },
-    subtleLabel: {
-      color: theme.colors.foreground
-    },
-    danger: {
-      backgroundColor: theme.colors.error,
-      borderColor: theme.colors.error
-    },
-    dangerPressed: {
-      opacity: 0.9
-    },
-    dangerLabel: {
-      color: theme.colors.primaryText
-    },
-    link: {
-      backgroundColor: 'transparent',
-      borderColor: 'transparent',
-      paddingVertical: 0,
-      paddingHorizontal: 0
-    },
-    linkPressed: {
-      opacity: 0.7
-    },
-    linkLabel: {
-      color: theme.colors.foreground,
-      textDecorationLine: 'underline'
-    },
-    disabled: {
-      opacity: 0.6
-    }
+    smLabel: { fontSize: sizeTokens.sm.fontSize },
+    mdLabel: { fontSize: sizeTokens.md.fontSize },
+    lgLabel: { fontSize: sizeTokens.lg.fontSize },
+    sm: { paddingVertical: sizeTokens.sm.paddingVertical, paddingHorizontal: sizeTokens.sm.paddingHorizontal },
+    md: { paddingVertical: sizeTokens.md.paddingVertical, paddingHorizontal: sizeTokens.md.paddingHorizontal },
+    lg: { paddingVertical: sizeTokens.lg.paddingVertical, paddingHorizontal: sizeTokens.lg.paddingHorizontal },
+    primary: { backgroundColor: theme.colors.primary },
+    primaryPressed: { opacity: 0.88 },
+    primaryLabel: { color: theme.colors.primaryText },
+    secondary: { backgroundColor: theme.shell?.backgroundSoft || theme.colors.inputBackground },
+    secondaryPressed: { opacity: 0.88 },
+    secondaryLabel: { color: theme.colors.foreground },
+    outline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.shell?.border || theme.colors.borderStrong },
+    outlinePressed: { backgroundColor: theme.colors.inputBackground },
+    outlineLabel: { color: theme.colors.foreground },
+    ghost: { backgroundColor: 'transparent' },
+    ghostPressed: { backgroundColor: theme.colors.inputBackground },
+    ghostLabel: { color: theme.colors.foreground },
+    subtle: { backgroundColor: theme.colors.inputBackground },
+    subtlePressed: { opacity: 0.88 },
+    subtleLabel: { color: theme.colors.foreground },
+    danger: { backgroundColor: theme.colors.error },
+    dangerPressed: { opacity: 0.88 },
+    dangerLabel: { color: '#fff' },
+    link: { backgroundColor: 'transparent', paddingVertical: 0, paddingHorizontal: 0 },
+    linkPressed: { opacity: 0.7 },
+    linkLabel: { color: theme.colors.foreground, textDecorationLine: 'underline' },
+    disabled: { opacity: 0.5 }
   });
 }
-

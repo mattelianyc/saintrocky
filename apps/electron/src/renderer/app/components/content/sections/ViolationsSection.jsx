@@ -39,7 +39,7 @@ export function ViolationsSection({ runtimeHub, onViolationAction, onConfirmOver
           )}
         </div>
       ) : (
-        <p className="desktop-HubEmpty">No pending violations. Arm the runtime to start monitoring desktop signals.</p>
+        <p className="desktop-HubEmpty">No pending violations. The runtime is monitoring desktop and chain signals.</p>
       )}
     </Card>
   );

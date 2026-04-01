@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native';
 
-import { api } from '@saintrocky/api-client';
+import { api } from '@/api/client.js';
 import { buildDirectMessagesChannel } from '@saintrocky/realtime';
 import { MAX_DIRECT_MESSAGE_LENGTH } from '@saintrocky/shared';
 import { ChatBubble, IconButton, useTheme } from '@saintrocky/ui-native';
@@ -19,16 +19,16 @@ export function ChatScreen({ route, auth }) {
   const listRef = useRef(null);
 
   const ownerEmail = auth.user?.email;
-  const ownerUserId = auth.user?.userId;
+  const ownerUserId = auth.user?.id;
   const messagesChannel = ownerEmail ? buildDirectMessagesChannel(ownerEmail) : null;
 
   useRealtimeChannel(messagesChannel, {
-    onEvent(message) {
-      const newMessage = message?.data;
+    onEvent(payload) {
+      const newMessage = payload?.message;
       if (
         newMessage &&
-        (newMessage.senderUserId === counterpartyUserId ||
-          newMessage.recipientUserId === counterpartyUserId)
+        (newMessage.sender?.id === counterpartyUserId ||
+          newMessage.recipient?.id === counterpartyUserId)
       ) {
         setMessages((prev) => [...prev, newMessage]);
       }
@@ -40,7 +40,9 @@ export function ChatScreen({ route, auth }) {
       const result = await api.messages.listMessages(counterpartyUserId);
       setMessages(result.messages || []);
       await api.messages.markRead(counterpartyUserId);
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load messages.');
+    }
   }, [counterpartyUserId]);
 
   useEffect(() => {
@@ -58,7 +60,9 @@ export function ChatScreen({ route, auth }) {
         body
       });
       setDraft('');
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to send message.');
+    }
     setSending(false);
   }, [draft, sending, counterpartyUserId]);
 
@@ -78,7 +82,7 @@ export function ChatScreen({ route, auth }) {
         renderItem={({ item }) => (
           <ChatBubble
             message={item}
-            isOwn={item.senderUserId === ownerUserId}
+            isOwn={item.sender?.id === ownerUserId}
           />
         )}
         contentContainerStyle={styles.messagesList}

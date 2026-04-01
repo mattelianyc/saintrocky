@@ -1,6 +1,10 @@
 import { createApiClient, setUnauthorizedHandler } from '@saintrocky/api-client';
 import {
+  buildCampaignsChannel,
+  buildDirectMessagesChannel,
   buildExtensionSessionsChannel,
+  buildFriendsChannel,
+  buildLeaderboardChannel,
   buildRulesChannel,
   buildRuntimeChannel,
   createRealtimeClient
@@ -11,9 +15,12 @@ import { createRuntimeHub } from './runtime-hub.js';
 import { desktopRuntimeModels } from './runtime-models.js';
 import { getDesktopRuntimeConfig } from './runtime-config.js';
 
+const DASHBOARD_REFRESH_INTERVAL_MS = 60_000;
+
 const runtimeConfig = getDesktopRuntimeConfig();
 let sessionUser = null;
 let sessionToken = '';
+let dashboardRefreshTimer = null;
 const apiClient = createApiClient({
   baseUrl: runtimeConfig.ELECTRON_API_BASE_URL,
   getAuthToken() {
@@ -32,6 +39,10 @@ const realtimeClient = createRealtimeClient({
 });
 let cleanupExtensionSessionsSubscription = null;
 let cleanupRulesSubscription = null;
+let cleanupLeaderboardSubscription = null;
+let cleanupFriendsSubscription = null;
+let cleanupDirectMessagesSubscription = null;
+let cleanupCampaignsSubscription = null;
 const runtimeHub = createRuntimeHub({
   listAssignments(ownerEmail) {
     return apiClient.rules.listRuntimeAssignments(
@@ -80,32 +91,94 @@ runtimeHub.onStateChange((snapshot) => {
     } catch {}
   });
 });
+
+runtimeHub.onNotifiableEvent((event) => {
+  fireNativeNotification(event.title, event.body);
+});
+
+function fireNativeNotification(title, body) {
+  ipcRenderer.invoke('desktop-runtime:show-notification', {
+    title: title || 'Saint Rocky',
+    body: body || ''
+  }).catch(() => {});
+}
+
 realtimeClient.onConnectionStateChange((connection) => {
+  runtimeHub.setRealtimeConnectionState(connection.state);
+
   if (connection.state !== 'authenticated' || !sessionUser?.email) {
     return;
   }
 
+  const email = sessionUser.email;
+
   cleanupExtensionSessionsSubscription?.();
   cleanupExtensionSessionsSubscription = realtimeClient.subscribe(
-    buildExtensionSessionsChannel(sessionUser.email),
+    buildExtensionSessionsChannel(email),
     (message) => {
-      if (message.type !== 'channel.snapshot') {
-        return;
-      }
-
+      if (message.type !== 'channel.snapshot') return;
       runtimeHub.replaceExtensionSessions(message.payload?.sessions || []);
     }
   );
 
   cleanupRulesSubscription?.();
   cleanupRulesSubscription = realtimeClient.subscribe(
-    buildRulesChannel(sessionUser.email),
+    buildRulesChannel(email),
     (message) => {
-      if (message.type !== 'channel.snapshot') {
-        return;
+      if (message.type === 'channel.snapshot') {
+        runtimeHub.replaceRules(message.payload?.rules || []);
+        if (message.payload?.eventType === 'chain_violation_detected') {
+          runtimeHub.ingestChainViolation(message.payload);
+          refreshDashboard();
+        }
       }
+      if (message.type === 'channel.event') {
+        const eventType = message.event || message.payload?.eventType || '';
+        if (eventType === 'chain_violation_detected') {
+          runtimeHub.ingestChainViolation(message.payload);
+          refreshDashboard();
+        } else if (eventType) {
+          runtimeHub.ingestRulesEvent(eventType, message.payload);
+          refreshDashboard();
+        }
+      }
+    }
+  );
 
-      runtimeHub.replaceRules(message.payload?.rules || []);
+  cleanupLeaderboardSubscription?.();
+  cleanupLeaderboardSubscription = realtimeClient.subscribe(
+    buildLeaderboardChannel(),
+    (message) => {
+      if (message.type === 'channel.snapshot' || message.type === 'channel.event') {
+        runtimeHub.updateLeaderboard(message.payload);
+      }
+    }
+  );
+
+  cleanupFriendsSubscription?.();
+  cleanupFriendsSubscription = realtimeClient.subscribe(
+    buildFriendsChannel(email),
+    (message) => {
+      const eventType = message.event || message.payload?.eventType || 'friend_update';
+      runtimeHub.ingestSocialEvent('friends', eventType, message.payload);
+    }
+  );
+
+  cleanupDirectMessagesSubscription?.();
+  cleanupDirectMessagesSubscription = realtimeClient.subscribe(
+    buildDirectMessagesChannel(email),
+    (message) => {
+      const eventType = message.event || message.payload?.eventType || 'message_received';
+      runtimeHub.ingestSocialEvent('direct_messages', eventType, message.payload);
+    }
+  );
+
+  cleanupCampaignsSubscription?.();
+  cleanupCampaignsSubscription = realtimeClient.subscribe(
+    buildCampaignsChannel(email),
+    (message) => {
+      const eventType = message.event || message.payload?.eventType || 'campaign_update';
+      runtimeHub.ingestSocialEvent('campaigns', eventType, message.payload);
     }
   );
 });
@@ -165,7 +238,38 @@ function disconnectRealtimeConnection() {
   cleanupExtensionSessionsSubscription = null;
   cleanupRulesSubscription?.();
   cleanupRulesSubscription = null;
+  cleanupLeaderboardSubscription?.();
+  cleanupLeaderboardSubscription = null;
+  cleanupFriendsSubscription?.();
+  cleanupFriendsSubscription = null;
+  cleanupDirectMessagesSubscription?.();
+  cleanupDirectMessagesSubscription = null;
+  cleanupCampaignsSubscription?.();
+  cleanupCampaignsSubscription = null;
+  stopDashboardRefresh();
   realtimeClient.disconnect();
+}
+
+async function refreshDashboard() {
+  try {
+    const summary = await apiClient.dashboard.summary();
+    if (summary?.ok !== false) {
+      runtimeHub.updateDashboard(summary);
+    }
+  } catch {}
+}
+
+function startDashboardRefresh() {
+  stopDashboardRefresh();
+  refreshDashboard();
+  dashboardRefreshTimer = setInterval(refreshDashboard, DASHBOARD_REFRESH_INTERVAL_MS);
+}
+
+function stopDashboardRefresh() {
+  if (dashboardRefreshTimer) {
+    clearInterval(dashboardRefreshTimer);
+    dashboardRefreshTimer = null;
+  }
 }
 
 function buildErrorResponse(error, fallbackMessage) {
@@ -213,6 +317,7 @@ export async function getSession() {
       runtimeHub.replaceExtensionSessions(extensionSessionsResponse?.sessions || []);
       await persistAuthState();
       await runtimeHub.start();
+      startDashboardRefresh();
     } else {
       await clearLocalSession();
     }
@@ -238,6 +343,7 @@ export async function login(credentials) {
 
     const session = await getSession();
     if (session.ok && session.authenticated) {
+      startDashboardRefresh();
       return session;
     }
 
@@ -531,5 +637,15 @@ export async function cancelRuntimeOverride() {
     };
   } catch (error) {
     return buildErrorResponse(error, 'Failed to cancel override');
+  }
+}
+
+export async function refreshDesktopDashboard() {
+  await loadPersistedAuthState();
+  try {
+    await refreshDashboard();
+    return { ok: true };
+  } catch (error) {
+    return buildErrorResponse(error, 'Failed to refresh dashboard');
   }
 }

@@ -1,27 +1,7 @@
 "use client";
 
-import { MarketingOverviewSection } from "@saintrocky/ui/web";
-import { saintRockyBranding } from "@saintrocky/branding";
-
-import { useAuthSession } from "@/src/auth/auth-session.jsx";
+import { BrandHeroParallax } from "@saintrocky/ui/web";
 
 export default function MarketingOverviewSessionSection() {
-  const { isAuthenticated, isLoadingSession } = useAuthSession();
-
-  const actionLabel = isLoadingSession
-    ? "Checking session..."
-    : isAuthenticated
-      ? "Open control plane"
-      : "Join the network";
-
-  const actionHref = isAuthenticated ? "/dashboard" : "/signup";
-
-  return (
-    <MarketingOverviewSection
-      marketingOverview={saintRockyBranding.marketingOverview}
-      actionHref={actionHref}
-      actionLabel={actionLabel}
-      isActionPending={isLoadingSession}
-    />
-  );
+  return <BrandHeroParallax />;
 }

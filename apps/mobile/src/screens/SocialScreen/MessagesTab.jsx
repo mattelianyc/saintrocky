@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 
-import { api } from '@saintrocky/api-client';
+import { api } from '@/api/client.js';
 import { buildDirectMessagesChannel } from '@saintrocky/realtime';
 import {
   Avatar,
@@ -12,6 +12,7 @@ import {
 } from '@saintrocky/ui-native';
 
 import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
+import { SocialScreenConfig } from '@/screens/SocialScreen/SocialScreen.config.js';
 import { createStyles } from '@/screens/SocialScreen/SocialScreen.styles.js';
 
 function formatThreadTime(dateString) {
@@ -46,7 +47,9 @@ export function MessagesTab({ auth, navigation }) {
     try {
       const result = await api.messages.listThreads();
       setThreads(result.threads || []);
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load messages.');
+    }
   }, []);
 
   useEffect(() => {
@@ -61,25 +64,25 @@ export function MessagesTab({ auth, navigation }) {
 
   const openChat = useCallback((thread) => {
     navigation.navigate('ChatConversation', {
-      counterpartyUserId: thread.counterpartyUserId,
-      counterpartyName: thread.counterpartyDisplayName || thread.counterpartyEmail,
-      counterpartyEmail: thread.counterpartyEmail
+      counterpartyUserId: thread.counterparty?.id,
+      counterpartyName: thread.counterparty?.displayName || thread.counterparty?.email,
+      counterpartyEmail: thread.counterparty?.email
     });
   }, [navigation]);
 
   return (
     <FlatList
       data={threads}
-      keyExtractor={(item) => item.counterpartyUserId}
+      keyExtractor={(item) => item.conversationId}
       contentContainerStyle={styles.listContent}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />}
       renderItem={({ item }) => (
         <ListItem
-          title={item.counterpartyDisplayName || item.counterpartyEmail}
-          subtitle={item.lastMessageBody || 'No messages yet'}
+          title={item.counterparty?.displayName || item.counterparty?.email}
+          subtitle={item.lastMessage?.body || 'No messages yet'}
           onPress={() => openChat(item)}
           showChevron
-          leading={<Avatar name={item.counterpartyDisplayName} size="md" />}
+          leading={<Avatar name={item.counterparty?.displayName || item.counterparty?.email} size="md" />}
           trailing={
             <View style={styles.threadMeta}>
               <Text style={styles.threadTime}>
@@ -95,8 +98,8 @@ export function MessagesTab({ auth, navigation }) {
       ListEmptyComponent={
         <EmptyState
           iconName="chat"
-          title="No conversations"
-          message="Add friends first, then start messaging for real-time accountability."
+          title={SocialScreenConfig.emptyMessagesTitle}
+          message={SocialScreenConfig.emptyMessagesMessage}
         />
       }
     />

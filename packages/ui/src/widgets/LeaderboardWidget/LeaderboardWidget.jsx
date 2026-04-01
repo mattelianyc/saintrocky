@@ -22,8 +22,34 @@ function resolvePulseClass(index) {
   return "";
 }
 
+function LeaderboardSkeletonRow({ index }) {
+  return (
+    <div
+      className="w-LeaderboardWidget__row w-LeaderboardWidget__skeletonRow"
+      style={{ animationDelay: `${index * 60}ms` }}
+    >
+      <span className="w-LeaderboardWidget__rank">
+        <span className="w-LeaderboardWidget__skeletonBlock" style={{ width: "1.6rem" }} />
+      </span>
+      <span className="w-LeaderboardWidget__trader">
+        <span
+          className="w-LeaderboardWidget__skeletonBlock"
+          style={{ width: `${55 + ((index * 17) % 30)}%` }}
+        />
+      </span>
+      <span className="w-LeaderboardWidget__score">
+        <span className="w-LeaderboardWidget__skeletonBlock" style={{ width: "2rem" }} />
+      </span>
+      <span className="w-LeaderboardWidget__earnings">
+        <span className="w-LeaderboardWidget__skeletonBlock" style={{ width: "4rem" }} />
+      </span>
+    </div>
+  );
+}
+
 function LeaderboardRow({ entry, index, variant }) {
-  const isHero = variant === "hero";
+  const isHero = variant === "hero" || variant === "heroLight";
+  const cleanStreak = entry.cleanStreak ?? 0;
 
   return (
     <motion.div
@@ -33,9 +59,13 @@ function LeaderboardRow({ entry, index, variant }) {
       transition={{ ...ROW_ANIMATION.transition, delay: index * 0.05 }}
     >
       <span className="w-LeaderboardWidget__rank">#{entry.rank || index + 1}</span>
-      <span className="w-LeaderboardWidget__trader">{resolveDisplayName(entry)}</span>
+      <span className="w-LeaderboardWidget__trader">
+        <span className="w-LeaderboardWidget__traderName">{resolveDisplayName(entry)}</span>
+        {cleanStreak >= 14 && (
+          <span className="w-LeaderboardWidget__streakBadge">🔥{cleanStreak}d</span>
+        )}
+      </span>
       <span className="w-LeaderboardWidget__score">{entry.disciplineScore ?? "—"}</span>
-      <span className="w-LeaderboardWidget__streak">{entry.cleanStreak ?? 0}d</span>
       <span className="w-LeaderboardWidget__earnings">
         {isHero ? (
           <SlotCounter value={entry.earningsSol ?? 0} prefix="" suffix=" SOL" decimals={3} />
@@ -43,7 +73,6 @@ function LeaderboardRow({ entry, index, variant }) {
           `${(entry.earningsSol ?? 0).toFixed(3)} SOL`
         )}
       </span>
-      <span className="w-LeaderboardWidget__staked">{(entry.lockedStakeSol ?? 0).toFixed(2)}</span>
     </motion.div>
   );
 }
@@ -72,9 +101,7 @@ export function LeaderboardWidget({
         </span>
         <span>Trader</span>
         <span>Score</span>
-        <span>Streak</span>
         <span>Earned</span>
-        <span>Staked</span>
       </div>
 
       <div className="w-LeaderboardWidget__rows">
@@ -89,11 +116,10 @@ export function LeaderboardWidget({
           ))}
         </AnimatePresence>
 
-        {!displayEntries.length && (
-          <div className="w-LeaderboardWidget__empty">
-            <span>Leaderboard loading...</span>
-          </div>
-        )}
+        {!displayEntries.length &&
+          Array.from({ length: limit }, (_, index) => (
+            <LeaderboardSkeletonRow key={`skeleton-${index}`} index={index} />
+          ))}
       </div>
     </div>
   );

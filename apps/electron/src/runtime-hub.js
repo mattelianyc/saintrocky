@@ -11,7 +11,7 @@ function buildInitialState() {
   return {
     ownerEmail: '',
     monitorStatus: 'idle',
-    isArmed: false,
+    isArmed: true,
     assignments: [],
     rules: [],
     recentEvents: [],
@@ -23,6 +23,11 @@ function buildInitialState() {
     visibleProcesses: [],
     focusedApplicationName: '',
     enforcementGap: null,
+    chainViolations: [],
+    dashboard: null,
+    leaderboardSnapshot: null,
+    crossSurfaceActivity: [],
+    realtimeConnectionState: 'idle',
     preferences: {
       notificationsEnabled: true,
       hideToTrayOnClose: true
@@ -47,9 +52,10 @@ function buildEventRecord(eventType, assignment, details = {}) {
 
 function buildMonitorStatus(state) {
   if (!state.ownerEmail) return 'disconnected';
+  if (state.realtimeConnectionState === 'connecting' || state.realtimeConnectionState === 'error') return 'reconnecting';
   if (state.enforcementGap) return 'enforcementGap';
+  if (state.pendingViolation && state.pendingOverrideRequest) return 'overrideCountdown';
   if (state.pendingViolation) return 'awaitingBypassDecision';
-  if (state.pendingOverrideRequest) return 'overrideCountdown';
   if (!state.isArmed) return 'idle';
   return state.assignments.length ? 'armed' : 'idle';
 }
@@ -82,12 +88,23 @@ export function createRuntimeHub({
   let processScanTimer = null;
   let unsubscribeAssignments = null;
   let stateListener = null;
+  let notifiableEventListener = null;
   let started = false;
 
   function emitState() {
     if (typeof stateListener === 'function') {
       stateListener(buildSnapshot(state));
     }
+  }
+
+  function emitNotifiableEvent(event) {
+    if (typeof notifiableEventListener === 'function') {
+      try { notifiableEventListener(event); } catch {}
+    }
+  }
+
+  function pushCrossSurfaceActivity(entry) {
+    state.crossSurfaceActivity = [entry, ...state.crossSurfaceActivity].slice(0, 30);
   }
 
   async function addEvent(eventType, assignment, details = {}) {
@@ -293,7 +310,6 @@ export function createRuntimeHub({
     stop() {
       clearTimers();
       started = false;
-      state.isArmed = false;
       state.pendingViolation = null;
       state.pendingOverrideRequest = null;
       state.enforcementGap = null;
@@ -361,6 +377,105 @@ export function createRuntimeHub({
       state.pendingOverrideRequest = null;
       emitState();
       return buildSnapshot(state);
+    },
+    onNotifiableEvent(listener) {
+      notifiableEventListener = listener;
+    },
+    ingestChainViolation(payload) {
+      const entry = {
+        eventId: randomUUID(),
+        surface: 'chain',
+        eventType: 'chain_violation_detected',
+        occurredAt: toIsoNow(),
+        title: 'Chain violation detected',
+        details: payload
+      };
+      state.chainViolations = [entry, ...state.chainViolations].slice(0, 20);
+      state.recentEvents = [entry, ...state.recentEvents].slice(0, 12);
+      pushCrossSurfaceActivity(entry);
+      emitNotifiableEvent({ type: 'chain_violation', title: entry.title, body: buildChainViolationBody(payload) });
+      emitState();
+      return buildSnapshot(state);
+    },
+    ingestRulesEvent(eventType, payload) {
+      const entry = {
+        eventId: randomUUID(),
+        surface: 'rules',
+        eventType,
+        occurredAt: toIsoNow(),
+        title: formatRulesEventTitle(eventType),
+        details: payload
+      };
+      pushCrossSurfaceActivity(entry);
+      if (shouldNotifyForRulesEvent(eventType)) {
+        emitNotifiableEvent({ type: 'rules_event', title: entry.title, body: payload?.ruleId || '' });
+      }
+      emitState();
+      return buildSnapshot(state);
+    },
+    ingestSocialEvent(surface, eventType, payload) {
+      const entry = {
+        eventId: randomUUID(),
+        surface,
+        eventType,
+        occurredAt: toIsoNow(),
+        title: formatSocialEventTitle(surface, eventType),
+        details: payload
+      };
+      pushCrossSurfaceActivity(entry);
+      if (shouldNotifyForSocialEvent(surface, eventType)) {
+        emitNotifiableEvent({ type: 'social_event', title: entry.title, body: '' });
+      }
+      emitState();
+      return buildSnapshot(state);
+    },
+    updateDashboard(summary) {
+      state.dashboard = summary || null;
+      emitState();
+      return buildSnapshot(state);
+    },
+    updateLeaderboard(snapshot) {
+      state.leaderboardSnapshot = snapshot || null;
+      emitState();
+      return buildSnapshot(state);
+    },
+    setRealtimeConnectionState(connectionState) {
+      state.realtimeConnectionState = connectionState || 'idle';
+      emitState();
+      return buildSnapshot(state);
     }
   };
+}
+
+function buildChainViolationBody(payload) {
+  const violations = payload?.violations;
+  if (!Array.isArray(violations) || violations.length === 0) return 'A chain rule was violated.';
+  const first = violations[0];
+  return first.message || first.constraintType || 'A chain rule was violated.';
+}
+
+function formatRulesEventTitle(eventType) {
+  const labels = {
+    rule_created: 'Rule created',
+    rule_published: 'Rule published',
+    rule_status_updated: 'Rule status changed',
+    rule_edited: 'Rule edited',
+    runtime_event_recorded: 'Runtime event recorded'
+  };
+  return labels[eventType] || eventType;
+}
+
+function shouldNotifyForRulesEvent(eventType) {
+  return ['rule_created', 'rule_published', 'rule_status_updated'].includes(eventType);
+}
+
+function formatSocialEventTitle(surface, eventType) {
+  if (surface === 'friends') return 'Friend activity';
+  if (surface === 'direct_messages') return 'New message';
+  if (surface === 'campaigns') return 'Campaign update';
+  return eventType;
+}
+
+function shouldNotifyForSocialEvent(surface, eventType) {
+  return surface === 'direct_messages' || (surface === 'friends' && eventType === 'friend_request_received');
 }

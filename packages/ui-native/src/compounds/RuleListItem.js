@@ -2,113 +2,93 @@ import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from '@saintrocky/icons';
 import { useTheme } from '../theme.js';
-import { Badge } from '../primitives/Badge.js';
 
-const STATUS_VARIANT_MAP = {
-  active: 'success',
-  inactive: 'muted',
-  draft: 'warning',
-  pending_review: 'warning'
+const STATUS_DOT_COLORS = {
+  active: '#4ade80',
+  inactive: 'rgba(255,255,255,0.25)',
+  draft: '#fbbf24',
+  pending_review: '#fbbf24'
 };
 
 export function RuleListItem({ rule, onPress }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const badgeVariant = STATUS_VARIANT_MAP[rule?.status] || 'default';
+  const dotColor = STATUS_DOT_COLORS[rule?.status] || theme.shell?.textMuted || theme.colors.muted;
 
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
     >
-      <View style={styles.header}>
+      <View style={[styles.statusDot, { backgroundColor: dotColor }]} />
+      <View style={styles.body}>
         <Text style={styles.title} numberOfLines={1}>
           {rule?.title || rule?.summary || 'Untitled rule'}
         </Text>
-        <Badge variant={badgeVariant} size="xs">
-          {rule?.status || 'unknown'}
-        </Badge>
-      </View>
-
-      {rule?.summary ? (
-        <Text style={styles.summary} numberOfLines={2}>{rule.summary}</Text>
-      ) : null}
-
-      <View style={styles.meta}>
-        {rule?.enforcementSurfaces?.length ? (
-          <View style={styles.metaItem}>
-            <Icon name="shield" size={12} color={theme.colors.muted} />
+        {rule?.summary ? (
+          <Text style={styles.summary} numberOfLines={1}>{rule.summary}</Text>
+        ) : null}
+        <View style={styles.meta}>
+          <Text style={styles.metaText}>
+            {rule?.status || 'unknown'}
+          </Text>
+          {rule?.enforcementSurfaces?.length ? (
             <Text style={styles.metaText}>
-              {rule.enforcementSurfaces.join(', ')}
+              · {rule.enforcementSurfaces.length} surface{rule.enforcementSurfaces.length !== 1 ? 's' : ''}
             </Text>
-          </View>
-        ) : null}
-        {rule?.scheduleType ? (
-          <View style={styles.metaItem}>
-            <Icon name="schedule" size={12} color={theme.colors.muted} />
-            <Text style={styles.metaText}>{rule.scheduleType}</Text>
-          </View>
-        ) : null}
+          ) : null}
+        </View>
       </View>
-
-      <View style={styles.chevron}>
-        <Icon name="chevronRight" size={18} color={theme.colors.muted} />
-      </View>
+      <Icon name="chevronRight" size={16} color={theme.shell?.textMuted || theme.colors.muted} />
     </Pressable>
   );
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
-      borderRadius: 14,
-      padding: 14,
-      backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      marginBottom: 10,
-      position: 'relative'
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing?.medium || 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.shell?.border || theme.colors.border
     },
     pressed: {
-      opacity: 0.8
+      opacity: 0.7
     },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 6
+    statusDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginRight: spacing?.small || 12
+    },
+    body: {
+      flex: 1,
+      marginRight: spacing?.xsmall || 8
     },
     title: {
       color: theme.colors.foreground,
-      fontSize: 15,
-      fontWeight: '600',
-      flex: 1,
-      marginRight: 10
+      fontSize: typography?.sizeBase || 15,
+      fontWeight: typography?.weightSemibold || '600'
     },
     summary: {
-      color: theme.colors.muted,
-      fontSize: 13,
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeSmall || 13,
       lineHeight: 18,
-      marginBottom: 8
+      marginTop: 2
     },
     meta: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 12
-    },
-    metaItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4
+      marginTop: 4
     },
     metaText: {
-      color: theme.colors.muted,
-      fontSize: 11
-    },
-    chevron: {
-      position: 'absolute',
-      right: 12,
-      top: '50%'
+      fontFamily: typography?.fontFamilyMono || 'System',
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeXxsmall || 10,
+      letterSpacing: typography?.letterSpacingWide || 1.2,
+      textTransform: 'uppercase'
     }
   });
 }

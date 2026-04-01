@@ -17,6 +17,9 @@ export { RuleListItem } from './compounds/RuleListItem.js';
 export { SectionHeader } from './compounds/SectionHeader.js';
 export { ViolationCard } from './compounds/ViolationCard.js';
 
+export { ScreenContainer } from './layout/ScreenContainer.js';
+export { SectionDivider } from './layout/SectionDivider.js';
+
 export * as NativePrimitives from './primitives/index.js';
 export * as NativeCompounds from './compounds/index.js';
 export * as NativeLayout from './layout/index.js';

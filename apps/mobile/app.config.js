@@ -3,24 +3,17 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
-function readStringEnv(value) {
-  return typeof value === 'string' && value.trim() ? value.trim() : null;
-}
-
 module.exports = ({ config }) => {
-  const projectId = readStringEnv(process.env.EXPO_PUBLIC_EAS_PROJECT_ID) || readStringEnv(process.env.EAS_PROJECT_ID);
-  const extra = {
-    ...(config.extra || {}),
-    EXPO_PUBLIC_APP_ENV: readStringEnv(process.env.EXPO_PUBLIC_APP_ENV) || 'development'
-  };
+  const extra = { ...(config.extra || {}) };
 
-  const apiUrl = readStringEnv(process.env.EXPO_PUBLIC_API_URL);
-  const analyticsKey = readStringEnv(process.env.EXPO_PUBLIC_ANALYTICS_KEY);
+  for (const [key, value] of Object.entries(process.env)) {
+    if (key.startsWith('EXPO_PUBLIC_') || key === 'EAS_PROJECT_ID') {
+      extra[key] = value;
+    }
+  }
 
-  if (apiUrl) extra.EXPO_PUBLIC_API_URL = apiUrl;
-  if (analyticsKey) extra.EXPO_PUBLIC_ANALYTICS_KEY = analyticsKey;
+  const projectId = extra.EXPO_PUBLIC_EAS_PROJECT_ID || extra.EAS_PROJECT_ID;
   if (projectId) {
-    extra.EXPO_PUBLIC_EAS_PROJECT_ID = projectId;
     extra.eas = { projectId };
   }
 
@@ -42,7 +35,7 @@ module.exports = ({ config }) => {
         backgroundColor: '#E6F4FE',
         foregroundImage: './assets/android-icon-foreground.png',
         backgroundImage: './assets/android-icon-background.png',
-        monochromeImage: './assets/android-icon-monochrome.png',
+        monochromeImage: './assets/android-icon-monochrome.png'
       }
     },
     web: {

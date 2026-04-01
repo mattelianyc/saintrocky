@@ -1,65 +1,49 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 
-import { api } from '@saintrocky/api-client';
+import { api } from '@/api/client.js';
 import { buildLeaderboardChannel } from '@saintrocky/realtime';
-import {
-  Avatar,
-  Badge,
-  Card,
-  EmptyState,
-  useTheme
-} from '@saintrocky/ui-native';
+import { EmptyState, useTheme } from '@saintrocky/ui-native';
 
+import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
+import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
 import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
+import { useRefreshControl } from '@/hooks/useRefreshControl.js';
+import { LeaderboardScreenConfig } from '@/screens/LeaderboardScreen/LeaderboardScreen.config.js';
 import { createStyles } from '@/screens/LeaderboardScreen/LeaderboardScreen.styles.js';
 
+const MEDAL_EMOJI = { 1: '1ST', 2: '2ND', 3: '3RD' };
 const PODIUM_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
 
 function LeaderboardEntry({ entry, index, isCurrentUser, theme, styles }) {
   const rank = entry.rank || index + 1;
   const isPodium = rank <= 3;
-  const podiumColor = isPodium ? PODIUM_COLORS[rank - 1] : null;
+  const accentColor = isPodium ? PODIUM_COLORS[rank - 1] : theme.colors.foreground;
 
   return (
-    <Card style={[styles.entryCard, isCurrentUser && styles.currentUserCard]}>
-      <View style={styles.entryRow}>
-        <View style={[
-          styles.rankCircle,
-          isPodium && { backgroundColor: podiumColor }
-        ]}>
-          <Text style={[styles.rankText, isPodium && styles.podiumRankText]}>
-            {rank}
-          </Text>
-        </View>
-
-        <Avatar
-          name={entry.displayName}
-          size="sm"
-          color={isPodium ? podiumColor : undefined}
-        />
-
-        <View style={styles.entryBody}>
-          <Text style={styles.entryName} numberOfLines={1}>
-            {entry.displayName || entry.email || 'Anonymous'}
-          </Text>
-          <Text style={styles.entryMeta}>
-            {entry.activeRuleCount || 0} rules · {entry.complianceRate || 0}% compliance
-          </Text>
-        </View>
-
-        <View style={styles.scoreColumn}>
-          <Text style={[styles.scoreValue, isPodium && { color: podiumColor }]}>
-            {entry.disciplineScore ?? 0}
-          </Text>
-          <Text style={styles.scoreLabel}>pts</Text>
-        </View>
+    <View style={[
+      styles.entryRow,
+      index % 2 === 1 && styles.entryRowAlt,
+      isCurrentUser && styles.currentUserRow
+    ]}>
+      <View style={styles.rankCell}>
+        <Text style={[styles.rankText, { color: accentColor }]}>
+          {isPodium ? MEDAL_EMOJI[rank] : rank}
+        </Text>
       </View>
-
-      {isCurrentUser ? (
-        <Badge variant="primary" size="xs" style={styles.youBadge}>You</Badge>
-      ) : null}
-    </Card>
+      <View style={styles.entryBody}>
+        <Text style={[styles.entryName, isCurrentUser && styles.currentUserName]} numberOfLines={1}>
+          {entry.displayName || entry.email || 'Anonymous'}
+          {isCurrentUser ? '  ·  YOU' : ''}
+        </Text>
+        <Text style={styles.entryMeta}>
+          {entry.activeRuleCount || 0} rules · {entry.complianceRate || 0}%
+        </Text>
+      </View>
+      <Text style={[styles.scoreValue, isPodium && { color: accentColor }]}>
+        {entry.disciplineScore ?? 0}
+      </Text>
+    </View>
   );
 }
 
@@ -67,9 +51,9 @@ export function LeaderboardScreen({ auth }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const currentUserId = auth?.user?.userId;
+  const currentUserId = auth?.user?.id;
 
   useRealtimeChannel(buildLeaderboardChannel(), {
     onSnapshot(data) {
@@ -77,9 +61,9 @@ export function LeaderboardScreen({ auth }) {
         setLeaderboard(data.leaderboard);
       }
     },
-    onEvent(message) {
-      if (message?.data?.leaderboard) {
-        setLeaderboard(message.data.leaderboard);
+    onEvent(payload) {
+      if (payload?.leaderboard) {
+        setLeaderboard(payload.leaderboard);
       }
     }
   });
@@ -88,49 +72,58 @@ export function LeaderboardScreen({ auth }) {
     try {
       const result = await api.leaderboard.getLeaderboard(50);
       setLeaderboard(result.leaderboard || []);
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load leaderboard.');
+    }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
-  }, [load]);
+  const { refreshing, onRefresh } = useRefreshControl(load);
 
   return (
-    <FlatList
-      data={leaderboard}
-      keyExtractor={(item) => item.userId}
-      contentContainerStyle={styles.listContent}
-      renderItem={({ item, index }) => (
-        <LeaderboardEntry
-          entry={item}
-          index={index}
-          isCurrentUser={item.userId === currentUserId}
-          theme={theme}
-          styles={styles}
-        />
-      )}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Leaderboard</Text>
-          <Text style={styles.headerSubtitle}>
-            Discipline scores updated in real time
-          </Text>
-        </View>
-      }
-      ListEmptyComponent={
-        <EmptyState
-          iconName="trophy"
-          title="No rankings yet"
-          message="Activate rules and maintain compliance to earn your spot on the board."
-        />
-      }
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={leaderboard}
+        keyExtractor={(item) => item.userId}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item, index }) => (
+          <LeaderboardEntry
+            entry={item}
+            index={index}
+            isCurrentUser={item.userId === currentUserId}
+            theme={theme}
+            styles={styles}
+          />
+        )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
+        }
+        ListHeaderComponent={
+          <>
+            <ScreenHeader kicker="RANKINGS" title="Leaderboard" showLogo />
+            <View style={styles.tableHeader}>
+              <Text style={[styles.tableHeaderText, styles.rankColumn]}>RANK</Text>
+              <Text style={[styles.tableHeaderText, styles.nameColumn]}>PLAYER</Text>
+              <Text style={[styles.tableHeaderText, styles.scoreColumn]}>SCORE</Text>
+            </View>
+          </>
+        }
+        ListEmptyComponent={
+          loading ? (
+            <LoadingSkeleton rows={8} />
+          ) : (
+            <EmptyState
+              iconName="trophy"
+              title={LeaderboardScreenConfig.emptyTitle}
+              message={LeaderboardScreenConfig.emptyMessage}
+            />
+          )
+        }
+      />
+    </View>
   );
 }

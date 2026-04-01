@@ -55,29 +55,62 @@ export function parseNotificationNavigation(notification) {
   if (!data) return null;
 
   if (data.type === 'violation' && data.ruleId) {
-    return { screen: 'Home', params: { focusViolation: data.ruleId } };
+    return {
+      screen: 'Main',
+      params: {
+        screen: 'MainTabs',
+        params: { screen: 'Home', params: { screen: 'HomeOverview' } }
+      }
+    };
   }
 
   if (data.type === 'message' && data.counterpartyUserId) {
     return {
-      screen: 'ChatConversation',
+      screen: 'Main',
       params: {
-        counterpartyUserId: data.counterpartyUserId,
-        counterpartyName: data.counterpartyName
+        screen: 'MainTabs',
+        params: {
+          screen: 'Social',
+          params: {
+            screen: 'ChatConversation',
+            params: {
+              counterpartyUserId: data.counterpartyUserId,
+              counterpartyName: data.counterpartyName
+            }
+          }
+        }
       }
     };
   }
 
   if (data.type === 'friend_request') {
-    return { screen: 'Main', params: { screen: 'Social' } };
+    return {
+      screen: 'Main',
+      params: {
+        screen: 'MainTabs',
+        params: { screen: 'Social' }
+      }
+    };
   }
 
   if (data.type === 'campaign') {
-    return { screen: 'Main', params: { screen: 'Social' } };
+    return {
+      screen: 'Main',
+      params: {
+        screen: 'MainTabs',
+        params: { screen: 'Social' }
+      }
+    };
   }
 
   if (data.type === 'leaderboard') {
-    return { screen: 'Main', params: { screen: 'Leaderboard' } };
+    return {
+      screen: 'Main',
+      params: {
+        screen: 'MainTabs',
+        params: { screen: 'Leaderboard' }
+      }
+    };
   }
 
   return null;

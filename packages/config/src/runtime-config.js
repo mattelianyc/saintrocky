@@ -28,8 +28,10 @@ const webRuntimeSchema = defineSchema({
 
 const mobileRuntimeSchema = defineSchema({
   EXPO_PUBLIC_API_URL: rules.optionalString("http://localhost:4000"),
+  EXPO_PUBLIC_WEB_URL: rules.optionalString("https://saintrocky.com"),
   EXPO_PUBLIC_APP_NAME: rules.optionalString("Saint Rocky"),
-  EXPO_PUBLIC_PRODUCT_NAME: rules.optionalString("Standard Deviants")
+  EXPO_PUBLIC_PRODUCT_NAME: rules.optionalString("Standard Deviants"),
+  EXPO_PUBLIC_ANALYTICS_KEY: rules.optionalString("")
 });
 
 const extensionRuntimeSchema = defineSchema({

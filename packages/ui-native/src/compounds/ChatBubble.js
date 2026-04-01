@@ -27,31 +27,34 @@ export function ChatBubble({ message, isOwn = false }) {
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     row: {
       flexDirection: 'row',
-      marginBottom: 6,
-      paddingHorizontal: 12
+      marginBottom: spacing?.xxsmall || 4,
+      paddingHorizontal: spacing?.medium || 16
     },
     ownRow: {
       justifyContent: 'flex-end'
     },
     bubble: {
       maxWidth: '78%',
-      borderRadius: 16,
-      paddingHorizontal: 14,
-      paddingVertical: 10
+      paddingHorizontal: spacing?.medium || 14,
+      paddingVertical: spacing?.xsmall || 10
     },
     ownBubble: {
       backgroundColor: theme.colors.accent,
-      borderBottomRightRadius: 4
+      borderRadius: 2,
+      borderBottomRightRadius: 0
     },
     otherBubble: {
-      backgroundColor: theme.colors.inputBackground,
-      borderBottomLeftRadius: 4
+      backgroundColor: theme.shell?.backgroundSoft || theme.colors.inputBackground,
+      borderRadius: 2,
+      borderBottomLeftRadius: 0
     },
     text: {
-      fontSize: 15,
+      fontSize: typography?.sizeBase || 15,
       lineHeight: 20
     },
     ownText: {
@@ -61,16 +64,18 @@ function createStyles(theme) {
       color: theme.colors.foreground
     },
     time: {
-      fontSize: 10,
+      fontFamily: typography?.fontFamilyMono || 'System',
+      fontSize: typography?.sizeXxsmall || 10,
       marginTop: 4,
-      alignSelf: 'flex-end'
+      alignSelf: 'flex-end',
+      letterSpacing: typography?.letterSpacingWide || 1.2
     },
     ownTime: {
       color: theme.colors.primaryText,
-      opacity: 0.7
+      opacity: 0.6
     },
     otherTime: {
-      color: theme.colors.muted
+      color: theme.shell?.textMuted || theme.colors.muted
     }
   });
 }

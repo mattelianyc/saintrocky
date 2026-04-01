@@ -86,69 +86,95 @@ export const saintRockyBranding = {
     ecosystemPillars: [
       {
         title: "Forum over isolation",
+        icon: "users",
         summary: "Think Reddit for process, accountability, and post-trade honesty."
       },
       {
         title: "AI makes the rule enforceable",
+        icon: "strategy",
         summary: "Messy intent gets clarified before the app lets it become policy."
       },
       {
         title: "Built for retail chaos",
+        icon: "alert",
         summary: "Not productivity theater. Behavioral guardrails for actual degens."
       }
+    ]
+  },
+  ethosSection: {
+    eyebrow: "THE ETHOS",
+    heading: "We lend a paw while making a profit.",
+    bodyLines: [
+      "Cost is the mechanism, not the motive. Every fee exists to challenge your weaknesses so you grow past them.",
+      "Payment is always your choice. Don't break your rules, don't pay a dime.",
+      "Top performers share in the override fee pool. Discipline isn't just free — it pays."
     ]
   },
   featureMatrix: [
     {
       name: "On-chain escrow",
+      icon: "wallet",
       summary:
         "Deposit SOL into your vault. Penalties auto-deduct when you violate your own rules. Rewards flow back to the disciplined."
     },
     {
       name: "Trade monitoring",
+      icon: "analytics",
       summary:
         "Real-time Solana transaction monitoring via Helius webhooks. Detects trades on Pump.fun, Jupiter, Raydium, and more."
     },
     {
       name: "Cross-surface enforcement",
+      icon: "tactics",
       summary:
         "Browser extension blocks trading domains, desktop app detects trading apps, chain watcher catches on-chain violations."
     }
   ],
+  platformsSection: {
+    eyebrow: "Deploy everywhere",
+    heading: "One account. Every surface."
+  },
   supportedPlatforms: [
-    "Web control plane",
-    "Browser extension",
-    "Cross-platform desktop",
-    "iOS companion app",
-    "Android companion app"
+    { label: "Web control plane", icon: "globe" },
+    { label: "Browser extension", icon: "extension" },
+    { label: "Cross-platform desktop", icon: "desktop" },
+    { label: "iOS companion app", icon: "phone" },
+    { label: "Android companion app", icon: "phone" }
   ],
   productModules: [
     {
       title: "Rules",
+      icon: "tactics",
       summary: "AI-mediated rule creation with universal templates for trade limits, schedules, and position sizing."
     },
     {
       title: "Wallet & Escrow",
+      icon: "wallet",
       summary: "Connect Phantom, stake SOL, and manage your on-chain escrow vault."
     },
     {
       title: "Trade History",
+      icon: "trades",
       summary: "Full audit trail of detected trades with violation flags and penalty records."
     },
     {
       title: "Leaderboard",
+      icon: "trophy",
       summary: "Discipline rankings with verifiable on-chain scores and gradient reward payouts."
     },
     {
       title: "Friends",
+      icon: "users",
       summary: "Add trusted traders, share accountability, and build a real social graph around discipline."
     },
     {
       title: "Messages",
+      icon: "chat",
       summary: "Chat with accepted friends in a private realtime inbox tied to your accountability network."
     },
     {
       title: "Campaigns",
+      icon: "calendar",
       summary: "Launch shared challenges with aligned rules, shared time windows, and group accountability."
     }
   ],

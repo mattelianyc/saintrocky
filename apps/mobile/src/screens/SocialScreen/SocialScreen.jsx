@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { useTheme } from '@saintrocky/ui-native';
 
+import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
 import { FriendsTab } from '@/screens/SocialScreen/FriendsTab.jsx';
 import { MessagesTab } from '@/screens/SocialScreen/MessagesTab.jsx';
 import { CampaignsTab } from '@/screens/SocialScreen/CampaignsTab.jsx';
+import { createStyles } from '@/screens/SocialScreen/SocialScreen.styles.js';
 
 const TABS = [
   { key: 'friends', label: 'Friends' },
@@ -20,66 +22,29 @@ export function SocialScreen({ auth, navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabBar}>
+      <ScreenHeader kicker="COMMUNITY" title="Social" />
+
+      <View style={styles.segmentedControl}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
             <Pressable
               key={tab.key}
               onPress={() => setActiveTab(tab.key)}
-              style={[styles.tab, isActive && styles.tabActive]}
+              style={[styles.segment, isActive && styles.segmentActive]}
             >
-              <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
-                {tab.label}
+              <Text style={[styles.segmentLabel, isActive && styles.segmentLabelActive]}>
+                {tab.label.toUpperCase()}
               </Text>
+              {isActive && <View style={styles.segmentIndicator} />}
             </Pressable>
           );
         })}
       </View>
 
-      {activeTab === 'friends' ? (
-        <FriendsTab auth={auth} />
-      ) : null}
-
-      {activeTab === 'messages' ? (
-        <MessagesTab auth={auth} navigation={navigation} />
-      ) : null}
-
-      {activeTab === 'campaigns' ? (
-        <CampaignsTab auth={auth} />
-      ) : null}
+      {activeTab === 'friends' && <FriendsTab auth={auth} />}
+      {activeTab === 'messages' && <MessagesTab auth={auth} navigation={navigation} />}
+      {activeTab === 'campaigns' && <CampaignsTab auth={auth} navigation={navigation} />}
     </View>
   );
-}
-
-function createStyles(theme) {
-  return StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background
-    },
-    tabBar: {
-      flexDirection: 'row',
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border
-    },
-    tab: {
-      flex: 1,
-      paddingVertical: 12,
-      alignItems: 'center',
-      borderBottomWidth: 2,
-      borderBottomColor: 'transparent'
-    },
-    tabActive: {
-      borderBottomColor: theme.colors.accent
-    },
-    tabLabel: {
-      color: theme.colors.muted,
-      fontSize: 14,
-      fontWeight: '600'
-    },
-    tabLabelActive: {
-      color: theme.colors.accent
-    }
-  });
 }

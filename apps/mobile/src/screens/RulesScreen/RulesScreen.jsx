@@ -1,28 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 
-import { api } from '@saintrocky/api-client';
+import { api } from '@/api/client.js';
 import { buildRulesChannel } from '@saintrocky/realtime';
-import {
-  Badge,
-  EmptyState,
-  RuleListItem,
-  SectionHeader,
-  useTheme
-} from '@saintrocky/ui-native';
+import { Button, EmptyState, RuleListItem, useTheme } from '@saintrocky/ui-native';
 
+import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
+import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
 import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
+import { useRefreshControl } from '@/hooks/useRefreshControl.js';
+import { RulesScreenConfig } from '@/screens/RulesScreen/RulesScreen.config.js';
 import { createStyles } from '@/screens/RulesScreen/RulesScreen.styles.js';
 
-const FILTER_OPTIONS = ['all', 'active', 'inactive', 'draft'];
+const FILTER_OPTIONS = ['active', 'inactive', 'draft'];
 
 export function RulesScreen({ auth, navigation }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [rules, setRules] = useState([]);
   const [drafts, setDrafts] = useState([]);
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [refreshing, setRefreshing] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const ownerEmail = auth.user?.email;
   const rulesChannel = ownerEmail ? buildRulesChannel(ownerEmail) : null;
@@ -41,18 +39,17 @@ export function RulesScreen({ auth, navigation }) {
       ]);
       setRules(rulesResult.rules || []);
       setDrafts(draftsResult.drafts || []);
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load rules.');
+    }
+    setLoading(false);
   }, [ownerEmail]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await loadData();
-    setRefreshing(false);
-  }, [loadData]);
+  const { refreshing, onRefresh } = useRefreshControl(loadData);
 
   const combinedRules = useMemo(() => {
     const draftItems = drafts.map((draft) => ({
@@ -62,19 +59,25 @@ export function RulesScreen({ auth, navigation }) {
       status: 'draft',
       isDraft: true
     }));
-
     const allItems = [...rules, ...draftItems];
-
-    if (activeFilter === 'all') return allItems;
-    return allItems.filter((item) => item.status === activeFilter);
-  }, [rules, drafts, activeFilter]);
+    if (selectedFilters.length === 0) return allItems;
+    return allItems.filter((item) => selectedFilters.includes(item.status));
+  }, [rules, drafts, selectedFilters]);
 
   const counts = useMemo(() => ({
-    all: rules.length + drafts.length,
     active: rules.filter((r) => r.status === 'active').length,
     inactive: rules.filter((r) => r.status === 'inactive').length,
     draft: drafts.length
   }), [rules, drafts]);
+
+  const toggleFilter = useCallback((filter) => {
+    setSelectedFilters((currentFilters) => {
+      if (currentFilters.includes(filter)) {
+        return currentFilters.filter((currentFilter) => currentFilter !== filter);
+      }
+      return [...currentFilters, filter];
+    });
+  }, []);
 
   const handleRulePress = useCallback((rule) => {
     navigation.navigate('RuleDetail', { rule });
@@ -82,42 +85,59 @@ export function RulesScreen({ auth, navigation }) {
 
   return (
     <View style={styles.container}>
+      <ScreenHeader kicker="STRATEGY" title="Rules" trailing={
+        <Button
+          variant="ghost"
+          size="sm"
+          leadingIconName="add"
+          onPress={() => navigation.navigate('Templates')}
+        >
+          Templates
+        </Button>
+      } />
+
       <View style={styles.filterRow}>
-        {FILTER_OPTIONS.map((filter) => (
-          <Badge
-            key={filter}
-            variant={activeFilter === filter ? 'primary' : 'default'}
-            onPress={() => setActiveFilter(filter)}
-          >
-            <Text
-              style={activeFilter === filter ? styles.filterActiveText : styles.filterText}
-              onPress={() => setActiveFilter(filter)}
+        {FILTER_OPTIONS.map((filter) => {
+          const isActive = selectedFilters.includes(filter);
+          return (
+            <Pressable
+              key={filter}
+              onPress={() => toggleFilter(filter)}
+              style={[styles.filterPill, isActive && styles.filterPillActive]}
             >
-              {filter.charAt(0).toUpperCase() + filter.slice(1)} ({counts[filter] || 0})
-            </Text>
-          </Badge>
-        ))}
+              <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
+                {filter} ({counts[filter] || 0})
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
-      <FlatList
-        data={combinedRules}
-        keyExtractor={(item) => item.ruleId || item.ruleDraftId}
-        contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
-          <RuleListItem
-            rule={item}
-            onPress={() => handleRulePress(item)}
-          />
-        )}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        ListEmptyComponent={
-          <EmptyState
-            iconName="tactics"
-            title="No rules yet"
-            message="Create rules from the Strategy workspace on web, or browse templates to get started."
-          />
-        }
-      />
+      {loading ? (
+        <LoadingSkeleton rows={6} />
+      ) : (
+        <FlatList
+          data={combinedRules}
+          keyExtractor={(item) => item.ruleId || item.ruleDraftId}
+          contentContainerStyle={styles.listContent}
+          renderItem={({ item }) => (
+            <RuleListItem
+              rule={item}
+              onPress={() => handleRulePress(item)}
+            />
+          )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
+          }
+          ListEmptyComponent={
+            <EmptyState
+              iconName="tactics"
+              title={RulesScreenConfig.emptyTitle}
+              message={RulesScreenConfig.emptyMessage}
+            />
+          }
+        />
+      )}
     </View>
   );
 }

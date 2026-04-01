@@ -1,46 +1,43 @@
 import { StyleSheet } from 'react-native';
 
 export function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.background
     },
     content: {
-      padding: 16,
-      paddingBottom: 32
+      paddingBottom: spacing.xxlarge
     },
-    greeting: {
-      marginBottom: 20
-    },
-    greetingName: {
-      fontSize: 24,
-      fontWeight: '800',
-      color: theme.colors.foreground,
-      marginBottom: 4
-    },
-    greetingSubtitle: {
-      fontSize: 14,
-      color: theme.colors.muted
-    },
-    metricsRow: {
+    metricsGrid: {
       flexDirection: 'row',
-      marginBottom: 10
+      paddingHorizontal: spacing.medium,
+      gap: spacing.large,
+      marginBottom: spacing.large
     },
-    metricSpacer: {
-      width: 10
+    sectionKicker: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightSemibold,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: theme.colors.accent,
+      textTransform: 'uppercase',
+      marginTop: spacing.xlarge,
+      marginBottom: spacing.xsmall,
+      paddingHorizontal: spacing.medium
     },
     violationWrapper: {
-      paddingHorizontal: 16,
-      marginBottom: 10
+      paddingHorizontal: spacing.medium
     },
     activityList: {
-      backgroundColor: theme.colors.card,
-      borderRadius: 14,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      marginHorizontal: 16,
-      overflow: 'hidden'
+      marginTop: spacing.xxsmall
+    },
+    tradeLink: {
+      paddingHorizontal: spacing.medium,
+      marginTop: spacing.small,
+      alignItems: 'flex-start'
     }
   });
 }

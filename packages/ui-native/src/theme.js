@@ -52,6 +52,12 @@ function buildTheme(mode) {
       text: tokens.desktop.text,
       textMuted: tokens.desktop.textMuted,
       kicker: tokens.desktop.kicker
+    },
+    typography: tokens.typography,
+    spacing: tokens.nativeSpacing,
+    gradients: {
+      problemStart: tokens.gradients.problemStart,
+      problemEnd: tokens.gradients.problemEnd
     }
   };
 }
@@ -114,9 +120,9 @@ export function useTheme() {
 
 const NAVIGATION_FONTS = {
   regular: { fontFamily: 'System', fontWeight: '400' },
-  medium: { fontFamily: 'System', fontWeight: '500' },
-  bold: { fontFamily: 'System', fontWeight: '700' },
-  heavy: { fontFamily: 'System', fontWeight: '900' }
+  medium: { fontFamily: 'SilkaMono-Regular', fontWeight: '500' },
+  bold: { fontFamily: 'SilkaMono-Regular', fontWeight: '700' },
+  heavy: { fontFamily: 'SilkaMono-Regular', fontWeight: '900' }
 };
 
 export function createNavigationTheme(theme) {

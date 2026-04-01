@@ -1,22 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 
-import { api } from '@saintrocky/api-client';
+import { api } from '@/api/client.js';
 import { buildFriendsChannel } from '@saintrocky/realtime';
 import { FRIENDSHIP_STATUSES } from '@saintrocky/shared';
 import {
   Avatar,
   Badge,
   Button,
-  Card,
   EmptyState,
   ListItem,
-  SectionHeader,
   TextField,
   useTheme
 } from '@saintrocky/ui-native';
 
 import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
+import { SocialScreenConfig } from '@/screens/SocialScreen/SocialScreen.config.js';
 import { createStyles } from '@/screens/SocialScreen/SocialScreen.styles.js';
 
 export function FriendsTab({ auth }) {
@@ -40,7 +39,9 @@ export function FriendsTab({ auth }) {
     try {
       const result = await api.friends.list();
       setFriends(result.friendships || []);
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load friends.');
+    }
   }, []);
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export function FriendsTab({ auth }) {
     }
   }, [loadFriends]);
 
-  const accepted = friends.filter((f) => f.status === FRIENDSHIP_STATUSES[0]);
+  const accepted = friends.filter((f) => f.status === 'accepted');
   const pending = friends.filter((f) => f.status === 'pending');
 
   return (
@@ -84,11 +85,11 @@ export function FriendsTab({ auth }) {
       data={accepted}
       keyExtractor={(item) => item.friendshipId}
       contentContainerStyle={styles.listContent}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />}
       ListHeaderComponent={
         <View>
-          <Card style={styles.addCard}>
-            <Text style={styles.addLabel}>Add a friend</Text>
+          <View style={styles.addSection}>
+            <Text style={styles.addLabel}>ADD A FRIEND</Text>
             <View style={styles.addRow}>
               <View style={styles.addInput}>
                 <TextField
@@ -108,11 +109,11 @@ export function FriendsTab({ auth }) {
                 {adding ? '…' : 'Send'}
               </Button>
             </View>
-          </Card>
+          </View>
 
-          {pending.length > 0 ? (
+          {pending.length > 0 && (
             <>
-              <SectionHeader title={`Pending (${pending.length})`} />
+              <Text style={styles.sectionKicker}>PENDING ({pending.length})</Text>
               {pending.map((friendship) => (
                 <ListItem
                   key={friendship.friendshipId}
@@ -144,9 +145,9 @@ export function FriendsTab({ auth }) {
                 />
               ))}
             </>
-          ) : null}
+          )}
 
-          <SectionHeader title={`Friends (${accepted.length})`} />
+          <Text style={styles.sectionKicker}>FRIENDS ({accepted.length})</Text>
         </View>
       }
       renderItem={({ item }) => (
@@ -159,8 +160,8 @@ export function FriendsTab({ auth }) {
       ListEmptyComponent={
         <EmptyState
           iconName="users"
-          title="No friends yet"
-          message="Add friends by email to start your accountability network."
+          title={SocialScreenConfig.emptyFriendsTitle}
+          message={SocialScreenConfig.emptyFriendsMessage}
         />
       }
     />

@@ -27,7 +27,7 @@ export function ListItem({
       {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
       {showChevron ? (
         <View style={styles.chevron}>
-          <Icon name="chevronRight" size={20} color={theme.colors.muted} />
+          <Icon name="chevronRight" size={16} color={theme.shell?.textMuted || theme.colors.muted} />
         </View>
       ) : null}
     </View>
@@ -48,36 +48,38 @@ export function ListItem({
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
+      paddingVertical: spacing?.small || 12,
+      paddingHorizontal: spacing?.medium || 16,
       borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border
+      borderBottomColor: theme.shell?.border || theme.colors.border
     },
     leading: {
-      marginRight: 12
+      marginRight: spacing?.small || 12
     },
     body: {
       flex: 1
     },
     title: {
       color: theme.colors.foreground,
-      fontSize: 15,
-      fontWeight: '600'
+      fontSize: typography?.sizeBase || 15,
+      fontWeight: typography?.weightSemibold || '600'
     },
     subtitle: {
-      color: theme.colors.muted,
-      fontSize: 13,
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeSmall || 13,
       marginTop: 2
     },
     trailing: {
-      marginLeft: 12
+      marginLeft: spacing?.small || 12
     },
     chevron: {
-      marginLeft: 8
+      marginLeft: spacing?.xsmall || 8
     }
   });
 }

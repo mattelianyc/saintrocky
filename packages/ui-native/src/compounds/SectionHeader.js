@@ -15,21 +15,24 @@ export function SectionHeader({ title, trailing, style }) {
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: 16,
-      paddingTop: 20,
-      paddingBottom: 8
+      paddingHorizontal: spacing?.medium || 16,
+      paddingTop: spacing?.xlarge || 24,
+      paddingBottom: spacing?.xsmall || 8
     },
     title: {
-      color: theme.colors.muted,
-      fontSize: 12,
-      fontWeight: '700',
+      fontFamily: typography?.fontFamilyMono || 'System',
+      color: theme.colors.accent || theme.colors.primary,
+      fontSize: typography?.sizeXxsmall || 10,
+      fontWeight: typography?.weightSemibold || '600',
       textTransform: 'uppercase',
-      letterSpacing: 0.8
+      letterSpacing: typography?.letterSpacingUltraWide || 3.0
     }
   });
 }

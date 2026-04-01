@@ -1,29 +1,91 @@
+import { useState } from 'react';
 import { Card } from '@saintrocky/ui';
 
-import { formatValue } from '../../../utils/runtime-formatters.js';
+import { formatRelativeTime, formatSurfaceLabel, formatValue } from '../../../utils/runtime-formatters.js';
+
+const FILTER_OPTIONS = [
+  { id: 'all', label: 'All' },
+  { id: 'desktop', label: 'Desktop' },
+  { id: 'chain', label: 'Chain' },
+  { id: 'rules', label: 'Rules' },
+  { id: 'social', label: 'Social' }
+];
+
+const SOCIAL_SURFACES = new Set(['friends', 'direct_messages', 'campaigns']);
+
+function filterEvents(events, filter) {
+  if (filter === 'all') return events;
+  if (filter === 'social') return events.filter((event) => SOCIAL_SURFACES.has(event.surface));
+  return events.filter((event) => event.surface === filter);
+}
 
 export function ActivitySection({ runtimeHub }) {
+  const [activeFilter, setActiveFilter] = useState('all');
+
+  const desktopEvents = (runtimeHub.recentEvents || []).map((event) => ({
+    ...event,
+    surface: event.surface || 'desktop'
+  }));
+  const crossSurfaceEvents = runtimeHub.crossSurfaceActivity || [];
+  const allEvents = mergeAndDeduplicate(desktopEvents, crossSurfaceEvents);
+  const filteredEvents = filterEvents(allEvents, activeFilter);
+
   return (
     <Card className="desktop-HubPanel">
       <div className="desktop-HubPanelHeader">
         <div>
           <p className="desktop-Kicker">Activity</p>
-          <h2>Recent desktop events</h2>
+          <h2>Cross-surface event feed</h2>
         </div>
       </div>
+      <div className="desktop-FilterRow">
+        {FILTER_OPTIONS.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            className={`desktop-FilterPill ${activeFilter === option.id ? 'desktop-FilterPill--active' : ''}`}
+            onClick={() => setActiveFilter(option.id)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
       <div className="desktop-HubList">
-        {runtimeHub.recentEvents.length ? (
-          runtimeHub.recentEvents.map((event) => (
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map((event) => (
             <div key={event.eventId} className="desktop-HubListItem">
-              <strong>{event.eventType}</strong>
-              <p>{event.title}</p>
-              <span className="desktop-HubMeta">{formatValue(event.occurredAt)}</span>
+              <div className="desktop-ActivityItemHeader">
+                <span className="desktop-HubMeta desktop-SurfaceTag">{formatSurfaceLabel(event.surface)}</span>
+                <span className="desktop-HubMeta">{formatRelativeTime(event.occurredAt)}</span>
+              </div>
+              <strong>{event.title}</strong>
+              {event.eventType && <span className="desktop-HubMeta">{event.eventType}</span>}
             </div>
           ))
         ) : (
-          <p className="desktop-HubEmpty">No desktop runtime events yet.</p>
+          <p className="desktop-HubEmpty">No events recorded yet. Activity from all surfaces will appear here.</p>
         )}
       </div>
     </Card>
   );
+}
+
+function mergeAndDeduplicate(desktopEvents, crossSurfaceEvents) {
+  const seen = new Set();
+  const merged = [];
+
+  for (const event of [...crossSurfaceEvents, ...desktopEvents]) {
+    if (!seen.has(event.eventId)) {
+      seen.add(event.eventId);
+      merged.push(event);
+    }
+  }
+
+  merged.sort((a, b) => {
+    const timeA = a.occurredAt ? new Date(a.occurredAt).getTime() : 0;
+    const timeB = b.occurredAt ? new Date(b.occurredAt).getTime() : 0;
+    return timeB - timeA;
+  });
+
+  return merged.slice(0, 50);
 }

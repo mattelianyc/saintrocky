@@ -1,75 +1,133 @@
 import { StyleSheet } from 'react-native';
 
 export function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
-    listContent: {
-      paddingBottom: 32
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background
     },
-    addCard: {
-      margin: 16,
-      marginBottom: 0
+    segmentedControl: {
+      flexDirection: 'row',
+      marginHorizontal: spacing.medium,
+      marginBottom: spacing.small
+    },
+    segment: {
+      flex: 1,
+      paddingVertical: spacing.xsmall,
+      alignItems: 'center'
+    },
+    segmentActive: {},
+    segmentLabel: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightMedium,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: theme.shell.textMuted,
+      textTransform: 'uppercase'
+    },
+    segmentLabelActive: {
+      color: theme.colors.accent,
+      fontWeight: typography.weightBold
+    },
+    segmentIndicator: {
+      width: 20,
+      height: 2,
+      backgroundColor: theme.colors.accent,
+      marginTop: 6
+    },
+    listContent: {
+      paddingHorizontal: spacing.medium,
+      paddingBottom: spacing.xxlarge
+    },
+    addSection: {
+      paddingHorizontal: spacing.medium,
+      paddingVertical: spacing.medium,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.shell.border
     },
     addLabel: {
-      color: theme.colors.foreground,
-      fontSize: 14,
-      fontWeight: '600',
-      marginBottom: 8
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightSemibold,
+      letterSpacing: typography.letterSpacingWide,
+      color: theme.shell.textMuted,
+      textTransform: 'uppercase',
+      marginBottom: spacing.xsmall
     },
     addRow: {
       flexDirection: 'row',
       alignItems: 'flex-end',
-      gap: 10
+      gap: spacing.xsmall
     },
     addInput: {
       flex: 1
     },
     pendingActions: {
       flexDirection: 'row',
-      gap: 6
+      gap: spacing.xxsmall
+    },
+    sectionKicker: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightSemibold,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: theme.colors.accent,
+      textTransform: 'uppercase',
+      paddingHorizontal: spacing.medium,
+      paddingTop: spacing.large,
+      paddingBottom: spacing.xsmall
     },
     threadMeta: {
       alignItems: 'flex-end',
       gap: 4
     },
     threadTime: {
-      color: theme.colors.muted,
-      fontSize: 11
+      fontFamily: typography.fontFamilyMono,
+      color: theme.shell.textMuted,
+      fontSize: typography.sizeXxsmall,
+      letterSpacing: typography.letterSpacingWide
     },
-    campaignCard: {
-      marginHorizontal: 16,
-      marginBottom: 12
+    campaignRow: {
+      paddingVertical: spacing.medium,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.shell.border
     },
     campaignHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 6
+      marginBottom: spacing.xxsmall
     },
     campaignTitle: {
       color: theme.colors.foreground,
-      fontSize: 16,
-      fontWeight: '700',
+      fontSize: typography.sizeBase,
+      fontWeight: typography.weightSemibold,
       flex: 1,
-      marginRight: 8
+      marginRight: spacing.xsmall
     },
     campaignDescription: {
-      color: theme.colors.muted,
-      fontSize: 13,
+      color: theme.shell.textMuted,
+      fontSize: typography.sizeSmall,
       lineHeight: 18,
-      marginBottom: 8
+      marginBottom: spacing.xsmall
     },
     campaignMeta: {
       flexDirection: 'row',
-      gap: 16
+      gap: spacing.medium
     },
     campaignMetaText: {
-      color: theme.colors.muted,
-      fontSize: 12
+      fontFamily: typography.fontFamilyMono,
+      color: theme.shell.textMuted,
+      fontSize: typography.sizeXxsmall,
+      letterSpacing: typography.letterSpacingWide,
+      textTransform: 'uppercase'
     },
     campaignActions: {
       flexDirection: 'row',
-      gap: 10,
-      marginTop: 12
+      gap: spacing.xsmall,
+      marginTop: spacing.small
     }
   });
 }

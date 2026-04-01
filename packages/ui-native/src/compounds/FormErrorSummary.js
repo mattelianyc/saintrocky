@@ -12,31 +12,48 @@ export function FormErrorSummary({ messages = [], status = null }) {
 
   return (
     <View style={styles.container}>
-      {hasMessages
-        ? messages.map((message) => (
-            <Text key={message} style={styles.text}>
-              {message}
-            </Text>
-          ))
-        : null}
-      {hasStatus ? <Text style={styles.text}>{String(status)}</Text> : null}
+      <View style={styles.dot} />
+      <View style={styles.textArea}>
+        {hasMessages
+          ? messages.map((message) => (
+              <Text key={message} style={styles.text}>{message}</Text>
+            ))
+          : null}
+        {hasStatus ? <Text style={styles.text}>{String(status)}</Text> : null}
+      </View>
     </View>
   );
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
-      borderWidth: 1,
-      borderColor: theme.colors.error,
-      backgroundColor: theme.colors.inputBackground,
-      borderRadius: 12,
-      padding: 12,
-      marginBottom: 12
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: theme.colors.error + '10',
+      paddingVertical: spacing?.small || 12,
+      paddingHorizontal: spacing?.medium || 16,
+      marginBottom: spacing?.small || 12
+    },
+    dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: theme.colors.error,
+      marginTop: 4,
+      marginRight: spacing?.small || 10
+    },
+    textArea: {
+      flex: 1,
+      gap: 2
     },
     text: {
+      fontFamily: typography?.fontFamilyMono || 'System',
       color: theme.colors.error,
-      marginBottom: 4
+      fontSize: typography?.sizeSmall || 13,
+      lineHeight: 18
     }
   });
 }

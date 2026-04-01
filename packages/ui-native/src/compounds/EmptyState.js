@@ -11,7 +11,7 @@ export function EmptyState({ iconName, title, message, children }) {
     <View style={styles.container}>
       {iconName ? (
         <View style={styles.iconWrapper}>
-          <Icon name={iconName} size={40} color={theme.colors.muted} />
+          <Icon name={iconName} size={36} color={theme.shell?.textMuted || theme.colors.muted} />
         </View>
       ) : null}
       {title ? <Text style={styles.title}>{title}</Text> : null}
@@ -22,32 +22,36 @@ export function EmptyState({ iconName, title, message, children }) {
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 48,
-      paddingHorizontal: 24
+      paddingVertical: spacing?.jumbo || 48,
+      paddingHorizontal: spacing?.large || 24
     },
     iconWrapper: {
-      marginBottom: 16,
-      opacity: 0.6
+      marginBottom: spacing?.medium || 16,
+      opacity: 0.4
     },
     title: {
+      fontFamily: typography?.fontFamilyMono || 'System',
       color: theme.colors.foreground,
-      fontSize: 17,
-      fontWeight: '700',
+      fontSize: typography?.sizeMedium || 17,
+      fontWeight: typography?.weightBold || '700',
       textAlign: 'center',
-      marginBottom: 8
+      letterSpacing: typography?.letterSpacingWide || 1.2,
+      marginBottom: spacing?.xsmall || 8
     },
     message: {
-      color: theme.colors.muted,
-      fontSize: 14,
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeSmall || 14,
       textAlign: 'center',
       lineHeight: 20
     },
     actions: {
-      marginTop: 20
+      marginTop: spacing?.large || 20
     }
   });
 }

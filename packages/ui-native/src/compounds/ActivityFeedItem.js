@@ -35,13 +35,11 @@ export function ActivityFeedItem({ event }) {
 
   const config = EVENT_CONFIG[event?.eventType] || { icon: 'info', label: event?.eventType || 'Event' };
   const isWarning = event?.eventType === 'rule_triggered' || event?.eventType === 'bypass_offered';
-  const iconColor = isWarning ? theme.colors.error : theme.colors.accent;
+  const dotColor = isWarning ? theme.colors.error : theme.colors.accent;
 
   return (
     <View style={styles.container}>
-      <View style={[styles.iconCircle, { backgroundColor: iconColor + '1A' }]}>
-        <Icon name={config.icon} size={16} color={iconColor} />
-      </View>
+      <View style={[styles.dot, { backgroundColor: dotColor }]} />
       <View style={styles.body}>
         <Text style={styles.label}>{config.label}</Text>
         {event?.ruleSummary ? (
@@ -54,40 +52,42 @@ export function ActivityFeedItem({ event }) {
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 10,
-      paddingHorizontal: 16,
+      paddingVertical: spacing?.small || 10,
+      paddingHorizontal: spacing?.medium || 16,
       borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border
+      borderBottomColor: theme.shell?.border || theme.colors.border
     },
-    iconCircle: {
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: 10
+    dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginRight: spacing?.small || 12
     },
     body: {
       flex: 1
     },
     label: {
       color: theme.colors.foreground,
-      fontSize: 14,
-      fontWeight: '600'
+      fontSize: typography?.sizeBase || 14,
+      fontWeight: typography?.weightSemibold || '600'
     },
     summary: {
-      color: theme.colors.muted,
-      fontSize: 12,
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeXsmall || 12,
       marginTop: 2
     },
     time: {
-      color: theme.colors.muted,
-      fontSize: 11,
-      marginLeft: 8
+      fontFamily: typography?.fontFamilyMono || 'System',
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeXxsmall || 10,
+      letterSpacing: typography?.letterSpacingWide || 1.2,
+      marginLeft: spacing?.xsmall || 8
     }
   });
 }

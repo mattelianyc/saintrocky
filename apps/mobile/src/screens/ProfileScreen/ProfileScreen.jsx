@@ -1,19 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Icon } from '@saintrocky/icons';
 
-import { api } from '@saintrocky/api-client';
+import { api } from '@/api/client.js';
 import { saintRockyBranding } from '@saintrocky/branding';
 import {
   Avatar,
-  Badge,
   Button,
-  Card,
   EmptyState,
-  ListItem,
-  SectionHeader,
+  MetricCard,
   useTheme
 } from '@saintrocky/ui-native';
 
+import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
+import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
+import { useRefreshControl } from '@/hooks/useRefreshControl.js';
+import { ProfileScreenConfig } from '@/screens/ProfileScreen/ProfileScreen.config.js';
 import { createStyles } from '@/screens/ProfileScreen/ProfileScreen.styles.js';
 
 function formatSol(lamports) {
@@ -31,25 +33,32 @@ export function ProfileScreen({ auth }) {
   const [wallets, setWallets] = useState([]);
   const [trades, setTrades] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     try {
       const result = await api.wallets.listWallets();
-      const walletList = result.wallets || [];
-      setWallets(walletList);
-      if (walletList.length > 0 && !selectedWallet) {
-        setSelectedWallet(walletList[0].walletAddress);
-      }
-    } catch {}
-  }, [selectedWallet]);
+      setWallets(result.wallets || []);
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load profile data.');
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (wallets.length > 0 && !selectedWallet) {
+      setSelectedWallet(wallets[0].walletAddress);
+    }
+  }, [wallets, selectedWallet]);
 
   const loadTrades = useCallback(async () => {
     if (!selectedWallet) return;
     try {
       const result = await api.chain.listRecentTrades(selectedWallet);
       setTrades(result.trades || []);
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load trades.');
+    }
   }, [selectedWallet]);
 
   useEffect(() => {
@@ -60,25 +69,21 @@ export function ProfileScreen({ auth }) {
     loadTrades();
   }, [loadTrades]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
+  const loadAll = useCallback(async () => {
     await Promise.all([loadData(), loadTrades()]);
-    setRefreshing(false);
   }, [loadData, loadTrades]);
+
+  const { refreshing, onRefresh } = useRefreshControl(loadAll);
 
   const handleLogout = useCallback(() => {
     Alert.alert('Sign out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign out',
-        style: 'destructive',
-        onPress: () => auth.logout()
-      }
+      { text: 'Sign out', style: 'destructive', onPress: () => auth.logout() }
     ]);
   }, [auth]);
 
   const totalEscrowLamports = wallets.reduce(
-    (sum, w) => sum + (w.escrowBalanceLamports || 0),
+    (sum, wallet) => sum + (wallet.escrowBalanceLamports || 0),
     0
   );
 
@@ -86,100 +91,111 @@ export function ProfileScreen({ auth }) {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
+      }
     >
+      <ScreenHeader kicker="ACCOUNT" title="Profile" />
+
       <View style={styles.profileHeader}>
-        <Avatar
-          name={auth.user?.displayName || auth.user?.email}
-          size="xl"
-        />
+        <Avatar name={auth.user?.displayName || auth.user?.email} size="xl" />
         <Text style={styles.displayName}>
           {auth.user?.displayName || auth.user?.email || '—'}
         </Text>
         <Text style={styles.email}>{auth.user?.email}</Text>
-        {auth.user?.role ? (
-          <Badge variant="default">{auth.user.role}</Badge>
-        ) : null}
+        {auth.user?.role && (
+          <Text style={styles.roleBadge}>{auth.user.role.toUpperCase()}</Text>
+        )}
       </View>
 
-      <SectionHeader title="Escrow Wallet" />
-      <Card style={styles.walletCard}>
-        <View style={styles.escrowRow}>
-          <Text style={styles.escrowLabel}>Total escrow balance</Text>
-          <Text style={styles.escrowValue}>{formatSol(totalEscrowLamports)} SOL</Text>
-        </View>
-      </Card>
-
-      {wallets.length > 0 ? (
-        <>
-          <SectionHeader title={`Linked wallets (${wallets.length})`} />
-          {wallets.map((wallet) => (
-            <ListItem
-              key={wallet.walletAddress}
-              title={wallet.label || 'Wallet'}
-              subtitle={shortenAddress(wallet.walletAddress)}
-              onPress={() => setSelectedWallet(wallet.walletAddress)}
-              trailing={
-                <Text style={styles.walletBalance}>
-                  {formatSol(wallet.escrowBalanceLamports)} SOL
-                </Text>
-              }
-            />
-          ))}
-        </>
+      {loading ? (
+        <LoadingSkeleton rows={5} />
       ) : (
-        <EmptyState
-          iconName="wallet"
-          message="No wallets linked. Connect a wallet on the web dashboard."
-        />
+        <>
+          <View style={styles.escrowMetrics}>
+            <MetricCard
+              label="ESCROW BAL"
+              value={`${formatSol(totalEscrowLamports)}`}
+              accentColor={theme.colors.accent}
+            />
+            <MetricCard
+              label="WALLETS"
+              value={wallets.length}
+              accentColor={theme.colors.warning}
+            />
+          </View>
+        </>
       )}
 
-      {trades.length > 0 ? (
+      {!loading && wallets.length > 0 ? (
         <>
-          <SectionHeader title="Recent trades" />
-          <Card style={styles.tradesCard}>
-            {trades.slice(0, 8).map((trade, index) => (
-              <View key={trade.signature || index} style={styles.tradeRow}>
-                <View style={styles.tradeInfo}>
-                  <Text style={styles.tradeToken}>
-                    {trade.token || trade.symbol || '—'}
-                  </Text>
-                  <Text style={styles.tradeMeta}>
-                    {trade.side || '—'} · {trade.platform || '—'}
-                  </Text>
-                </View>
-                <View style={styles.tradeStatus}>
-                  <Badge
-                    variant={trade.isViolation ? 'error' : 'success'}
-                    size="xs"
-                  >
-                    {trade.isViolation ? 'Violation' : 'Clean'}
-                  </Badge>
-                </View>
+          <Text style={styles.sectionKicker}>LINKED WALLETS</Text>
+          {wallets.map((wallet) => (
+            <Pressable
+              key={wallet.walletAddress}
+              style={({ pressed }) => [styles.walletRow, pressed && styles.pressed]}
+              onPress={() => setSelectedWallet(wallet.walletAddress)}
+            >
+              <View>
+                <Text style={styles.walletLabel}>{wallet.label || 'Wallet'}</Text>
+                <Text style={styles.walletAddress}>{shortenAddress(wallet.walletAddress)}</Text>
               </View>
-            ))}
-          </Card>
+              <View style={styles.walletRight}>
+                <Text style={styles.walletBalance}>{formatSol(wallet.escrowBalanceLamports)} SOL</Text>
+                {selectedWallet === wallet.walletAddress && (
+                  <View style={styles.selectedDot} />
+                )}
+              </View>
+            </Pressable>
+          ))}
         </>
+      ) : !loading ? (
+        <EmptyState
+          iconName="wallet"
+          message={ProfileScreenConfig.emptyWalletsMessage}
+        />
       ) : null}
 
-      <SectionHeader title="Settings" />
-      <ListItem
-        title="Appearance"
-        subtitle={`${theme.mode === 'dark' ? 'Dark' : 'Light'} mode`}
+      {trades.length > 0 && (
+        <>
+          <Text style={styles.sectionKicker}>RECENT TRADES</Text>
+          {trades.slice(0, 8).map((trade, index) => (
+            <View key={trade.signature || index} style={styles.tradeRow}>
+              <View style={styles.tradeInfo}>
+                <Text style={styles.tradeToken}>{trade.token || trade.symbol || '—'}</Text>
+                <Text style={styles.tradeMeta}>
+                  {trade.side || '—'} · {trade.platform || '—'}
+                </Text>
+              </View>
+              <View style={[
+                styles.tradeDot,
+                { backgroundColor: trade.isViolation ? theme.colors.error : theme.colors.success }
+              ]} />
+            </View>
+          ))}
+        </>
+      )}
+
+      <Text style={styles.sectionKicker}>SETTINGS</Text>
+      <Pressable
+        style={({ pressed }) => [styles.settingsRow, pressed && styles.pressed]}
         onPress={toggleTheme}
-        showChevron
-      />
+      >
+        <View>
+          <Text style={styles.settingsLabel}>Appearance</Text>
+          <Text style={styles.settingsValue}>
+            {theme.mode === 'dark' ? 'Dark' : 'Light'} mode
+          </Text>
+        </View>
+        <Icon name="chevronRight" size={16} color={theme.shell.textMuted} />
+      </Pressable>
 
       <View style={styles.logoutSection}>
-        <Button
-          variant="outline"
-          leadingIconName="logout"
-          onPress={handleLogout}
-        >
+        <Button variant="ghost" leadingIconName="logout" onPress={handleLogout}>
           Sign out
         </Button>
         <Text style={styles.versionText}>
-          {saintRockyBranding.productName} v0.1.0
+          {saintRockyBranding.productName} · v0.1.0
         </Text>
       </View>
     </ScrollView>

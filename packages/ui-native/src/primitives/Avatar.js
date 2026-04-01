@@ -3,10 +3,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../theme.js';
 
 const SIZE_MAP = {
-  sm: { container: 28, fontSize: 12 },
-  md: { container: 36, fontSize: 14 },
-  lg: { container: 48, fontSize: 18 },
-  xl: { container: 64, fontSize: 24 }
+  sm: { container: 28, fontSize: 11 },
+  md: { container: 36, fontSize: 13 },
+  lg: { container: 48, fontSize: 17 },
+  xl: { container: 64, fontSize: 22 }
 };
 
 function getInitials(name) {
@@ -31,13 +31,16 @@ export function Avatar({ name, size = 'md', color, style }) {
         {
           width: sizeConfig.container,
           height: sizeConfig.container,
-          borderRadius: sizeConfig.container / 2,
+          borderRadius: 2,
           backgroundColor
         },
         style
       ]}
     >
-      <Text style={[styles.initials, { fontSize: sizeConfig.fontSize }]}>
+      <Text style={[
+        styles.initials,
+        { fontSize: sizeConfig.fontSize }
+      ]}>
         {getInitials(name)}
       </Text>
     </View>
@@ -45,14 +48,18 @@ export function Avatar({ name, size = 'md', color, style }) {
 }
 
 function createStyles(theme) {
+  const mono = theme.typography?.fontFamilyMono || 'System';
+
   return StyleSheet.create({
     container: {
       alignItems: 'center',
       justifyContent: 'center'
     },
     initials: {
+      fontFamily: mono,
       color: theme.colors.primaryText,
-      fontWeight: '700'
+      fontWeight: '700',
+      letterSpacing: 1.0
     }
   });
 }

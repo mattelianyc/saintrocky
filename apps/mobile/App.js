@@ -1,8 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Platform, StatusBar, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 
 import { RootNavigator } from '@/navigation/RootNavigator.jsx';
-import { bootstrapEnv } from '@/bootstrap/env.js';
+import { NotificationProvider } from '@/context/NotificationContext.jsx';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary.jsx';
+import { api } from '@/api/client.js';
 import { analytics } from '@/analytics/client.js';
 import { notifications } from '@/notifications/client.js';
 import {
@@ -11,7 +18,7 @@ import {
   parseNotificationNavigation
 } from '@/notifications/push.js';
 import { connectRealtime, disconnectRealtime } from '@/realtime/client.js';
-import { api, setUnauthorizedHandler } from '@saintrocky/api-client';
+import { setUnauthorizedHandler } from '@saintrocky/api-client';
 import { AnalyticsEvents, trackEvent } from '@saintrocky/analytics';
 import { saintRockyBranding } from '@saintrocky/branding';
 import { createValidationT, initValidation } from '@saintrocky/validation';
@@ -20,7 +27,6 @@ import { createNavigationTheme, ThemeProvider, useTheme } from '@saintrocky/ui-n
 function AppShell() {
   const { theme } = useTheme();
   const navigationRef = useRef(null);
-  bootstrapEnv();
   initValidation({ t: createValidationT('en') });
 
   const [status, setStatus] = useState('loading');
@@ -55,7 +61,16 @@ function AppShell() {
     if (!user) return;
 
     connectRealtime();
-    registerForPushNotifications().catch(() => {});
+    registerForPushNotifications()
+      .then((token) => {
+        if (token) {
+          api.devices.registerPushToken({
+            pushToken: token,
+            platform: Platform.OS
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
 
     return () => {
       disconnectRealtime();
@@ -85,6 +100,15 @@ function AppShell() {
         });
         return res;
       },
+      async register({ name, email, password }) {
+        const res = await api.auth.register({ name, email, password });
+        setUser(res.user || null);
+        trackEvent(analytics, AnalyticsEvents.RegisterSucceeded, {
+          platform: 'mobile',
+          product: saintRockyBranding.shortProductName
+        });
+        return res;
+      },
       async logout() {
         try {
           await api.auth.logout();
@@ -108,16 +132,45 @@ function AppShell() {
   const navigationTheme = useMemo(() => createNavigationTheme(theme), [theme]);
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
-      <RootNavigator auth={auth} navigationRef={navigationRef} />
-    </NavigationContainer>
+    <>
+      <StatusBar
+        barStyle={theme.mode === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.colors.background}
+        translucent
+      />
+      <ErrorBoundary>
+        <NotificationProvider ownerEmail={user?.email}>
+          <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+            <RootNavigator auth={auth} />
+          </NavigationContainer>
+        </NotificationProvider>
+      </ErrorBoundary>
+    </>
   );
 }
 
+SplashScreen.preventAutoHideAsync();
+
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    'SilkaMono-Regular': require('./assets/fonts/SilkaMono-Regular.ttf')
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
+
   return (
-    <ThemeProvider>
-      <AppShell />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AppShell />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

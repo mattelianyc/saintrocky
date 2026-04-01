@@ -5,10 +5,17 @@
   "engines": {
     "node": ">=18"
   },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "nohoist": [
+      "@saintrocky/mobile/react",
+      "@saintrocky/mobile/react-native",
+      "@saintrocky/mobile/react-native/**"
+    ]
+  },
   "scripts": {
     "dev": "PORT=5175 NODE_ENV=development yarn workspace @saintrocky/web dev",
     "dev:web": "yarn workspace @saintrocky/web dev",

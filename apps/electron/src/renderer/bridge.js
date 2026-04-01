@@ -22,6 +22,10 @@ export function logout() {
   return getDesktopBridge().logout();
 }
 
+export function getDashboard() {
+  return getDesktopBridge().getDashboard();
+}
+
 export function getControlPlaneSnapshot() {
   return getDesktopBridge().getControlPlaneSnapshot();
 }
@@ -62,10 +66,26 @@ export function cancelRuntimeOverride() {
   return getDesktopBridge().cancelRuntimeOverride();
 }
 
+export function refreshDesktopDashboard() {
+  return getDesktopBridge().refreshDesktopDashboard();
+}
+
 export function updateNativeRuntimeState(payload) {
   return getDesktopBridge().updateNativeRuntimeState(payload);
 }
 
 export function showNativeNotification(payload) {
   return getDesktopBridge().showNativeNotification(payload);
+}
+
+export function getOpenAtLogin() {
+  return getDesktopBridge().getOpenAtLogin();
+}
+
+export function setOpenAtLogin(enabled) {
+  return getDesktopBridge().setOpenAtLogin(enabled);
+}
+
+export function onNavigateFromMain(callback) {
+  return getDesktopBridge().onNavigateFromMain(callback);
 }

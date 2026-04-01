@@ -1,84 +1,90 @@
 import { StyleSheet } from 'react-native';
 
 export function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background
+    },
     listContent: {
-      padding: 16,
-      paddingBottom: 32
+      paddingBottom: spacing.xxlarge
     },
-    header: {
-      marginBottom: 16
+    tableHeader: {
+      flexDirection: 'row',
+      paddingHorizontal: spacing.medium,
+      paddingVertical: spacing.xsmall,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.shell.border
     },
-    headerTitle: {
-      fontSize: 22,
-      fontWeight: '800',
-      color: theme.colors.foreground,
-      marginBottom: 4
+    tableHeaderText: {
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightSemibold,
+      letterSpacing: typography.letterSpacingUltraWide,
+      color: theme.shell.textMuted,
+      textTransform: 'uppercase'
     },
-    headerSubtitle: {
-      fontSize: 13,
-      color: theme.colors.muted
+    rankColumn: {
+      width: 56
     },
-    entryCard: {
-      marginBottom: 8
+    nameColumn: {
+      flex: 1
     },
-    currentUserCard: {
-      borderColor: theme.colors.accent,
-      borderWidth: 1.5
+    scoreColumn: {
+      width: 64,
+      textAlign: 'right'
     },
     entryRow: {
       flexDirection: 'row',
-      alignItems: 'center'
-    },
-    rankCircle: {
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      backgroundColor: theme.colors.inputBackground,
       alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: 10
+      paddingHorizontal: spacing.medium,
+      paddingVertical: spacing.small + 2
+    },
+    entryRowAlt: {
+      backgroundColor: theme.shell.backgroundSoft || 'rgba(255,255,255,0.02)'
+    },
+    currentUserRow: {
+      backgroundColor: theme.colors.accent + '10'
+    },
+    rankCell: {
+      width: 56
     },
     rankText: {
-      color: theme.colors.foreground,
-      fontSize: 13,
-      fontWeight: '700'
-    },
-    podiumRankText: {
-      color: '#fff'
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXsmall,
+      fontWeight: typography.weightBlack,
+      letterSpacing: typography.letterSpacingWide
     },
     entryBody: {
       flex: 1,
-      marginLeft: 10
+      marginRight: spacing.xsmall
     },
     entryName: {
       color: theme.colors.foreground,
-      fontSize: 15,
-      fontWeight: '600'
+      fontSize: typography.sizeBase,
+      fontWeight: typography.weightSemibold
+    },
+    currentUserName: {
+      color: theme.colors.accent
     },
     entryMeta: {
-      color: theme.colors.muted,
-      fontSize: 12,
-      marginTop: 2
-    },
-    scoreColumn: {
-      alignItems: 'flex-end',
-      marginLeft: 12
+      fontFamily: typography.fontFamilyMono,
+      color: theme.shell.textMuted,
+      fontSize: typography.sizeXxsmall,
+      letterSpacing: typography.letterSpacingWide,
+      marginTop: 2,
+      textTransform: 'uppercase'
     },
     scoreValue: {
-      color: theme.colors.accent,
-      fontSize: 20,
-      fontWeight: '800'
-    },
-    scoreLabel: {
-      color: theme.colors.muted,
-      fontSize: 10,
-      fontWeight: '600'
-    },
-    youBadge: {
-      position: 'absolute',
-      top: -6,
-      right: -6
+      width: 64,
+      textAlign: 'right',
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeLarge,
+      fontWeight: typography.weightBlack,
+      color: theme.colors.foreground,
+      letterSpacing: typography.letterSpacingTight
     }
   });
 }

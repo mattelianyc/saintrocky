@@ -4,11 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
 
+import { createRequire } from 'node:module';
+
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectoryPath = path.dirname(currentFilePath);
-const workspaceRoot = path.resolve(currentDirectoryPath, '..', '..');
-const sharedReactPath = path.resolve(workspaceRoot, 'node_modules', 'react');
-const sharedReactDomPath = path.resolve(workspaceRoot, 'node_modules', 'react-dom');
+const electronRequire = createRequire(path.join(currentDirectoryPath, 'package.json'));
+const sharedReactPath = path.dirname(electronRequire.resolve('react/package.json'));
+const sharedReactDomPath = path.dirname(electronRequire.resolve('react-dom/package.json'));
 
 export default defineConfig({
   root: path.join(currentDirectoryPath, 'src', 'renderer'),

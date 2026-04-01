@@ -24,8 +24,8 @@ const VARIANT_MAP = {
     color: '#fff'
   }),
   muted: (theme) => ({
-    backgroundColor: theme.colors.border,
-    color: theme.colors.muted
+    backgroundColor: theme.shell?.backgroundSoft || theme.colors.border,
+    color: theme.shell?.textMuted || theme.colors.muted
   })
 };
 
@@ -45,11 +45,13 @@ export function Badge({ children, variant = 'default', size = 'sm', style }) {
   );
 }
 
-function createStyles() {
+function createStyles(theme) {
+  const mono = theme.typography?.fontFamilyMono || 'System';
+
   return StyleSheet.create({
     badge: {
       alignSelf: 'flex-start',
-      borderRadius: 6
+      borderRadius: 2
     },
     small: {
       paddingHorizontal: 8,
@@ -60,11 +62,14 @@ function createStyles() {
       paddingVertical: 2
     },
     label: {
-      fontSize: 12,
-      fontWeight: '600'
+      fontFamily: mono,
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 0.6,
+      textTransform: 'uppercase'
     },
     extraSmallLabel: {
-      fontSize: 10
+      fontSize: 9
     }
   });
 }

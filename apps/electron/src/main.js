@@ -19,7 +19,9 @@ let tray = null;
 let isQuitting = false;
 let nativeRuntimeState = {
   monitorStatus: 'idle',
-  pendingViolationCount: 0
+  pendingViolationCount: 0,
+  chainViolationCount: 0,
+  hideToTrayOnClose: true
 };
 let desktopAuthState = {
   sessionUser: null,
@@ -70,6 +72,7 @@ function updateTrayMenu() {
     return;
   }
 
+  const totalAlerts = nativeRuntimeState.pendingViolationCount + nativeRuntimeState.chainViolationCount;
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Open Saint Rocky',
@@ -80,9 +83,9 @@ function updateTrayMenu() {
       enabled: false
     },
     {
-      label: nativeRuntimeState.pendingViolationCount
-        ? `Pending violations: ${nativeRuntimeState.pendingViolationCount}`
-        : 'No pending violations',
+      label: totalAlerts > 0
+        ? `Active alerts: ${totalAlerts}`
+        : 'No active alerts',
       enabled: false
     },
     { type: 'separator' },
@@ -152,8 +155,10 @@ function createMainWindow() {
       return;
     }
 
-    event.preventDefault();
-    window.hide();
+    if (nativeRuntimeState.hideToTrayOnClose) {
+      event.preventDefault();
+      window.hide();
+    }
   });
 
   window.webContents.setWindowOpenHandler(({ url }) => {
@@ -193,9 +198,22 @@ ipcMain.on('desktop-runtime:update-state', (_event, payload = {}) => {
     pendingViolationCount:
       typeof payload.pendingViolationCount === 'number'
         ? payload.pendingViolationCount
-        : nativeRuntimeState.pendingViolationCount
+        : nativeRuntimeState.pendingViolationCount,
+    chainViolationCount:
+      typeof payload.chainViolationCount === 'number'
+        ? payload.chainViolationCount
+        : nativeRuntimeState.chainViolationCount,
+    hideToTrayOnClose:
+      typeof payload.hideToTrayOnClose === 'boolean'
+        ? payload.hideToTrayOnClose
+        : nativeRuntimeState.hideToTrayOnClose
   };
   updateTrayMenu();
+
+  const badgeCount = nativeRuntimeState.pendingViolationCount + nativeRuntimeState.chainViolationCount;
+  if (process.platform === 'darwin' && app.dock) {
+    app.dock.setBadge(badgeCount > 0 ? String(badgeCount) : '');
+  }
 });
 
 ipcMain.handle('desktop-runtime:show-notification', async (_event, payload = {}) => {
@@ -207,6 +225,12 @@ ipcMain.handle('desktop-runtime:show-notification', async (_event, payload = {})
     title: payload.title || 'Saint Rocky',
     body: payload.body || '',
     silent: Boolean(payload.silent)
+  });
+  notification.on('click', () => {
+    showMainWindow();
+    if (payload.navigateTo && mainWindow) {
+      mainWindow.webContents.send('desktop-runtime:navigate', payload.navigateTo);
+    }
   });
   notification.show();
   return { ok: true };
@@ -230,6 +254,16 @@ ipcMain.handle('desktop-auth:clear-state', async () => {
     sessionToken: ''
   };
   return { ok: true };
+});
+
+ipcMain.handle('desktop-runtime:get-open-at-login', async () => {
+  const settings = app.getLoginItemSettings();
+  return { ok: true, openAtLogin: settings.openAtLogin };
+});
+
+ipcMain.handle('desktop-runtime:set-open-at-login', async (_event, enabled) => {
+  app.setLoginItemSettings({ openAtLogin: Boolean(enabled) });
+  return { ok: true, openAtLogin: Boolean(enabled) };
 });
 
 app.on('before-quit', () => {

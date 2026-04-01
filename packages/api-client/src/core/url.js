@@ -21,34 +21,30 @@ export function resolveApiBaseUrl(overrides = {}) {
     }
   }
 
-  const processEnv = typeof process !== "undefined" ? process.env : undefined;
+  const hasProcess = typeof process !== "undefined" && process.env;
 
-  if (processEnv?.EXPO_PUBLIC_API_URL) {
-    return joinUrl(processEnv.EXPO_PUBLIC_API_URL, "api");
+  // babel-preset-expo inlines EXPO_PUBLIC_* only when accessed as
+  // the full `process.env.EXPO_PUBLIC_X` member-expression.
+  // Aliasing process.env to a variable breaks the static AST match.
+  if (hasProcess && process.env.EXPO_PUBLIC_API_URL) {
+    return joinUrl(process.env.EXPO_PUBLIC_API_URL, "api");
   }
 
-  if (processEnv?.ELECTRON_API_BASE_URL) {
-    return joinUrl(processEnv.ELECTRON_API_BASE_URL, "api");
+  if (hasProcess && process.env.ELECTRON_API_BASE_URL) {
+    return joinUrl(process.env.ELECTRON_API_BASE_URL, "api");
   }
 
-  if (processEnv?.EXTENSION_API_BASE_URL) {
-    return joinUrl(processEnv.EXTENSION_API_BASE_URL, "api");
+  if (hasProcess && process.env.EXTENSION_API_BASE_URL) {
+    return joinUrl(process.env.EXTENSION_API_BASE_URL, "api");
   }
 
-  if (processEnv?.NEXT_PUBLIC_API_BASE_URL) {
-    return joinUrl(processEnv.NEXT_PUBLIC_API_BASE_URL, "api");
+  if (hasProcess && process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return joinUrl(process.env.NEXT_PUBLIC_API_BASE_URL, "api");
   }
 
-  if (processEnv?.API_BASE_URL) {
-    return joinUrl(processEnv.API_BASE_URL, "api");
+  if (hasProcess && process.env.API_BASE_URL) {
+    return joinUrl(process.env.API_BASE_URL, "api");
   }
-
-  console.log("processEnv", processEnv);
-  console.log("processEnv.EXPO_PUBLIC_API_URL", processEnv.EXPO_PUBLIC_API_URL);
-  console.log("processEnv.ELECTRON_API_BASE_URL", processEnv.ELECTRON_API_BASE_URL);
-  console.log("processEnv.EXTENSION_API_BASE_URL", processEnv.EXTENSION_API_BASE_URL);
-  console.log("processEnv.NEXT_PUBLIC_API_BASE_URL", processEnv.NEXT_PUBLIC_API_BASE_URL);
-  console.log("processEnv.API_BASE_URL", processEnv.API_BASE_URL);
 
   return "http://localhost:4000/api";
 }

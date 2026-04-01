@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native';
 
 export function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -8,25 +10,35 @@ export function createStyles(theme) {
     },
     filterRow: {
       flexDirection: 'row',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      gap: 8,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border
+      flexWrap: 'wrap',
+      paddingHorizontal: spacing.medium,
+      gap: spacing.xsmall,
+      marginBottom: spacing.small
+    },
+    filterPill: {
+      paddingHorizontal: spacing.small,
+      paddingVertical: spacing.xxsmall + 2,
+      borderRadius: 2,
+      minWidth: 88
+    },
+    filterPillActive: {
+      backgroundColor: theme.colors.accent + '18'
     },
     filterText: {
-      color: theme.colors.foreground,
-      fontSize: 12,
-      fontWeight: '600'
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightMedium,
+      letterSpacing: typography.letterSpacingWide,
+      color: theme.shell.textMuted,
+      textTransform: 'uppercase'
     },
-    filterActiveText: {
-      color: theme.colors.primaryText,
-      fontSize: 12,
-      fontWeight: '600'
+    filterTextActive: {
+      color: theme.colors.accent,
+      fontWeight: typography.weightBold
     },
     listContent: {
-      padding: 16,
-      paddingBottom: 32
+      paddingHorizontal: spacing.medium,
+      paddingBottom: spacing.xxlarge
     }
   });
 }

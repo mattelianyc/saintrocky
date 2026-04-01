@@ -76,6 +76,39 @@ export const lightTokens = {
     jumbo: '72px',
     sectionVerticalPadding: '150px'
   },
+  nativeSpacing: {
+    xxsmall: 4,
+    xsmall: 8,
+    small: 12,
+    medium: 16,
+    large: 24,
+    xlarge: 32,
+    xxlarge: 40,
+    xxxlarge: 56,
+    jumbo: 72
+  },
+  typography: {
+    fontFamilyBase: 'System',
+    fontFamilyMono: 'SilkaMono-Regular',
+    sizeXxsmall: 10,
+    sizeXsmall: 12,
+    sizeSmall: 13,
+    sizeBase: 15,
+    sizeMedium: 17,
+    sizeLarge: 20,
+    sizeXlarge: 24,
+    sizeXxlarge: 32,
+    sizeJumbo: 40,
+    weightRegular: '400',
+    weightMedium: '500',
+    weightSemibold: '600',
+    weightBold: '700',
+    weightBlack: '900',
+    letterSpacingTight: -0.4,
+    letterSpacingNormal: 0,
+    letterSpacingWide: 1.2,
+    letterSpacingUltraWide: 3.0
+  },
   fonts: {
     base: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"'
   }
@@ -158,6 +191,39 @@ export const darkTokens = {
     xxxlarge: '56px',
     jumbo: '72px',
     sectionVerticalPadding: '150px'
+  },
+  nativeSpacing: {
+    xxsmall: 4,
+    xsmall: 8,
+    small: 12,
+    medium: 16,
+    large: 24,
+    xlarge: 32,
+    xxlarge: 40,
+    xxxlarge: 56,
+    jumbo: 72
+  },
+  typography: {
+    fontFamilyBase: 'System',
+    fontFamilyMono: 'SilkaMono-Regular',
+    sizeXxsmall: 10,
+    sizeXsmall: 12,
+    sizeSmall: 13,
+    sizeBase: 15,
+    sizeMedium: 17,
+    sizeLarge: 20,
+    sizeXlarge: 24,
+    sizeXxlarge: 32,
+    sizeJumbo: 40,
+    weightRegular: '400',
+    weightMedium: '500',
+    weightSemibold: '600',
+    weightBold: '700',
+    weightBlack: '900',
+    letterSpacingTight: -0.4,
+    letterSpacingNormal: 0,
+    letterSpacingWide: 1.2,
+    letterSpacingUltraWide: 3.0
   },
   fonts: {
     base: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"'

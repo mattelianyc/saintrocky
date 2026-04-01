@@ -16,11 +16,9 @@ export function Card({ children, style, ...props }) {
 function createStyles(theme) {
   return StyleSheet.create({
     card: {
-      borderRadius: 16,
-      padding: 16,
-      backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border
+      borderRadius: 2,
+      padding: theme.spacing?.medium || 16,
+      backgroundColor: theme.shell?.backgroundSoft || theme.colors.card
     }
   });
 }

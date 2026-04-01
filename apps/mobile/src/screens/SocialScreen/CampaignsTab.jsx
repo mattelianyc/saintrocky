@@ -1,17 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 
-import { api } from '@saintrocky/api-client';
+import { api } from '@/api/client.js';
 import { buildCampaignsChannel } from '@saintrocky/realtime';
-import {
-  Badge,
-  Button,
-  Card,
-  EmptyState,
-  useTheme
-} from '@saintrocky/ui-native';
+import { Badge, Button, EmptyState, useTheme } from '@saintrocky/ui-native';
 
 import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
+import { SocialScreenConfig } from '@/screens/SocialScreen/SocialScreen.config.js';
 import { createStyles } from '@/screens/SocialScreen/SocialScreen.styles.js';
 
 const STATUS_VARIANT = {
@@ -28,7 +23,7 @@ function formatCampaignDates(startDate, endDate) {
   return start || end || '';
 }
 
-export function CampaignsTab({ auth }) {
+export function CampaignsTab({ auth, navigation }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [campaigns, setCampaigns] = useState([]);
@@ -47,7 +42,9 @@ export function CampaignsTab({ auth }) {
     try {
       const result = await api.campaigns.list();
       setCampaigns(result.campaigns || []);
-    } catch {}
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Failed to load campaigns.');
+    }
   }, []);
 
   useEffect(() => {
@@ -74,9 +71,9 @@ export function CampaignsTab({ auth }) {
       data={campaigns}
       keyExtractor={(item) => item.campaignId}
       contentContainerStyle={styles.listContent}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />}
       renderItem={({ item }) => (
-        <Card style={styles.campaignCard}>
+        <View style={styles.campaignRow}>
           <View style={styles.campaignHeader}>
             <Text style={styles.campaignTitle}>{item.title || 'Campaign'}</Text>
             <Badge variant={STATUS_VARIANT[item.status] || 'default'} size="xs">
@@ -84,24 +81,24 @@ export function CampaignsTab({ auth }) {
             </Badge>
           </View>
 
-          {item.description ? (
+          {item.description && (
             <Text style={styles.campaignDescription} numberOfLines={2}>
               {item.description}
             </Text>
-          ) : null}
+          )}
 
           <View style={styles.campaignMeta}>
             <Text style={styles.campaignMetaText}>
               {formatCampaignDates(item.startDate, item.endDate)}
             </Text>
-            {item.memberCount != null ? (
+            {item.memberCount != null && (
               <Text style={styles.campaignMetaText}>
                 {item.memberCount} member{item.memberCount !== 1 ? 's' : ''}
               </Text>
-            ) : null}
+            )}
           </View>
 
-          {item.membershipStatus === 'invited' ? (
+          {item.membershipStatus === 'invited' && (
             <View style={styles.campaignActions}>
               <Button
                 size="sm"
@@ -118,14 +115,26 @@ export function CampaignsTab({ auth }) {
                 Decline
               </Button>
             </View>
-          ) : null}
-        </Card>
+          )}
+        </View>
       )}
+      ListHeaderComponent={
+        <View style={styles.campaignActions}>
+          <Button
+            variant="primary"
+            size="sm"
+            leadingIconName="add"
+            onPress={() => navigation?.navigate('CreateCampaign')}
+          >
+            New campaign
+          </Button>
+        </View>
+      }
       ListEmptyComponent={
         <EmptyState
           iconName="calendar"
-          title="No campaigns"
-          message="Campaigns are shared rule challenges with friends over a fixed time window."
+          title={SocialScreenConfig.emptyCampaignsTitle}
+          message={SocialScreenConfig.emptyCampaignsMessage}
         />
       }
     />

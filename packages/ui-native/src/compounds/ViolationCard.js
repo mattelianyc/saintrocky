@@ -9,6 +9,7 @@ export function ViolationCard({
   violation,
   onComply,
   onBypass,
+  bypassLabel,
   loading = false
 }) {
   const { theme } = useTheme();
@@ -35,21 +36,17 @@ export function ViolationCard({
   const ruleTitle = violation.ruleTitle || violation.ruleSummary || 'Rule violation';
 
   return (
-    <View style={styles.card}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.alertIcon}>
-          <Icon name="warning" size={20} color={theme.colors.error} />
-        </View>
+        <View style={styles.alertDot} />
         <View style={styles.headerText}>
-          <Text style={styles.alertLabel}>Violation Detected</Text>
+          <Text style={styles.alertLabel}>VIOLATION</Text>
           <Text style={styles.ruleTitle} numberOfLines={2}>{ruleTitle}</Text>
         </View>
       </View>
 
       {violation.surface ? (
-        <Text style={styles.surfaceLabel}>
-          Surface: {violation.surface}
-        </Text>
+        <Text style={styles.surfaceLabel}>{violation.surface}</Text>
       ) : null}
 
       {feeQuote ? (
@@ -88,9 +85,9 @@ export function ViolationCard({
           disabled={loading}
           style={styles.actionButton}
         >
-          {feeQuote && !feeQuote.isFree
+          {bypassLabel || (feeQuote && !feeQuote.isFree
             ? `Bypass · ${formatFeeSol(feeQuote.feeLamports)} SOL`
-            : 'Bypass'}
+            : 'Bypass')}
         </Button>
       </View>
     </View>
@@ -98,55 +95,56 @@ export function ViolationCard({
 }
 
 function createStyles(theme) {
+  const { spacing, typography } = theme;
+
   return StyleSheet.create({
-    card: {
-      borderRadius: 14,
-      padding: 16,
-      backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.error + '40'
+    container: {
+      paddingVertical: spacing?.medium || 16,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.error + '30'
     },
     header: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      marginBottom: 12
+      marginBottom: spacing?.small || 12
     },
-    alertIcon: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: theme.colors.error + '1A',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: 12
+    alertDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: theme.colors.error,
+      marginTop: 5,
+      marginRight: spacing?.small || 12
     },
     headerText: {
       flex: 1
     },
     alertLabel: {
+      fontFamily: typography?.fontFamilyMono || 'System',
       color: theme.colors.error,
-      fontSize: 11,
-      fontWeight: '700',
-      textTransform: 'uppercase',
-      letterSpacing: 0.6,
+      fontSize: typography?.sizeXxsmall || 10,
+      fontWeight: typography?.weightBold || '700',
+      letterSpacing: typography?.letterSpacingUltraWide || 3.0,
       marginBottom: 4
     },
     ruleTitle: {
       color: theme.colors.foreground,
-      fontSize: 15,
-      fontWeight: '600',
+      fontSize: typography?.sizeBase || 15,
+      fontWeight: typography?.weightSemibold || '600',
       lineHeight: 20
     },
     surfaceLabel: {
-      color: theme.colors.muted,
-      fontSize: 12,
-      marginBottom: 12
+      fontFamily: typography?.fontFamilyMono || 'System',
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeXxsmall || 10,
+      letterSpacing: typography?.letterSpacingWide || 1.2,
+      marginBottom: spacing?.small || 12,
+      textTransform: 'uppercase'
     },
     feeSection: {
-      backgroundColor: theme.colors.inputBackground,
-      borderRadius: 10,
-      padding: 12,
-      marginBottom: 14
+      backgroundColor: theme.shell?.backgroundSoft || theme.colors.inputBackground,
+      padding: spacing?.small || 12,
+      marginBottom: spacing?.medium || 14
     },
     feeRow: {
       flexDirection: 'row',
@@ -155,22 +153,24 @@ function createStyles(theme) {
       marginBottom: 4
     },
     feeLabel: {
-      color: theme.colors.muted,
-      fontSize: 13
+      color: theme.shell?.textMuted || theme.colors.muted,
+      fontSize: typography?.sizeSmall || 13
     },
     feeValue: {
+      fontFamily: typography?.fontFamilyMono || 'System',
       color: theme.colors.warning,
-      fontSize: 15,
-      fontWeight: '700'
+      fontSize: typography?.sizeBase || 15,
+      fontWeight: typography?.weightBold || '700'
     },
     feeCountdown: {
+      fontFamily: typography?.fontFamilyMono || 'System',
       color: theme.colors.accent,
-      fontSize: 13,
-      fontWeight: '600'
+      fontSize: typography?.sizeSmall || 13,
+      fontWeight: typography?.weightSemibold || '600'
     },
     actions: {
       flexDirection: 'row',
-      gap: 10
+      gap: spacing?.xsmall || 10
     },
     actionButton: {
       flex: 1
