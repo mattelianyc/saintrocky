@@ -16,13 +16,21 @@ export function RulesStack({ auth }) {
         contentStyle: { backgroundColor: theme.colors.background },
         header: ({ navigation, options, back }) => (
           <CustomHeader
-            title={options.title}
+            centerTitle={options.headerCenterTitle}
+            centerSubtitle={options.headerCenterSubtitle}
             canGoBack={!!back}
           />
         )
       }}
     >
-      <Stack.Screen name="RulesList" options={{ title: '' }}>
+      <Stack.Screen
+        name="RulesList"
+        options={{
+          title: '',
+          headerCenterTitle: 'Rules',
+          headerCenterSubtitle: 'Strategy'
+        }}
+      >
         {(props) => <RulesScreen {...props} auth={auth} />}
       </Stack.Screen>
       <Stack.Screen

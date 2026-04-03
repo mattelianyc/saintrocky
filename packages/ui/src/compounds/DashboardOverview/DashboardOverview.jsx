@@ -21,7 +21,7 @@ export function DashboardOverview({
     <div className={cx('c-DashboardOverview', className)}>
       <section className="c-DashboardOverview__hero">
         {eyebrow ? <p className="c-DashboardOverview__eyebrow">{eyebrow}</p> : null}
-        <h1>{title}</h1>
+        {title ? <h1>{title}</h1> : null}
         {summary ? <p className="c-DashboardOverview__summary">{summary}</p> : null}
       </section>
 
@@ -31,17 +31,6 @@ export function DashboardOverview({
             <div className="c-DashboardOverview__metricCard">
               <span className="c-DashboardOverview__metricLabel">{label}</span>
               <strong>{String(counts?.[key] ?? 0)}</strong>
-            </div>
-          </Card>
-        ))}
-      </section>
-
-      <section className="c-DashboardOverview__sectionGrid">
-        {sections.map((section) => (
-          <Card key={section.slug || section.id || section.title}>
-            <div className="c-DashboardOverview__sectionCard">
-              <h2>{section.title}</h2>
-              <p>{section.description}</p>
             </div>
           </Card>
         ))}

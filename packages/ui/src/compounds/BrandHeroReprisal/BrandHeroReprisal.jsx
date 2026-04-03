@@ -32,13 +32,15 @@ const REPRISAL_BRAND_NAME = saintRockyBranding.wordmark || saintRockyBranding.pr
 const REPRISAL_INSTAGRAM_URL = saintRockyBranding.social?.url || saintRockyBranding.siteUrl || "/";
 const REPRISAL_TERMINAL_COMMAND = saintRockyBranding.social?.handle || "@standarddeviants";
 
-export function BrandHeroReprisal() {
+export function BrandHeroReprisal({
+  brandName = REPRISAL_BRAND_NAME
+}) {
   const sceneReference = useRef(null);
   const shouldReduceMotion = Boolean(useReducedMotion());
   const [scrollProgress, setScrollProgress] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(900);
 
-  const brandCharacters = REPRISAL_BRAND_NAME.split("");
+  const brandCharacters = brandName.split("");
   const terminalRevealProgress = shouldReduceMotion
     ? 1
     : clamp(
@@ -253,7 +255,7 @@ export function BrandHeroReprisal() {
               </div>
               <div className="c-BrandHeroReprisal__footerBottomRow">
                 <p className="c-BrandHeroReprisal__footerCopyright">
-                  &copy; 2026 {REPRISAL_BRAND_NAME}. All rights reserved.
+                  &copy; 2026 {brandName}. All rights reserved.
                 </p>
               </div>
             </div>
@@ -295,7 +297,7 @@ export function BrandHeroReprisal() {
             animate={{ clipPath: redPanelClipPath }}
             transition={{ duration: 0.08, ease: "linear" }}
           >
-            <h2 aria-label={REPRISAL_BRAND_NAME} className="c-BrandHeroReprisal__heading">
+            <h2 aria-label={brandName} className="c-BrandHeroReprisal__heading">
               {renderCharacters("c-BrandHeroReprisal__characterInner", { reverse: true })}
             </h2>
           </motion.div>

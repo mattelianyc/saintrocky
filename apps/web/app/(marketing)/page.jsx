@@ -6,10 +6,11 @@ import {
 
 import MarketingOverviewSessionSection from "./MarketingOverviewSessionSection.jsx";
 import MarketingOverviewContentSection from "./MarketingOverviewContentSection.jsx";
+import { marketingLandingBrandPreview } from "./marketingBrandPreview.js";
 
 export const metadata = {
-  title: `${saintRockyBranding.companyName} | ${saintRockyBranding.productName}`,
-  description: saintRockyBranding.description
+  title: `${saintRockyBranding.companyName} | ${marketingLandingBrandPreview.name}`,
+  description: marketingLandingBrandPreview.descriptionReplacement
 };
 
 export default function MarketingPage() {
@@ -18,7 +19,7 @@ export default function MarketingPage() {
       <BackgroundScrollTransition />
       <MarketingOverviewSessionSection />
       <MarketingOverviewContentSection />
-      <BrandHeroReprisal />
+      <BrandHeroReprisal brandName={marketingLandingBrandPreview.name} />
     </main>
   );
 }

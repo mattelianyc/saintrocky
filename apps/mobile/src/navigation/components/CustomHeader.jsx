@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { IconButton, Badge, useTheme } from '@saintrocky/ui-native';
-import { brandImages } from '@/assets/images.js';
 import { useNotificationContext } from '@/context/NotificationContext.jsx';
+import { TopNavBranding } from '@/components/TopNavBranding/TopNavBranding.jsx';
 
 export function CustomHeader({
-  title,
+  centerTitle,
+  centerSubtitle,
   canGoBack = false,
   showDrawerToggle = true
 }) {
@@ -42,11 +43,9 @@ export function CustomHeader({
         </View>
 
         <View style={styles.centerSlot} pointerEvents="none">
-          <Image
-            source={brandImages.navLogo}
-            style={styles.logo}
-            resizeMode="contain"
-            accessibilityIgnoresInvertColors
+          <TopNavBranding
+            title={centerTitle}
+            subtitle={centerSubtitle}
           />
         </View>
 
@@ -72,7 +71,7 @@ export function CustomHeader({
 }
 
 function createStyles(theme) {
-  const { typography, spacing } = theme;
+  const { spacing } = theme;
 
   return StyleSheet.create({
     container: {
@@ -82,11 +81,13 @@ function createStyles(theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      height: 56,
-      paddingHorizontal: spacing.xxsmall
+      minHeight: 72,
+      paddingHorizontal: spacing.xxsmall,
+      paddingBottom: spacing.xsmall
     },
     sideSlot: {
       width: 48,
+      minHeight: 56,
       alignItems: 'center',
       justifyContent: 'center'
     },
@@ -94,12 +95,8 @@ function createStyles(theme) {
       padding: 8
     },
     centerSlot: {
-      flex: 1
-    },
-    logo: {
-      width: 164,
-      height: 28,
-      alignSelf: 'center'
+      flex: 1,
+      paddingHorizontal: spacing.small
     },
     badgeContainer: {
       position: 'absolute',

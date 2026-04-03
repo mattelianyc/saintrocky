@@ -74,7 +74,8 @@ export function useRulesWorkspaceData({ refreshToken = 0 } = {}) {
             type: BROWSER_EXTENSION_MESSAGE_TYPES.authHandoff,
             payload: {
               token: auth.token,
-              user: auth.user
+              user: auth.user,
+              apiBaseUrl: globalThis.window?.__SAINTROCKY_API_BASE_URL__ || ""
             }
           },
           globalThis.window?.location?.origin || "*"

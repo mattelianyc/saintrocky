@@ -3,7 +3,6 @@ import { Alert, FlatList, Pressable, RefreshControl, Text, View } from 'react-na
 
 import { api } from '@/api/client.js';
 import { EmptyState, useTheme } from '@saintrocky/ui-native';
-import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
 import { useRefreshControl } from '@/hooks/useRefreshControl.js';
 import { createStyles } from '@/screens/TradesScreen/TradesScreen.styles.js';
@@ -110,8 +109,6 @@ export function TradesScreen({ auth }) {
         }
         ListHeaderComponent={
           <>
-            <ScreenHeader kicker="ON-CHAIN" title="Trade history" />
-
             {wallets.length > 1 && (
               <View style={styles.walletSelector}>
                 {wallets.map((wallet) => (

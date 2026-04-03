@@ -8,8 +8,13 @@
   </head>
   <body>
     <main class="popup">
-      <p class="eyebrow">Saint Rocky</p>
-      <h1>Browser runtime</h1>
+      <div class="brand">
+        <img class="brand-mark" src="./rocco-icon.png" alt="Saint Rocky mark" />
+        <div class="brand-copy">
+          <p class="eyebrow">Saint Rocky</p>
+          <h1>Browser runtime</h1>
+        </div>
+      </div>
       <p id="connection-summary" class="summary">Waiting for auth handoff.</p>
 
       <section class="panel">
@@ -23,8 +28,8 @@
             <strong id="assignment-count">0</strong>
           </div>
           <div class="metric">
-            <span>TradingView</span>
-            <strong id="tradingview-status">idle</strong>
+            <span>Browser monitor</span>
+            <strong id="browser-monitor-status">idle</strong>
           </div>
         </div>
         <div class="actions">
@@ -62,6 +67,13 @@
           <strong>Assignments</strong>
         </div>
         <ul id="assignment-list" class="list"></ul>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Recent activity</strong>
+        </div>
+        <ul id="activity-list" class="list"></ul>
       </section>
     </main>
     <script type="module" src="./popup.js"></script>

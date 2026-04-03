@@ -58,6 +58,22 @@ export function resolveRuntimeViolation(action) {
   return getDesktopBridge().resolveRuntimeViolation(action);
 }
 
+export function confirmRuleOverrideRequest(ruleId, requestId) {
+  return getDesktopBridge().confirmRuleOverrideRequest(ruleId, requestId);
+}
+
+export function cancelRuleOverrideRequest(ruleId, requestId) {
+  return getDesktopBridge().cancelRuleOverrideRequest(ruleId, requestId);
+}
+
+export function confirmRuleDeactivationRequest(ruleId, requestId) {
+  return getDesktopBridge().confirmRuleDeactivationRequest(ruleId, requestId);
+}
+
+export function cancelRuleDeactivationRequest(ruleId, requestId) {
+  return getDesktopBridge().cancelRuleDeactivationRequest(ruleId, requestId);
+}
+
 export function confirmRuntimeOverride() {
   return getDesktopBridge().confirmRuntimeOverride();
 }
@@ -84,6 +100,30 @@ export function getOpenAtLogin() {
 
 export function setOpenAtLogin(enabled) {
   return getDesktopBridge().setOpenAtLogin(enabled);
+}
+
+export function getDesktopThemeState() {
+  return getDesktopBridge().getDesktopThemeState();
+}
+
+export function onDesktopThemeChange(callback) {
+  return getDesktopBridge().onDesktopThemeChange(callback);
+}
+
+export function getUpdaterState() {
+  return getDesktopBridge().getUpdaterState();
+}
+
+export function checkForUpdates() {
+  return getDesktopBridge().checkForUpdates();
+}
+
+export function installUpdate() {
+  return getDesktopBridge().installUpdate();
+}
+
+export function onUpdaterStateChange(callback) {
+  return getDesktopBridge().onUpdaterStateChange(callback);
 }
 
 export function onNavigateFromMain(callback) {

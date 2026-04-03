@@ -11,6 +11,7 @@ export function createStyles(theme) {
     segmentedControl: {
       flexDirection: 'row',
       marginHorizontal: spacing.medium,
+      marginTop: spacing.small,
       marginBottom: spacing.small
     },
     segment: {

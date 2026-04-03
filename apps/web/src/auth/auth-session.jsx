@@ -109,7 +109,8 @@ export function AuthSessionProvider({ children }) {
               type: BROWSER_EXTENSION_MESSAGE_TYPES.authHandoff,
               payload: {
                 token: runtimeAuth.token,
-                user: runtimeAuth.user
+                user: runtimeAuth.user,
+                apiBaseUrl: globalThis.window?.__SAINTROCKY_API_BASE_URL__ || ""
               }
             },
             targetOrigin

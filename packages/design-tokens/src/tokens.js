@@ -8,9 +8,9 @@ export const lightTokens = {
     input: 'rgba(13, 18, 17, 0.045)',
     border: 'rgba(13, 18, 17, 0.14)',
     borderStrong: 'rgba(13, 18, 17, 0.22)',
-    mint: '#6ddfb8',
-    primary: '#6ddfb8',
-    primaryText: '#08110d',
+    mint: '#0f5a46',
+    primary: '#0f5a46',
+    primaryText: '#f5faf7',
     error: '#d06d90',
     uiDarkBg: '#0b0f1a',
     uiDarkFg: '#f8fafc',
@@ -32,26 +32,26 @@ export const lightTokens = {
     border: 'rgba(13, 18, 17, 0.1)',
     text: '#0d1211',
     textMuted: 'rgba(13, 18, 17, 0.62)',
-    accent: '#6ddfb8',
+    accent: '#0f5a46',
     accentStrong: '#e8b8c8',
     shadow: '0 24px 60px rgba(13, 18, 17, 0.08)',
     glow: 'rgba(232, 184, 200, 0.18)'
   },
   gradients: {
-    problemStart: '#6ddfb8',
+    problemStart: '#0f5a46',
     problemEnd: '#e8b8c8'
   },
   desktop: {
     backgroundStart: '#ffffff',
     backgroundEnd: '#eef9f3',
     surface: 'rgba(255, 255, 255, 0.86)',
-    surfaceStrong: 'rgba(109, 223, 184, 0.08)',
+    surfaceStrong: 'rgba(15, 90, 70, 0.08)',
     sidebarSurface: 'rgba(255, 255, 255, 0.92)',
     cardSurface: 'rgba(255, 255, 255, 0.88)',
     border: 'rgba(13, 18, 17, 0.1)',
     text: '#0d1211',
     textMuted: 'rgba(13, 18, 17, 0.62)',
-    kicker: '#6ddfb8',
+    kicker: '#0f5a46',
     shadow: '0 20px 48px rgba(13, 18, 17, 0.08)'
   },
   radii: {
@@ -62,7 +62,7 @@ export const lightTokens = {
     md: '0 18px 60px rgba(0, 0, 0, 0.18)'
   },
   rings: {
-    md: '0 0 0 3px rgba(109, 223, 184, 0.3)'
+    md: '0 0 0 3px rgba(15, 90, 70, 0.22)'
   },
   spaces: {
     xxsmall: '4px',
@@ -124,9 +124,9 @@ export const darkTokens = {
     input: 'rgba(255, 255, 255, 0.06)',
     border: 'rgba(245, 250, 247, 0.12)',
     borderStrong: 'rgba(245, 250, 247, 0.22)',
-    mint: '#6ddfb8',
-    primary: '#6ddfb8',
-    primaryText: '#0a0a0a',
+    mint: '#0f5a46',
+    primary: '#0f5a46',
+    primaryText: '#f5faf7',
     error: '#f0a2bc',
     uiDarkBg: '#06080f',
     uiDarkFg: '#f5faf7',
@@ -148,26 +148,26 @@ export const darkTokens = {
     border: 'rgba(245, 250, 247, 0.1)',
     text: '#f5faf7',
     textMuted: 'rgba(245, 250, 247, 0.68)',
-    accent: '#6ddfb8',
+    accent: '#0f5a46',
     accentStrong: '#e3a7bc',
     shadow: '0 24px 60px rgba(0, 0, 0, 0.34)',
     glow: 'rgba(227, 167, 188, 0.14)'
   },
   gradients: {
-    problemStart: '#6ddfb8',
+    problemStart: '#0f5a46',
     problemEnd: '#e3a7bc'
   },
   desktop: {
     backgroundStart: '#050807',
     backgroundEnd: '#0d1512',
     surface: 'rgba(255, 255, 255, 0.04)',
-    surfaceStrong: 'rgba(109, 223, 184, 0.08)',
+    surfaceStrong: 'rgba(15, 90, 70, 0.12)',
     sidebarSurface: 'rgba(9, 16, 13, 0.84)',
     cardSurface: 'rgba(11, 18, 15, 0.84)',
     border: 'rgba(245, 250, 247, 0.1)',
     text: '#f5faf7',
     textMuted: 'rgba(245, 250, 247, 0.68)',
-    kicker: '#6ddfb8',
+    kicker: '#0f5a46',
     shadow: '0 20px 48px rgba(0, 0, 0, 0.24)'
   },
   radii: {
@@ -178,7 +178,7 @@ export const darkTokens = {
     md: '0 18px 60px rgba(0, 0, 0, 0.45)'
   },
   rings: {
-    md: '0 0 0 3px rgba(109, 223, 184, 0.24)'
+    md: '0 0 0 3px rgba(15, 90, 70, 0.24)'
   },
   spaces: {
     xxsmall: '4px',

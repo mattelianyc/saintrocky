@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StatusBar, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { RootNavigator } from '@/navigation/RootNavigator.jsx';
 import { NotificationProvider } from '@/context/NotificationContext.jsx';
 import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary.jsx';
+import { PendingActionsOverlay } from '@/components/PendingActionsOverlay/PendingActionsOverlay.jsx';
 import { api } from '@/api/client.js';
 import { analytics } from '@/analytics/client.js';
 import { notifications } from '@/notifications/client.js';
@@ -140,9 +141,12 @@ function AppShell() {
       />
       <ErrorBoundary>
         <NotificationProvider ownerEmail={user?.email}>
-          <NavigationContainer ref={navigationRef} theme={navigationTheme}>
-            <RootNavigator auth={auth} />
-          </NavigationContainer>
+          <View style={styles.appFrame}>
+            <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+              <RootNavigator auth={auth} />
+            </NavigationContainer>
+            <PendingActionsOverlay ownerEmail={user?.email} />
+          </View>
         </NotificationProvider>
       </ErrorBoundary>
     </>
@@ -165,7 +169,7 @@ export default function App() {
   if (!fontsLoaded) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <GestureHandlerRootView style={styles.root} onLayout={onLayoutRootView}>
       <SafeAreaProvider>
         <ThemeProvider>
           <AppShell />
@@ -174,3 +178,12 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1
+  },
+  appFrame: {
+    flex: 1
+  }
+});

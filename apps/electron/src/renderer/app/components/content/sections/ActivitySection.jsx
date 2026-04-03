@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card } from '@saintrocky/ui';
 
-import { formatRelativeTime, formatSurfaceLabel, formatValue } from '../../../utils/runtime-formatters.js';
+import { formatRelativeTime, formatRuleEventHeadline, formatRuleEventMeta, formatSurfaceLabel } from '../../../utils/runtime-formatters.js';
 
 const FILTER_OPTIONS = [
   { id: 'all', label: 'All' },
@@ -58,8 +58,8 @@ export function ActivitySection({ runtimeHub }) {
                 <span className="desktop-HubMeta desktop-SurfaceTag">{formatSurfaceLabel(event.surface)}</span>
                 <span className="desktop-HubMeta">{formatRelativeTime(event.occurredAt)}</span>
               </div>
-              <strong>{event.title}</strong>
-              {event.eventType && <span className="desktop-HubMeta">{event.eventType}</span>}
+              <strong>{formatRuleEventHeadline(event)}</strong>
+              {formatRuleEventMeta(event) ? <span className="desktop-HubMeta">{formatRuleEventMeta(event)}</span> : null}
             </div>
           ))
         ) : (

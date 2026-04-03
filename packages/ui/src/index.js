@@ -70,6 +70,8 @@ export { TimeSlotPicker } from './compounds/TimeSlotPicker/TimeSlotPicker.jsx';
 export { BookingSummaryCard } from './compounds/BookingSummaryCard/BookingSummaryCard.jsx';
 export { ProfileCard } from './compounds/ProfileCard/ProfileCard.jsx';
 export { ChatWidget } from './compounds/ChatWidget/ChatWidget.jsx';
+export { PendingActionsOverview } from './compounds/PendingActionsOverview/PendingActionsOverview.jsx';
+export { PendingActionsWidget } from './compounds/PendingActionsWidget/PendingActionsWidget.jsx';
 export { ConfirmDialog } from './compounds/ConfirmDialog/ConfirmDialog.jsx';
 export { ImageUpload } from './compounds/ImageUpload/ImageUpload.jsx';
 export { PromptDialog } from './compounds/PromptDialog/PromptDialog.jsx';

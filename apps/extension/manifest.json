@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": ["<all_urls>"],
-  "homepage_url": "https://saintrocky.com",
+  "homepage_url": "https://saintrocky.com/privacy",
   "icons": {
     "16": "extension-icon-16.png",
     "48": "extension-icon-48.png",

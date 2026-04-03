@@ -38,7 +38,7 @@ export function DrawerContent({ navigation, auth, toggleTheme }) {
     <View style={[styles.container, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 }]}>
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
         <View style={styles.brandHeader}>
-          <Image source={brandImages.navLogo} style={styles.logo} resizeMode="contain" />
+          <Image source={brandImages.roccoIcon} style={styles.logo} resizeMode="cover" />
           <Text style={styles.brandName}>{saintRockyBranding.shortProductName}</Text>
         </View>
 
@@ -131,9 +131,9 @@ function createStyles(theme) {
       marginBottom: spacing.xlarge
     },
     logo: {
-      width: 28,
-      height: 28,
-      opacity: 0.8
+      width: 44,
+      height: 44,
+      borderRadius: 12
     },
     brandName: {
       fontFamily: typography.fontFamilyMono,

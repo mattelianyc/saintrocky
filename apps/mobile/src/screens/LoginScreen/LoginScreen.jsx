@@ -19,6 +19,7 @@ import { createValidationT, flattenValidationErrors, loginSchema } from '@saintr
 import { AnalyticsEvents, trackEvent } from '@saintrocky/analytics';
 import { LoginScreenConfig } from '@/screens/LoginScreen/LoginScreen.config.js';
 import { createStyles } from '@/screens/LoginScreen/LoginScreen.styles.js';
+import { TopNavBranding } from '@/components/TopNavBranding/TopNavBranding.jsx';
 import { Button, FormErrorSummary, TextField, useTheme } from '@saintrocky/ui-native';
 
 export function LoginScreen({ auth, navigation }) {
@@ -74,14 +75,16 @@ export function LoginScreen({ auth, navigation }) {
           keyboardShouldPersistTaps="handled"
           bounces={false}
         >
-          <View style={styles.topSection}>
-            <Image source={brandImages.navLogo} style={styles.navLogo} resizeMode="contain" />
+          <View style={[styles.topSection, { paddingTop: insets.top + 16 }]}>
+            <TopNavBranding
+              variant="auth"
+              title={LoginScreenConfig.heading}
+              subtitle={saintRockyBranding.auth.summary}
+            />
           </View>
 
           <View style={styles.brandArea}>
             <Image source={brandImages.mascot} style={styles.mascot} resizeMode="contain" />
-            <Text style={styles.heading}>{LoginScreenConfig.heading}</Text>
-            <Text style={styles.summary}>{saintRockyBranding.auth.summary}</Text>
           </View>
 
           <View style={styles.formArea}>

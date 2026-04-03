@@ -13,6 +13,7 @@ export { ChatBubble } from './compounds/ChatBubble.js';
 export { EmptyState } from './compounds/EmptyState.js';
 export { FormErrorSummary } from './compounds/FormErrorSummary.js';
 export { MetricCard } from './compounds/MetricCard.js';
+export { PendingActionsPill } from './compounds/PendingActionsPill.js';
 export { RuleListItem } from './compounds/RuleListItem.js';
 export { SectionHeader } from './compounds/SectionHeader.js';
 export { ViolationCard } from './compounds/ViolationCard.js';

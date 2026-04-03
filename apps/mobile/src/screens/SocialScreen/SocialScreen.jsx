@@ -3,7 +3,6 @@ import { Pressable, Text, View } from 'react-native';
 
 import { useTheme } from '@saintrocky/ui-native';
 
-import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
 import { FriendsTab } from '@/screens/SocialScreen/FriendsTab.jsx';
 import { MessagesTab } from '@/screens/SocialScreen/MessagesTab.jsx';
 import { CampaignsTab } from '@/screens/SocialScreen/CampaignsTab.jsx';
@@ -22,8 +21,6 @@ export function SocialScreen({ auth, navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader kicker="COMMUNITY" title="Social" />
-
       <View style={styles.segmentedControl}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key;

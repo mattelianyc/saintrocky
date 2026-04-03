@@ -17,7 +17,9 @@ import { brandImages } from '@/assets/images.js';
 import { saintRockyBranding } from '@saintrocky/branding';
 import { createValidationT, flattenValidationErrors, registerSchema } from '@saintrocky/validation';
 import { AnalyticsEvents, trackEvent } from '@saintrocky/analytics';
+import { RegisterScreenConfig } from '@/screens/RegisterScreen/RegisterScreen.config.js';
 import { createStyles } from '@/screens/RegisterScreen/RegisterScreen.styles.js';
+import { TopNavBranding } from '@/components/TopNavBranding/TopNavBranding.jsx';
 import { Button, FormErrorSummary, TextField, useTheme } from '@saintrocky/ui-native';
 
 export function RegisterScreen({ auth, navigation }) {
@@ -71,13 +73,12 @@ export function RegisterScreen({ auth, navigation }) {
           keyboardShouldPersistTaps="handled"
           bounces={false}
         >
-          <View style={styles.topSection}>
-            <Image source={brandImages.navLogo} style={styles.navLogo} resizeMode="contain" />
-          </View>
-
-          <View style={styles.brandArea}>
-            <Text style={styles.heading}>Create account</Text>
-            <Text style={styles.summary}>{saintRockyBranding.auth.summary}</Text>
+          <View style={[styles.topSection, { paddingTop: insets.top + 16 }]}>
+            <TopNavBranding
+              variant="auth"
+              title={RegisterScreenConfig.heading}
+              subtitle={saintRockyBranding.auth.summary}
+            />
           </View>
 
           <View style={styles.formArea}>

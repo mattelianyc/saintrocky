@@ -9,6 +9,7 @@ export function createStyles(theme) {
       backgroundColor: theme.colors.background
     },
     listContent: {
+      paddingTop: spacing.small,
       paddingBottom: spacing.xxlarge
     },
     tableHeader: {

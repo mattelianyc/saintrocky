@@ -4,6 +4,8 @@ import { BROWSER_EXTENSION_MESSAGE_TYPES, isScheduleActive } from "@saintrocky/s
 
 const STORAGE_KEY = "saintRockyExtensionRuntime";
 const MESSAGE_TYPES = BROWSER_EXTENSION_MESSAGE_TYPES;
+const LOCAL_DEVELOPMENT_HOSTNAMES = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
+const LOCAL_DEVELOPMENT_API_BASE_URL = "http://localhost:4000";
 
 let state = null;
 let hasLoadedState = false;
@@ -96,6 +98,52 @@ function rebuildApiClient() {
   return getApiClient();
 }
 
+function normalizeBaseUrl(baseUrl = "") {
+  return String(baseUrl || "").trim().replace(/\/+$/, "");
+}
+
+function isLocalDevelopmentUrl(url = "") {
+  try {
+    const parsedUrl = new URL(url);
+    return LOCAL_DEVELOPMENT_HOSTNAMES.has(parsedUrl.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function getDefaultApiBaseUrl() {
+  return normalizeBaseUrl(__SAINTROCKY_EXTENSION_API_BASE_URL__) || LOCAL_DEVELOPMENT_API_BASE_URL;
+}
+
+function resolveRuntimeApiBaseUrl({ senderUrl = "", requestedApiBaseUrl = "" } = {}) {
+  if (isLocalDevelopmentUrl(senderUrl)) {
+    return LOCAL_DEVELOPMENT_API_BASE_URL;
+  }
+
+  return normalizeBaseUrl(requestedApiBaseUrl) || getDefaultApiBaseUrl();
+}
+
+async function applyRuntimeApiBaseUrl(nextApiBaseUrl = "") {
+  const normalizedNextApiBaseUrl = normalizeBaseUrl(nextApiBaseUrl);
+  if (!normalizedNextApiBaseUrl) {
+    return false;
+  }
+
+  if (normalizeBaseUrl(state.runtimeConfig.apiBaseUrl) === normalizedNextApiBaseUrl) {
+    return false;
+  }
+
+  state.runtimeConfig.apiBaseUrl = normalizedNextApiBaseUrl;
+  rebuildApiClient();
+  await persistState();
+
+  if (state.sessionToken) {
+    await connectRealtime();
+  }
+
+  return true;
+}
+
 function getDomain(url = "") {
   try { return new URL(url).hostname.replace(/^www\./, "").toLowerCase(); }
   catch { return ""; }
@@ -182,6 +230,16 @@ function subscribeRulesChannel() {
     async (message) => {
       if (message.type !== "channel.snapshot") return;
       state.rules = message.payload?.rules || [];
+      if (message.payload?.eventType === "chain_violation_detected") {
+        addRecentEvent(
+          "chain_violation_detected",
+          {
+            ruleId: message.payload?.ruleId || "chain",
+            compiledRule: { summary: "Chain violation detected" }
+          },
+          message.payload
+        );
+      }
       syncPendingOverrideFromRules();
       await persistState();
 
@@ -240,8 +298,20 @@ async function sendTabMessage(tabId, payload) {
   try {
     await chrome.tabs.sendMessage(tabId, payload);
   } catch (error) {
+    if (isMissingTabReceiverError(error)) {
+      state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
+      return;
+    }
     console.error("Failed to send browser extension tab message.", error);
   }
+}
+
+function isMissingTabReceiverError(error) {
+  const message = error?.message || "";
+  return (
+    message.includes("Could not establish connection. Receiving end does not exist.") ||
+    message.includes("The message port closed before a response was received.")
+  );
 }
 
 async function sendOverrideCountdownToBlockedTabs() {
@@ -339,6 +409,10 @@ async function resolveViolation(action = "comply") {
       const result = await getApiClient().rules.requestOverride(state.pendingViolation.ruleId);
       if (result?.request) {
         state.pendingOverrideRequest = result.request;
+        await reportRuntimeEvent("bypass_accepted", assignment, {
+          tabId,
+          url: state.pendingViolation.url
+        });
         await persistState();
         await sendOverrideCountdownToBlockedTabs();
         await publishExtensionSession();
@@ -354,7 +428,7 @@ async function resolveViolation(action = "comply") {
     }
   }
 
-  await reportRuntimeEvent("rule_blocked", assignment, { tabId, url: state.pendingViolation.url });
+  await reportRuntimeEvent("rule_complied", assignment, { tabId, url: state.pendingViolation.url });
 
   state.pendingViolation = null;
   state.pendingOverrideRequest = null;
@@ -371,6 +445,14 @@ async function handleConfirmOverride() {
   try {
     await getApiClient().rules.confirmOverrideRequest(ruleId, requestId);
     const tabId = state.pendingViolation.tabId;
+    const assignment = state.assignments.find((item) => item.ruleId === ruleId);
+    if (assignment) {
+      await reportRuntimeEvent("bypass_confirmed", assignment, {
+        tabId,
+        url: state.pendingViolation.url,
+        requestId
+      });
+    }
     state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
     await sendTabMessage(tabId, { type: MESSAGE_TYPES.clearBlock });
     state.pendingViolation = null;
@@ -391,6 +473,14 @@ async function handleCancelOverride() {
 
   try {
     await getApiClient().rules.cancelOverrideRequest(ruleId, requestId);
+    const assignment = state.assignments.find((item) => item.ruleId === ruleId);
+    if (assignment) {
+      await reportRuntimeEvent("bypass_cancelled", assignment, {
+        tabId: state.pendingViolation.tabId,
+        url: state.pendingViolation.url,
+        requestId
+      });
+    }
     state.pendingOverrideRequest = null;
     await persistState();
     for (const tabId of state.blockedTabIds) {
@@ -407,7 +497,13 @@ async function handleCancelOverride() {
   return state;
 }
 
-async function handleAuthHandoff(payload = {}) {
+async function handleAuthHandoff(payload = {}, sender = {}) {
+  await applyRuntimeApiBaseUrl(
+    resolveRuntimeApiBaseUrl({
+      senderUrl: sender?.tab?.url,
+      requestedApiBaseUrl: payload.apiBaseUrl
+    })
+  );
   state.sessionToken = payload.token || "";
   state.sessionUser = payload.user || null;
   rebuildApiClient();
@@ -451,12 +547,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   ensureState()
     .then(async () => {
       if (message?.type === MESSAGE_TYPES.authHandoff) {
-        await handleAuthHandoff(message.payload || {});
+        await handleAuthHandoff(message.payload || {}, sender);
         sendResponse({ ok: true, state });
         return;
       }
 
       if (message?.type === MESSAGE_TYPES.pageContext) {
+        await applyRuntimeApiBaseUrl(
+          resolveRuntimeApiBaseUrl({
+            senderUrl: sender?.tab?.url,
+            requestedApiBaseUrl: message.payload?.apiBaseUrl
+          })
+        );
         state.latestPageContext = message.payload || null;
         await persistState();
         if (sender.tab?.id && message.payload?.url) {

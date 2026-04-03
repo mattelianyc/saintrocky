@@ -16,13 +16,21 @@ export function SocialStack({ auth }) {
         contentStyle: { backgroundColor: theme.colors.background },
         header: ({ navigation, options, back }) => (
           <CustomHeader
-            title={options.title}
+            centerTitle={options.headerCenterTitle}
+            centerSubtitle={options.headerCenterSubtitle}
             canGoBack={!!back}
           />
         )
       }}
     >
-      <Stack.Screen name="SocialOverview" options={{ title: '' }}>
+      <Stack.Screen
+        name="SocialOverview"
+        options={{
+          title: '',
+          headerCenterTitle: 'Social',
+          headerCenterSubtitle: 'Community'
+        }}
+      >
         {(props) => <SocialScreen {...props} auth={auth} />}
       </Stack.Screen>
       <Stack.Screen

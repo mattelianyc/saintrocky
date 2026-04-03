@@ -13,7 +13,12 @@ const runtimeConfig = loadWebRuntimeConfig(process.env);
 
 export const metadata = {
   title: saintRockyBranding.title,
-  description: saintRockyBranding.description
+  description: saintRockyBranding.description,
+  icons: {
+    icon: "/images/rocco-icon.png",
+    apple: "/images/rocco-icon.png",
+    shortcut: "/images/rocco-icon.png"
+  }
 };
 
 export default function RootLayout({ children }) {

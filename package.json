@@ -40,6 +40,8 @@
     "seed:wallets": "yarn workspace @saintrocky/api seed:wallets",
     "seed:social": "yarn workspace @saintrocky/api seed:social",
     "seed:all": "yarn workspace @saintrocky/api seed:all",
+    "build:extension": "yarn workspace @saintrocky/extension build",
+    "build:extension:dev": "yarn workspace @saintrocky/extension build:dev",
     "escrow:init": "node apps/blockchain/scripts/initialize-platform.mjs"
   },
   "devDependencies": {

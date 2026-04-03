@@ -15,7 +15,8 @@ export function HomeStack({ auth }) {
         contentStyle: { backgroundColor: theme.colors.background },
         header: ({ navigation, route, options, back }) => (
           <CustomHeader
-            title={options.title}
+            centerTitle={options.headerCenterTitle}
+            centerSubtitle={options.headerCenterSubtitle}
             canGoBack={!!back}
           />
         )
@@ -24,7 +25,14 @@ export function HomeStack({ auth }) {
       <Stack.Screen name="HomeOverview" options={{ title: '' }}>
         {(props) => <HomeScreen {...props} auth={auth} />}
       </Stack.Screen>
-      <Stack.Screen name="Trades" options={{ title: 'TRADE HISTORY' }}>
+      <Stack.Screen
+        name="Trades"
+        options={{
+          title: 'TRADE HISTORY',
+          headerCenterTitle: 'Trade history',
+          headerCenterSubtitle: 'On-chain'
+        }}
+      >
         {(props) => <TradesScreen {...props} auth={auth} />}
       </Stack.Screen>
     </Stack.Navigator>

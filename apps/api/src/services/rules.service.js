@@ -269,9 +269,15 @@ export async function publishOwnerRuleState(ownerUserId, ownerEmail, eventName, 
   publishSnapshot(buildRulesChannel(ownerEmail), { eventType: eventName, rules, drafts });
   publishEvent(buildRulesChannel(ownerEmail), eventName, payload);
 
-  for (const surface of ['browser_extension', 'desktop_runtime', 'chain_watcher']) {
+  for (const surface of ['browser_extension', 'desktop_runtime', 'chain_watcher', 'mobile_observer']) {
     const assignments = activeRules
-      .filter((rule) => inferRuntimeSurfaces(rule.compiledRule).includes(surface))
+      .filter((rule) => {
+        if (surface === 'mobile_observer') {
+          return true;
+        }
+
+        return inferRuntimeSurfaces(rule.compiledRule).includes(surface);
+      })
       .map((rule) => ({
         ruleId: rule.ruleId,
         ownerUserId: rule.ownerUserId,
@@ -626,7 +632,10 @@ export async function listRuntimeAssignments(payload = {}) {
     .filter(
       (rule) =>
         rule.status === 'active' &&
-        inferRuntimeSurfaces(rule.compiledRule).includes(payload.runtimeSurface)
+        (
+          payload.runtimeSurface === 'mobile_observer' ||
+          inferRuntimeSurfaces(rule.compiledRule).includes(payload.runtimeSurface)
+        )
     )
     .map((rule) => ({
       ruleId: rule.ruleId,

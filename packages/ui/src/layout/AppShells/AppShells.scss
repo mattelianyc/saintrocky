@@ -196,8 +196,10 @@
 
 .sr-WebDashboardBrandLogo {
   width: 100%;
-  max-width: 10.5rem;
+  max-width: 7rem;
   height: auto;
+  justify-self: start;
+  border-radius: 24px;
 }
 
 .sr-WebDashboardBrandMeta {
@@ -266,19 +268,35 @@
 }
 
 :where(body.sr-DesktopBody) {
-  --ui-bg: var(--ui-desktop-background-end);
-  --ui-fg: var(--ui-desktop-text);
-  --ui-muted: var(--ui-desktop-text-muted);
-  --ui-card: var(--ui-desktop-card-surface);
-  --ui-input: var(--ui-desktop-surface);
-  --ui-border: var(--ui-desktop-border);
-  --ui-border-strong: color-mix(in srgb, var(--ui-desktop-border) 82%, var(--ui-desktop-text));
-  --ui-shadow: var(--ui-desktop-shadow);
+  --ui-bg: var(--ui-shell-background);
+  --ui-fg: var(--ui-shell-text);
+  --ui-muted: var(--ui-shell-text-muted);
+  --ui-card: var(--ui-shell-panel);
+  --ui-input: var(--ui-shell-input-bg);
+  --ui-border: var(--ui-shell-border);
+  --ui-border-strong: color-mix(in srgb, var(--ui-shell-border) 74%, var(--ui-shell-text));
+  --ui-shadow: var(--ui-shell-shadow);
+  --ui-font-brand: var(--font-silka-mono, var(--ui-font));
+  --ui-desktop-background-start: color-mix(in srgb, var(--ui-shell-background-strong) 94%, white);
+  --ui-desktop-background-end: var(--ui-shell-background);
+  --ui-desktop-text: var(--ui-shell-text);
+  --ui-desktop-text-muted: var(--ui-shell-text-muted);
+  --ui-desktop-card-surface: color-mix(in srgb, var(--ui-shell-panel) 92%, white);
+  --ui-desktop-surface: color-mix(in srgb, var(--ui-shell-panel-muted) 84%, white);
+  --ui-desktop-border: var(--ui-shell-border);
+  --ui-desktop-shadow: var(--ui-shell-shadow);
+  --ui-desktop-sidebar-surface:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ui-shell-background-strong) 90%, white) 0%,
+      color-mix(in srgb, var(--ui-shell-background) 88%, white) 100%
+    );
+  --ui-desktop-kicker: var(--ui-shell-accent);
 
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--ui-desktop-kicker) 18%, transparent), transparent 30%),
-    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--ui-shell-accent-strong) 14%, transparent), transparent 24%),
+    radial-gradient(circle at top left, color-mix(in srgb, var(--ui-shell-accent) 16%, transparent), transparent 30%),
+    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--ui-shell-accent-strong) 12%, transparent), transparent 24%),
     linear-gradient(180deg, var(--ui-desktop-background-start) 0%, var(--ui-desktop-background-end) 100%);
   color: var(--ui-desktop-text);
 }
@@ -290,17 +308,24 @@
 .desktop-App,
 .desktop-Layout {
   min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .desktop-Layout .c-PageLayout__main {
-  padding: 24px;
+  height: 100vh;
+  padding: 32px 24px 40px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .desktop-Layout .c-PageLayout__sidebar {
-  padding: 16px;
+  height: 100vh;
+  overflow: hidden;
+  padding: 20px 18px;
   background: var(--ui-desktop-sidebar-surface);
-  border-right: 0;
+  border-right: 1px solid color-mix(in srgb, var(--ui-shell-border) 82%, white);
+  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--ui-shell-background-strong) 72%, white);
 }
 
 .desktop-Layout .c-AppSidebar,
@@ -309,28 +334,89 @@
   color: var(--ui-desktop-text);
 }
 
+.desktop-Layout .c-AppSidebar {
+  height: 100%;
+  overflow: hidden;
+}
+
+.desktop-Layout .c-AppSidebar__nav {
+  flex: 0 0 auto;
+  min-height: auto;
+  overflow: visible;
+  padding-bottom: 0;
+}
+
 .desktop-Layout .c-AppSidebar__brand,
 .desktop-Layout .c-AppSidebar__footer {
-  background: var(--ui-desktop-surface);
+  background: transparent;
 }
 
 .desktop-Layout .c-AppSidebar .c-NavLink,
 .desktop-Layout .c-AppSidebar .c-AppSidebar__toggle {
   background: transparent;
+  color: var(--ui-desktop-text-muted);
+}
+
+.desktop-Layout .c-AppSidebar .c-NavLink:hover,
+.desktop-Layout .c-AppSidebar .c-NavLink:focus-visible,
+.desktop-Layout .c-AppSidebar .c-AppSidebar__toggle:hover,
+.desktop-Layout .c-AppSidebar .c-AppSidebar__toggle:focus-visible {
+  background: color-mix(in srgb, var(--ui-shell-accent) 8%, white);
   color: var(--ui-desktop-text);
 }
 
 .desktop-Layout .c-AppSidebar .c-NavLink.is-active,
 .desktop-Layout .c-AppSidebar .c-AppSidebar__toggle.is-active {
-  background: color-mix(in srgb, var(--ui-desktop-kicker) 18%, transparent);
+  background: color-mix(in srgb, var(--ui-shell-accent) 12%, white);
+  color: var(--ui-desktop-text);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ui-shell-accent) 26%, white);
 }
 
 .desktop-SidebarBrand {
   display: grid;
-  gap: 4px;
+  gap: 12px;
 }
 
-.desktop-SidebarEyebrow,
+.desktop-BrandLockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.desktop-BrandLockup--compact {
+  align-items: flex-start;
+}
+
+.desktop-BrandMonogram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 62px;
+  width: 62px;
+  height: 62px;
+  padding: 0;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ui-shell-background-strong) 90%, white) 0%, rgba(255, 255, 255, 0.96) 100%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ui-shell-border) 84%, white),
+    0 18px 40px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.desktop-BrandMark {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.desktop-BrandCopy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.desktop-BrandEyebrow,
 .desktop-Kicker {
   margin: 0;
   text-transform: uppercase;
@@ -339,11 +425,19 @@
   font-size: 12px;
 }
 
-.desktop-SidebarWordmark {
-  font-size: 32px;
-  font-weight: 300;
+.desktop-BrandWordmark {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 0.92;
+  color: var(--ui-desktop-text);
+  text-transform: uppercase;
 }
 
+.desktop-BrandLockup--compact .desktop-BrandWordmark {
+  font-size: 24px;
+}
+
+.desktop-BrandDetail,
 .desktop-SidebarHint {
   color: var(--ui-desktop-text-muted);
   font-size: 12px;
@@ -362,6 +456,7 @@
   background: var(--ui-desktop-card-surface);
   color: var(--ui-desktop-text);
   box-shadow: var(--ui-desktop-shadow);
+  border: 1px solid color-mix(in srgb, var(--ui-desktop-border) 80%, white);
 }
 
 .desktop-HeroHeader {
@@ -414,9 +509,53 @@
   padding: 24px;
 }
 
+.desktop-AuthPage {
+  display: grid;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--ui-shell-accent) 10%, transparent), transparent 32%),
+    radial-gradient(circle at 82% 14%, color-mix(in srgb, var(--ui-shell-accent-strong) 10%, transparent), transparent 26%),
+    linear-gradient(180deg, var(--ui-desktop-background-start) 0%, var(--ui-desktop-background-end) 100%);
+}
+
+.desktop-AuthStage {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 24px;
+}
+
+.desktop-AuthShell {
+  width: min(1120px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 460px);
+  gap: 24px;
+  align-items: center;
+}
+
+.desktop-AuthBrandPanel,
 .desktop-AuthCard,
 .desktop-LoadingCard {
   width: min(560px, 100%);
+}
+
+.desktop-AuthBrandPanel {
+  width: 100%;
+  min-height: 100%;
+  padding: 28px;
+  display: grid;
+  align-content: center;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ui-desktop-card-surface) 94%, white) 0%, color-mix(in srgb, var(--ui-desktop-surface) 92%, white) 100%);
+  border: 1px solid color-mix(in srgb, var(--ui-desktop-border) 82%, white);
+  box-shadow: var(--ui-desktop-shadow);
+}
+
+.desktop-AuthFormColumn {
+  display: grid;
+  gap: 14px;
+  width: 100%;
 }
 
 .desktop-AuthHint {
@@ -428,6 +567,10 @@
 .desktop-StatusBanner {
   width: 100%;
   margin-bottom: 16px;
+}
+
+.desktop-AuthFormColumn .desktop-StatusBanner {
+  margin-bottom: 0;
 }
 
 .desktop-CenteredContent {
@@ -444,6 +587,46 @@
   background: var(--ui-desktop-surface);
   color: var(--ui-desktop-text);
   border-bottom-color: var(--ui-desktop-border);
+}
+
+.desktop-AuthCard {
+  width: 100%;
+  padding: 28px;
+  background: color-mix(in srgb, var(--ui-desktop-card-surface) 98%, white);
+  border: 1px solid color-mix(in srgb, var(--ui-desktop-border) 82%, white);
+  box-shadow: var(--ui-desktop-shadow);
+}
+
+.desktop-AuthCard h1,
+.desktop-AuthBrandPanel h1 {
+  margin: 0;
+  line-height: 1.05;
+}
+
+.desktop-AuthFeatureList {
+  display: grid;
+  gap: 12px;
+}
+
+.desktop-AuthFeature {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--ui-desktop-border) 74%, white);
+  background: color-mix(in srgb, var(--ui-desktop-surface) 90%, white);
+}
+
+.desktop-AuthFeature span {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+  color: var(--ui-desktop-kicker);
+}
+
+.desktop-AuthFeature strong {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ui-desktop-text);
 }
 
 .desktop-AuthCard label,
@@ -486,7 +669,8 @@
   display: grid;
   gap: 6px;
   padding: 14px 16px;
-  background: color-mix(in srgb, var(--ui-desktop-surface) 88%, transparent);
+  background: color-mix(in srgb, var(--ui-desktop-surface) 92%, white);
+  border: 1px solid color-mix(in srgb, var(--ui-desktop-border) 80%, white);
 }
 
 .desktop-PreferenceRow {
@@ -593,6 +777,10 @@
     grid-template-columns: 1fr;
   }
 
+  .desktop-AuthShell {
+    grid-template-columns: 1fr;
+  }
+
   .desktop-RuntimeGrid {
     min-width: 0;
     width: 100%;
@@ -625,6 +813,15 @@
   .desktop-AuthScreen,
   .desktop-LoadingScreen {
     padding: 16px;
+  }
+
+  .desktop-AuthStage {
+    padding: 16px;
+  }
+
+  .desktop-AuthBrandPanel,
+  .desktop-AuthCard {
+    padding: 20px;
   }
 
   .desktop-ResourceGrid {

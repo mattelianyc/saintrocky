@@ -18,54 +18,52 @@ export function LoginView({
   loadingLabel = 'Signing in'
 }) {
   return (
-    <div className="layout-center-screen desktop-AuthScreen">
-      <Card className="desktop-AuthCard">
-        <div className="layout-stack-gap-16">
-          <div className="layout-stack-gap-8">
-            <p className="desktop-Kicker">{eyebrow}</p>
-            <h1>{title}</h1>
-            <p className="Kicker">{summary}</p>
-          </div>
-
-          <form className="layout-stack-gap-12" onSubmit={onSubmit}>
-            <Field.Root>
-              <Field.Label htmlFor="desktopEmail">Email</Field.Label>
-              <Field.Control>
-                <Input
-                  id="desktopEmail"
-                  name="email"
-                  type="email"
-                  autoComplete="username"
-                  value={email}
-                  onChange={(event) => onEmailChange(event.target.value)}
-                  required
-                />
-              </Field.Control>
-            </Field.Root>
-
-            <Field.Root>
-              <Field.Label htmlFor="desktopPassword">Password</Field.Label>
-              <Field.Control>
-                <Input
-                  id="desktopPassword"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(event) => onPasswordChange(event.target.value)}
-                  required
-                />
-              </Field.Control>
-            </Field.Root>
-
-            <Button type="submit" loading={loading} loadingLabel={loadingLabel} block>
-              {submitLabel}
-            </Button>
-          </form>
-
-          <p className="desktop-AuthHint">{footnote}</p>
+    <Card className="desktop-AuthCard">
+      <div className="layout-stack-gap-16">
+        <div className="layout-stack-gap-8">
+          <p className="desktop-Kicker">{eyebrow}</p>
+          <h1>{title}</h1>
+          <p className="Kicker">{summary}</p>
         </div>
-      </Card>
-    </div>
+
+        <form className="layout-stack-gap-12" onSubmit={onSubmit}>
+          <Field.Root>
+            <Field.Label htmlFor="desktopEmail">Email</Field.Label>
+            <Field.Control>
+              <Input
+                id="desktopEmail"
+                name="email"
+                type="email"
+                autoComplete="username"
+                value={email}
+                onChange={(event) => onEmailChange(event.target.value)}
+                required
+              />
+            </Field.Control>
+          </Field.Root>
+
+          <Field.Root>
+            <Field.Label htmlFor="desktopPassword">Password</Field.Label>
+            <Field.Control>
+              <Input
+                id="desktopPassword"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => onPasswordChange(event.target.value)}
+                required
+              />
+            </Field.Control>
+          </Field.Root>
+
+          <Button type="submit" loading={loading} loadingLabel={loadingLabel} block>
+            {submitLabel}
+          </Button>
+        </form>
+
+        <p className="desktop-AuthHint">{footnote}</p>
+      </div>
+    </Card>
   );
 }

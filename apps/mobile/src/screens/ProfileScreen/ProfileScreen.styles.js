@@ -9,6 +9,7 @@ export function createStyles(theme) {
       backgroundColor: theme.colors.background
     },
     content: {
+      paddingTop: spacing.small,
       paddingBottom: spacing.jumbo
     },
     profileHeader: {

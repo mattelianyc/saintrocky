@@ -35,13 +35,8 @@ export function createStyles(theme) {
       position: 'absolute',
       top: 0,
       left: 0,
-      paddingLeft: spacing.large,
-      paddingTop: spacing.large
-    },
-    navLogo: {
-      width: 28,
-      height: 28,
-      opacity: 0.6
+      right: 0,
+      paddingHorizontal: spacing.large
     },
     brandArea: {
       alignItems: 'center',
@@ -50,25 +45,7 @@ export function createStyles(theme) {
     mascot: {
       width: 100,
       height: 100,
-      marginBottom: spacing.medium,
       opacity: 0.9
-    },
-    heading: {
-      fontFamily: typography.fontFamilyMono,
-      fontSize: typography.sizeXlarge,
-      fontWeight: typography.weightBlack,
-      color: '#f5faf7',
-      letterSpacing: typography.letterSpacingTight,
-      textAlign: 'center'
-    },
-    summary: {
-      fontFamily: typography.fontFamilyMono,
-      fontSize: typography.sizeXsmall,
-      letterSpacing: typography.letterSpacingWide,
-      color: 'rgba(245, 250, 247, 0.45)',
-      textAlign: 'center',
-      marginTop: spacing.xsmall,
-      textTransform: 'uppercase'
     },
     formArea: {
       gap: spacing.small

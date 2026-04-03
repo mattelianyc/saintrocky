@@ -8,6 +8,12 @@ export function createStyles(theme) {
       flex: 1,
       backgroundColor: theme.colors.background
     },
+    topActionRow: {
+      alignItems: 'flex-start',
+      paddingHorizontal: spacing.medium,
+      paddingTop: spacing.small,
+      paddingBottom: spacing.xsmall
+    },
     filterRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',

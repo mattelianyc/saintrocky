@@ -11,8 +11,9 @@ const MESSAGE_TYPES = BROWSER_EXTENSION_MESSAGE_TYPES;
 const connectionSummaryElement = document.getElementById("connection-summary");
 const monitorStatusElement = document.getElementById("monitor-status");
 const assignmentCountElement = document.getElementById("assignment-count");
-const tradingViewStatusElement = document.getElementById("tradingview-status");
+const browserMonitorStatusElement = document.getElementById("browser-monitor-status");
 const assignmentListElement = document.getElementById("assignment-list");
+const activityListElement = document.getElementById("activity-list");
 const signOutButtonElement = document.getElementById("sign-out-button");
 const violationEmptyElement = document.getElementById("violation-empty");
 const violationCardElement = document.getElementById("violation-card");
@@ -55,6 +56,55 @@ function renderAssignments(assignments = []) {
     meta.textContent = assignment.compiledRule?.telemetry?.templateKey || "browser rule";
     item.append(title, meta);
     assignmentListElement.appendChild(item);
+  });
+}
+
+function formatRelativeTime(dateString) {
+  if (!dateString) {
+    return "just now";
+  }
+
+  const diffMinutes = Math.floor((Date.now() - new Date(dateString).getTime()) / 60000);
+  if (diffMinutes < 1) return "just now";
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${Math.floor(diffHours / 24)}d ago`;
+}
+
+function formatEventLabel(eventType = "") {
+  const labels = {
+    rule_triggered: "Rule triggered",
+    rule_complied: "Stayed blocked",
+    bypass_offered: "Bypass offered",
+    bypass_accepted: "Override started",
+    bypass_confirmed: "Override confirmed",
+    bypass_cancelled: "Override cancelled",
+    chain_violation_detected: "Chain violation",
+    override_request_failed: "Override failed"
+  };
+
+  return labels[eventType] || eventType || "Runtime event";
+}
+
+function renderActivity(events = []) {
+  activityListElement.innerHTML = "";
+
+  if (!events.length) {
+    const item = document.createElement("li");
+    item.textContent = "No recent runtime activity yet.";
+    activityListElement.appendChild(item);
+    return;
+  }
+
+  events.slice(0, 5).forEach((event) => {
+    const item = document.createElement("li");
+    const title = document.createElement("strong");
+    title.textContent = formatEventLabel(event.eventType);
+    const meta = document.createElement("p");
+    meta.textContent = `${event.title || "Saint Rocky"} · ${formatRelativeTime(event.occurredAt)}`;
+    item.append(title, meta);
+    activityListElement.appendChild(item);
   });
 }
 
@@ -123,8 +173,9 @@ function renderState(runtimeState = {}) {
     : "Open the web dashboard with the extension installed to complete auth handoff.";
   monitorStatusElement.textContent = runtimeState.connectionState || "idle";
   assignmentCountElement.textContent = String(runtimeState.assignments?.length || 0);
-  tradingViewStatusElement.textContent = runtimeState.assignments?.length > 0 ? "monitoring" : "idle";
+  browserMonitorStatusElement.textContent = runtimeState.assignments?.length > 0 ? "monitoring" : "idle";
   renderAssignments(runtimeState.assignments || []);
+  renderActivity(runtimeState.recentEvents || []);
   renderViolation(
     runtimeState.pendingViolation || null,
     runtimeState.pendingOverrideRequest || null

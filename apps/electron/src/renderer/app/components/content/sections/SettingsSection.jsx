@@ -4,7 +4,7 @@ import { Card } from '@saintrocky/ui';
 import { getOpenAtLogin, setOpenAtLogin } from '../../../../bridge.js';
 import { formatValue } from '../../../utils/runtime-formatters.js';
 
-export function SettingsSection({ runtimeHub, onPreferenceToggle, onArmToggle }) {
+export function SettingsSection({ runtimeHub, updater, onPreferenceToggle, onArmToggle, onCheckForUpdates }) {
   const [openAtLogin, setOpenAtLoginState] = useState(false);
   const [loadingLoginItem, setLoadingLoginItem] = useState(false);
 
@@ -69,6 +69,14 @@ export function SettingsSection({ runtimeHub, onPreferenceToggle, onArmToggle })
           <span>Launch at login</span>
           <strong>{openAtLogin ? 'On' : 'Off'}</strong>
         </button>
+        <button
+          type="button"
+          className="desktop-PreferenceRow"
+          onClick={onCheckForUpdates}
+        >
+          <span>Desktop updates</span>
+          <strong>{formatUpdaterLabel(updater?.status)}</strong>
+        </button>
         <div className="desktop-HubListItem">
           <strong>Realtime connection</strong>
           <p className={`desktop-ConnectionState desktop-ConnectionState--${realtimeState}`}>
@@ -96,6 +104,13 @@ export function SettingsSection({ runtimeHub, onPreferenceToggle, onArmToggle })
               : 'No extension session connected yet.'}
           </p>
         </div>
+        <div className="desktop-HubListItem">
+          <strong>Latest updater check</strong>
+          <p>{formatValue(updater?.checkedAt, 'No update check yet.')}</p>
+          {updater?.errorMessage ? (
+            <span className="desktop-HubMeta">{updater.errorMessage}</span>
+          ) : null}
+        </div>
       </div>
     </Card>
   );
@@ -113,4 +128,18 @@ function formatConnectionLabel(state) {
     unauthenticated: 'Not authenticated'
   };
   return labels[state] || state;
+}
+
+function formatUpdaterLabel(state) {
+  const labels = {
+    idle: 'Idle',
+    disabled: 'Disabled',
+    checking: 'Checking...',
+    'update-available': 'Downloading',
+    'ready-to-install': 'Ready to install',
+    'up-to-date': 'Up to date',
+    error: 'Error'
+  };
+
+  return labels[state] || state || 'Idle';
 }

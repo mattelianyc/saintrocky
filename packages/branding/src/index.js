@@ -2,7 +2,7 @@ export const saintRockyBranding = {
   companyName: "Saint Rocky",
   productName: "Standard Deviants",
   shortProductName: "std/dev",
-  wordmark: "STANDARD DEVIANTS",
+  wordmark: "DEVIANT$TANDARD",
   monogramLines: ["STD", "DEV"],
   namespace: "saintrocky",
   siteUrl: "",

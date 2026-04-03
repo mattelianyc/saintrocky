@@ -20,6 +20,42 @@ function parseTaskListCsv(stdout) {
     .filter(Boolean);
 }
 
+async function getLinuxFocusedApplicationName() {
+  const { stdout: processIdOutput } = await execFileAsync('xdotool', ['getwindowfocus', 'getwindowpid']);
+  const processId = String(processIdOutput || '').trim();
+  if (!processId) {
+    return '';
+  }
+
+  const { stdout } = await execFileAsync('ps', ['-p', processId, '-o', 'comm=']);
+  return normalizeProcessName(stdout);
+}
+
+async function getWindowsFocusedApplicationName() {
+  const command = `
+    Add-Type -TypeDefinition @"
+    using System;
+    using System.Runtime.InteropServices;
+    public static class User32 {
+      [DllImport("user32.dll")]
+      public static extern IntPtr GetForegroundWindow();
+
+      [DllImport("user32.dll")]
+      public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+    }
+"@;
+    $processId = 0;
+    $windowHandle = [User32]::GetForegroundWindow();
+    [void] [User32]::GetWindowThreadProcessId($windowHandle, [ref] $processId);
+    if ($processId -gt 0) {
+      (Get-Process -Id $processId).ProcessName
+    }
+  `;
+
+  const { stdout } = await execFileAsync('powershell', ['-NoProfile', '-Command', command]);
+  return normalizeProcessName(stdout);
+}
+
 export async function listVisibleProcesses() {
   try {
     if (process.platform === 'win32') {
@@ -42,11 +78,19 @@ export async function listVisibleProcesses() {
 }
 
 export async function getFocusedApplicationName() {
-  if (process.platform !== 'darwin') {
-    return '';
-  }
-
   try {
+    if (process.platform === 'win32') {
+      return await getWindowsFocusedApplicationName();
+    }
+
+    if (process.platform === 'linux') {
+      return await getLinuxFocusedApplicationName();
+    }
+
+    if (process.platform !== 'darwin') {
+      return '';
+    }
+
     const { stdout } = await execFileAsync('osascript', [
       '-e',
       'tell application "System Events" to get name of first application process whose frontmost is true'

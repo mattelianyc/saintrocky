@@ -5,7 +5,6 @@ import { api } from '@/api/client.js';
 import { buildLeaderboardChannel } from '@saintrocky/realtime';
 import { EmptyState, useTheme } from '@saintrocky/ui-native';
 
-import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
 import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
 import { useRefreshControl } from '@/hooks/useRefreshControl.js';
@@ -103,14 +102,11 @@ export function LeaderboardScreen({ auth }) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
         }
         ListHeaderComponent={
-          <>
-            <ScreenHeader kicker="RANKINGS" title="Leaderboard" showLogo />
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderText, styles.rankColumn]}>RANK</Text>
-              <Text style={[styles.tableHeaderText, styles.nameColumn]}>PLAYER</Text>
-              <Text style={[styles.tableHeaderText, styles.scoreColumn]}>SCORE</Text>
-            </View>
-          </>
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableHeaderText, styles.rankColumn]}>RANK</Text>
+            <Text style={[styles.tableHeaderText, styles.nameColumn]}>PLAYER</Text>
+            <Text style={[styles.tableHeaderText, styles.scoreColumn]}>SCORE</Text>
+          </View>
         }
         ListEmptyComponent={
           loading ? (

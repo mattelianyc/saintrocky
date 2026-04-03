@@ -112,4 +112,6 @@ export {
 
 export { useTerminalTyping } from './marketing/index.js';
 
+export { extractPendingActions } from './pending-actions.js';
+
 

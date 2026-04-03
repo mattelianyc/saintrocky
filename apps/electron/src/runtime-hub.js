@@ -332,14 +332,16 @@ export function createRuntimeHub({
             const result = await requestOverride(state.pendingViolation.ruleId);
             if (result?.request) {
               state.pendingOverrideRequest = result.request;
+              await addEvent('bypass_accepted', assignment, {
+                matchedTargets: state.pendingViolation.matchedTargets
+              });
               emitState();
               return buildSnapshot(state);
             }
           } catch {}
         }
-        await addEvent('bypass_accepted', assignment, { matchedTargets: state.pendingViolation.matchedTargets });
       } else {
-        await addEvent('rule_blocked', assignment, { matchedTargets: state.pendingViolation.matchedTargets });
+        await addEvent('rule_complied', assignment, { matchedTargets: state.pendingViolation.matchedTargets });
       }
 
       state.pendingViolation = null;
@@ -358,6 +360,13 @@ export function createRuntimeHub({
         } catch {}
       }
 
+      const assignment = state.assignments.find((item) => item.ruleId === ruleId);
+      if (assignment) {
+        await addEvent('bypass_confirmed', assignment, {
+          matchedTargets: state.pendingViolation.matchedTargets,
+          requestId
+        });
+      }
       state.pendingViolation = null;
       state.pendingOverrideRequest = null;
       emitState();
@@ -374,6 +383,13 @@ export function createRuntimeHub({
         } catch {}
       }
 
+      const assignment = state.assignments.find((item) => item.ruleId === ruleId);
+      if (assignment) {
+        await addEvent('bypass_cancelled', assignment, {
+          matchedTargets: state.pendingViolation.matchedTargets,
+          requestId
+        });
+      }
       state.pendingOverrideRequest = null;
       emitState();
       return buildSnapshot(state);

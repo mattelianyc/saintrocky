@@ -46,7 +46,9 @@ import {
 } from "./brandHeroParallax.config.js";
 import { BrandHeroParallaxOverview } from "./BrandHeroParallaxOverview.jsx";
 
-export function BrandHeroParallax() {
+export function BrandHeroParallax({
+  heroWordmark = HERO_WORDMARK
+}) {
   const heroContainerReference = useRef(null);
   const heroMediaReference = useRef(null);
   const prefersReducedMotion = useReducedMotion();
@@ -54,7 +56,7 @@ export function BrandHeroParallax() {
   const [viewportWidth, setViewportWidth] = useState(1440);
   const [viewportHeight, setViewportHeight] = useState(900);
   const [isHeroRevealReady, setIsHeroRevealReady] = useState(Boolean(prefersReducedMotion));
-  const brandWords = HERO_WORDMARK.split(" ");
+  const brandWords = heroWordmark.split(" ");
 
   useEffect(() => {
     const heroMediaElement = heroMediaReference.current;
@@ -340,7 +342,7 @@ export function BrandHeroParallax() {
       className="c-BrandHeroParallax"
     >
       <div className="c-BrandHeroParallax__viewport">
-        <section className="c-BrandHeroParallax__section" aria-label={`${HERO_WORDMARK} hero`}>
+        <section className="c-BrandHeroParallax__section" aria-label={`${heroWordmark} hero`}>
           <div className="c-BrandHeroParallax__media" aria-hidden="true">
             <motion.video
               ref={heroMediaReference}
@@ -444,7 +446,7 @@ export function BrandHeroParallax() {
               }}
             >
               <h1
-                aria-label={HERO_WORDMARK}
+                aria-label={heroWordmark}
                 className="c-BrandHeroParallax__wordmark c-BrandHeroParallax__wordmarkPrimary"
               >
                 {renderWordmarkCharacters("c-BrandHeroParallax__characterInner")}

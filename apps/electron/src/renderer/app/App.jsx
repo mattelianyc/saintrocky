@@ -11,9 +11,11 @@ export function App() {
     banner,
     email,
     password,
+    pendingActionSubmittingId,
     refreshing,
     runtime,
     runtimeHub,
+    updater,
     user,
     view,
     actions
@@ -43,12 +45,17 @@ export function App() {
       activePath={activePath}
       activeSectionId={activeSectionId}
       banner={banner}
+      pendingActionSubmittingId={pendingActionSubmittingId}
       refreshing={refreshing}
       runtime={runtime}
       runtimeHub={runtimeHub}
+      updater={updater}
       user={user}
       onArmToggle={actions.handleArmToggle}
+      onCheckForUpdates={actions.handleCheckForUpdates}
       onLogout={actions.handleLogout}
+      onPendingActionCancel={actions.handlePendingActionCancel}
+      onPendingActionConfirm={actions.handlePendingActionConfirm}
       onPreferenceToggle={actions.handlePreferenceToggle}
       onRuntimeRefresh={actions.handleRuntimeRefresh}
       onSidebarNavigate={actions.handleSidebarNavigate}

@@ -12,7 +12,6 @@ import {
   useTheme
 } from '@saintrocky/ui-native';
 
-import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
 import { useRefreshControl } from '@/hooks/useRefreshControl.js';
 import { ProfileScreenConfig } from '@/screens/ProfileScreen/ProfileScreen.config.js';
@@ -95,8 +94,6 @@ export function ProfileScreen({ auth }) {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
       }
     >
-      <ScreenHeader kicker="ACCOUNT" title="Profile" />
-
       <View style={styles.profileHeader}>
         <Avatar name={auth.user?.displayName || auth.user?.email} size="xl" />
         <Text style={styles.displayName}>

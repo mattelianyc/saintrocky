@@ -1,22 +1,42 @@
+@import "../theme/extension-theme.css";
+
 body {
   margin: 0;
   min-width: 360px;
-  background: #ffffff;
-  color: #111111;
-  font-family: Inter, system-ui, sans-serif;
+  background: var(--ui-shell-background);
+  color: var(--ui-shell-text);
+  font-family: var(--ui-font);
 }
 
 .popup {
-  padding: 1rem;
+  padding: var(--ui-space-medium);
   display: grid;
+  gap: var(--ui-space-small);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
   gap: 0.875rem;
+}
+
+.brand-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.brand-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  object-fit: cover;
 }
 
 .eyebrow {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #00a66d;
+  color: var(--ui-shell-accent);
   font-size: 0.75rem;
 }
 
@@ -28,16 +48,18 @@ h1,
 }
 
 .summary {
-  color: rgba(17, 17, 17, 0.7);
+  color: var(--ui-shell-text-muted);
   line-height: 1.5;
 }
 
 .panel {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--ui-space-small);
   padding: 0.875rem;
-  background: #f5fff9;
-  border-radius: 2px;
+  background: var(--ui-shell-panel);
+  border: 1px solid var(--ui-shell-border);
+  border-radius: var(--ui-radius);
+  box-shadow: var(--ui-shell-shadow);
 }
 
 .panel-header,
@@ -63,11 +85,12 @@ h1,
 .badge,
 .empty,
 .list li p {
-  color: rgba(17, 17, 17, 0.68);
+  color: var(--ui-shell-text-muted);
 }
 
 .badge {
   text-transform: capitalize;
+  font-weight: 600;
 }
 
 .list {
@@ -89,18 +112,24 @@ h1,
 
 .button {
   border: 0;
-  border-radius: 2px;
+  border-radius: var(--ui-radius);
   padding: 0.7rem 0.9rem;
-  background: #00d084;
-  color: #08110d;
+  background: var(--ui-shell-accent);
+  color: var(--ui-primary-contrast);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.button:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
 .button-secondary {
-  background: #111111;
-  color: #ffffff;
+  background: var(--ui-shell-text);
+  color: var(--ui-shell-background-strong);
 }
 
 .hidden {
@@ -118,19 +147,20 @@ h1,
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.625rem;
-  background: rgba(0, 208, 132, 0.08);
-  border-radius: 4px;
+  background: color-mix(in srgb, var(--ui-shell-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ui-shell-accent) 28%, transparent);
+  border-radius: var(--ui-radius);
 }
 
 .override-fee-amount {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #00a66d;
+  color: var(--ui-shell-accent);
   font-variant-numeric: tabular-nums;
 }
 
 .override-countdown {
   font-size: 0.75rem;
-  color: rgba(17, 17, 17, 0.55);
+  color: var(--ui-shell-text-muted);
   font-variant-numeric: tabular-nums;
 }

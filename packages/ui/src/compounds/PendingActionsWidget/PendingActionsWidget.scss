@@ -1,0 +1,162 @@
+.c-PendingActionsWidget {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.c-PendingActionsWidget__toggle {
+  border-radius: 999px;
+  min-width: 240px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: color-mix(in srgb, var(--ui-card) 96%, var(--ui-bg));
+  border: 1px solid var(--ui-border);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.c-PendingActionsWidget__badge {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-primary);
+  color: var(--ui-primary-contrast);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.c-PendingActionsWidget__toggleCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.c-PendingActionsWidget__toggleCopy strong,
+.c-PendingActionsWidget__toggleCopy span {
+  line-height: 1.2;
+}
+
+.c-PendingActionsWidget__toggleCopy span {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+.c-PendingActionsWidget__panel {
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  max-height: min(72vh, 560px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ui-card) 98%, var(--ui-bg));
+  border: 1px solid var(--ui-border);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(24px);
+}
+
+.c-PendingActionsWidget__panelHeader,
+.c-PendingActionsWidget__itemHeader,
+.c-PendingActionsWidget__summary,
+.c-PendingActionsWidget__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.c-PendingActionsWidget__eyebrow,
+.c-PendingActionsWidget__itemEyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ui-muted);
+}
+
+.c-PendingActionsWidget__panelHeader h3,
+.c-PendingActionsWidget__itemHeader h4,
+.c-PendingActionsWidget__itemSummary,
+.c-PendingActionsWidget__itemMeta {
+  margin: 0;
+}
+
+.c-PendingActionsWidget__summary {
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ui-card) 88%, var(--ui-bg));
+  border: 1px solid var(--ui-border);
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.c-PendingActionsWidget__summary span,
+.c-PendingActionsWidget__itemMeta,
+.c-PendingActionsWidget__scheduledHint {
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+
+.c-PendingActionsWidget__emptyState {
+  padding: 16px;
+  border: 1px dashed var(--ui-border);
+  border-radius: 16px;
+  color: var(--ui-muted);
+}
+
+.c-PendingActionsWidget__emptyState p {
+  margin: 0;
+}
+
+.c-PendingActionsWidget__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.c-PendingActionsWidget__item {
+  padding: 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: color-mix(in srgb, var(--ui-card) 92%, var(--ui-bg));
+}
+
+.c-PendingActionsWidget__itemSummary {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.c-PendingActionsWidget__actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .c-PendingActionsWidget {
+    right: 16px;
+    left: 16px;
+    bottom: 16px;
+    align-items: stretch;
+  }
+
+  .c-PendingActionsWidget__toggle,
+  .c-PendingActionsWidget__panel {
+    width: 100%;
+    max-width: 100%;
+  }
+}

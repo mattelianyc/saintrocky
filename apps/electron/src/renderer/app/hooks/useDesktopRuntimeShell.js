@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
 
 import {
+  cancelRuleDeactivationRequest,
+  cancelRuleOverrideRequest,
+  checkForUpdates,
   cancelRuntimeOverride,
+  confirmRuleDeactivationRequest,
+  confirmRuleOverrideRequest,
   confirmRuntimeOverride,
   getRuntimeHubSnapshot,
   getRuntimeInfo,
   getSession,
+  getUpdaterState,
+  installUpdate,
   login,
   logout,
   onNavigateFromMain,
+  onUpdaterStateChange,
   resolveRuntimeViolation,
   setRuntimeArmed,
   setRuntimePreferences,
@@ -27,7 +35,9 @@ export function useDesktopRuntimeShell() {
   const [password, setPassword] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [pendingActionSubmittingId, setPendingActionSubmittingId] = useState('');
   const [activePath, setActivePath] = useState('#home');
+  const [updater, setUpdater] = useState(null);
 
   const activeSectionId = resolveDesktopSectionId(activePath);
 
@@ -55,6 +65,20 @@ export function useDesktopRuntimeShell() {
           globalThis.location.hash = nextPath;
         }
       }
+    });
+  }, []);
+
+  useEffect(() => {
+    getUpdaterState()
+      .then((response) => {
+        if (response?.ok) {
+          setUpdater(response.updater || null);
+        }
+      })
+      .catch(() => {});
+
+    return onUpdaterStateChange((nextUpdater) => {
+      setUpdater(nextUpdater || null);
     });
   }, []);
 
@@ -194,6 +218,23 @@ export function useDesktopRuntimeShell() {
     }
   }
 
+  async function handleCheckForUpdates() {
+    if (updater?.status === 'ready-to-install') {
+      await installUpdate();
+      setBanner({ message: 'Installing downloaded desktop update.', tone: 'success' });
+      return;
+    }
+
+    const response = await checkForUpdates();
+    if (!response?.ok) {
+      setBanner({ message: response?.message || 'Failed to check for desktop updates.', tone: 'error' });
+      return;
+    }
+
+    setUpdater(response.updater || null);
+    setBanner({ message: 'Desktop update check started.', tone: 'success' });
+  }
+
   async function handleArmToggle() {
     const response = await setRuntimeArmed(!runtimeHub?.isArmed);
     if (!response.ok) {
@@ -260,6 +301,61 @@ export function useDesktopRuntimeShell() {
     setBanner({ message: 'Override request cancelled.', tone: 'success' });
   }
 
+  async function handlePendingActionConfirm(action) {
+    if (!action?.ruleId || !action?.requestId) return;
+
+    setPendingActionSubmittingId(action.actionId);
+
+    try {
+      let response = null;
+
+      if (action.actionKind === 'override') {
+        response = await confirmRuleOverrideRequest(action.ruleId, action.requestId);
+      } else if (action.actionKind === 'deactivation') {
+        response = await confirmRuleDeactivationRequest(action.ruleId, action.requestId);
+      }
+
+      if (!response?.ok) {
+        setBanner({ message: response?.message || 'Unable to confirm pending action.', tone: 'error' });
+        return;
+      }
+
+      setRuntimeHub(response.runtimeHub);
+      setBanner({
+        message: action.actionKind === 'override' ? 'Override confirmed.' : 'Rule change confirmed.',
+        tone: 'success'
+      });
+    } finally {
+      setPendingActionSubmittingId('');
+    }
+  }
+
+  async function handlePendingActionCancel(action) {
+    if (!action?.ruleId || !action?.requestId) return;
+
+    setPendingActionSubmittingId(action.actionId);
+
+    try {
+      let response = null;
+
+      if (action.actionKind === 'override') {
+        response = await cancelRuleOverrideRequest(action.ruleId, action.requestId);
+      } else if (action.actionKind === 'deactivation') {
+        response = await cancelRuleDeactivationRequest(action.ruleId, action.requestId);
+      }
+
+      if (!response?.ok) {
+        setBanner({ message: response?.message || 'Unable to cancel pending action.', tone: 'error' });
+        return;
+      }
+
+      setRuntimeHub(response.runtimeHub);
+      setBanner({ message: 'Pending action cancelled.', tone: 'success' });
+    } finally {
+      setPendingActionSubmittingId('');
+    }
+  }
+
   return {
     activePath,
     activeSectionId,
@@ -267,17 +363,22 @@ export function useDesktopRuntimeShell() {
     banner,
     email,
     password,
+    pendingActionSubmittingId,
     refreshing,
     runtime,
     runtimeHub,
+    updater,
     user,
     view,
     actions: {
       handleArmToggle,
       handleCancelOverride,
+      handleCheckForUpdates,
       handleConfirmOverride,
       handleLogin,
       handleLogout,
+      handlePendingActionCancel,
+      handlePendingActionConfirm,
       handlePreferenceToggle,
       handleRuntimeRefresh,
       handleSidebarNavigate,

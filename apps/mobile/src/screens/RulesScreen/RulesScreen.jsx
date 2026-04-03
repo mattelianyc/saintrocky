@@ -5,7 +5,6 @@ import { api } from '@/api/client.js';
 import { buildRulesChannel } from '@saintrocky/realtime';
 import { Button, EmptyState, RuleListItem, useTheme } from '@saintrocky/ui-native';
 
-import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
 import { useRealtimeChannel } from '@/hooks/useRealtimeChannel.js';
 import { useRefreshControl } from '@/hooks/useRefreshControl.js';
@@ -85,7 +84,7 @@ export function RulesScreen({ auth, navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader kicker="STRATEGY" title="Rules" trailing={
+      <View style={styles.topActionRow}>
         <Button
           variant="ghost"
           size="sm"
@@ -94,7 +93,7 @@ export function RulesScreen({ auth, navigation }) {
         >
           Templates
         </Button>
-      } />
+      </View>
 
       <View style={styles.filterRow}>
         {FILTER_OPTIONS.map((filter) => {

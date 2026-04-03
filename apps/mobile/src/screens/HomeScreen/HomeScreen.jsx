@@ -12,7 +12,6 @@ import {
 } from '@saintrocky/ui-native';
 
 import { appConfig } from '@/config/app-config.js';
-import { ScreenHeader } from '@/components/ScreenHeader/ScreenHeader.jsx';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
 import { useViolationAlerts } from '@/hooks/useViolationAlerts.js';
 import { useRefreshControl } from '@/hooks/useRefreshControl.js';
@@ -77,6 +76,7 @@ export function HomeScreen({ auth, navigation }) {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
       }
     >
+      
       {loading ? (
         <LoadingSkeleton rows={4} />
       ) : (

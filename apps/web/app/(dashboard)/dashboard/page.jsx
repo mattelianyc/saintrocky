@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 
 import { api } from "@saintrocky/api-client";
 import { saintRockyBranding } from "@saintrocky/branding";
-import { DashboardOverview, LeaderboardWidget, RuntimesPanel } from "@saintrocky/ui";
+import {
+  DashboardOverview,
+  LeaderboardWidget,
+  NestedTabNavigator,
+  PendingActionsOverview,
+  RuntimesPanel
+} from "@saintrocky/ui";
+
+import { useDashboardRules } from "@/src/dashboard/DashboardRulesContext.jsx";
 
 const fallbackCounts = {
   disciplineScore: "—",
@@ -18,6 +26,12 @@ export default function DashboardPage() {
   const [leaderboardEntries, setLeaderboardEntries] = useState([]);
   const [extensionSessions, setExtensionSessions] = useState([]);
   const [realtimeStatus, setRealtimeStatus] = useState("idle");
+  const {
+    pendingActions,
+    submittingActionId,
+    handleConfirmAction,
+    handleCancelAction
+  } = useDashboardRules();
 
   useEffect(() => {
     let isMounted = true;
@@ -52,27 +66,52 @@ export default function DashboardPage() {
 
   return (
     <div className="c-DashboardOverviewPage">
-      <DashboardOverview
-        eyebrow={saintRockyBranding.companyName}
-        title={saintRockyBranding.productName}
-        summary="On-chain escrow enforcement, real-time trade monitoring, and discipline rankings for Solana traders."
-        counts={counts}
-        sections={saintRockyBranding.dashboardSections}
+      <NestedTabNavigator
+        defaultValue="pending"
+        tabs={[
+          {
+            value: "pending",
+            label: "Pending actions",
+            content: (
+              <PendingActionsOverview
+                pendingActions={pendingActions}
+                submittingActionId={submittingActionId}
+                onConfirmAction={handleConfirmAction}
+                onCancelAction={handleCancelAction}
+              />
+            )
+          },
+          {
+            value: "overview",
+            label: "Overview",
+            content: (
+              <>
+                <DashboardOverview
+                  eyebrow={saintRockyBranding.companyName}
+                  title={saintRockyBranding.productName}
+                  summary="On-chain escrow enforcement, real-time trade monitoring, and discipline rankings for Solana traders."
+                  counts={counts}
+                  sections={saintRockyBranding.dashboardSections}
+                />
+
+                <div className="c-DashboardOverviewPage__widgets">
+                  <LeaderboardWidget
+                    entries={leaderboardEntries}
+                    variant="compact"
+                    limit={10}
+                    enableRealtime
+                  />
+
+                  <RuntimesPanel
+                    extensionSessions={extensionSessions}
+                    realtimeStatus={realtimeStatus}
+                  />
+                </div>
+              </>
+            )
+          }
+        ]}
       />
-
-      <div className="c-DashboardOverviewPage__widgets">
-        <LeaderboardWidget
-          entries={leaderboardEntries}
-          variant="compact"
-          limit={10}
-          enableRealtime
-        />
-
-        <RuntimesPanel
-          extensionSessions={extensionSessions}
-          realtimeStatus={realtimeStatus}
-        />
-      </div>
     </div>
   );
 }

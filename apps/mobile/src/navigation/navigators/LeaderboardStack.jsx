@@ -14,13 +14,21 @@ export function LeaderboardStack({ auth }) {
         contentStyle: { backgroundColor: theme.colors.background },
         header: ({ navigation, options, back }) => (
           <CustomHeader
-            title={options.title}
+            centerTitle={options.headerCenterTitle}
+            centerSubtitle={options.headerCenterSubtitle}
             canGoBack={!!back}
           />
         )
       }}
     >
-      <Stack.Screen name="LeaderboardOverview" options={{ title: '' }}>
+      <Stack.Screen
+        name="LeaderboardOverview"
+        options={{
+          title: '',
+          headerCenterTitle: 'Leaderboard',
+          headerCenterSubtitle: 'Rankings'
+        }}
+      >
         {(props) => <LeaderboardScreen {...props} auth={auth} />}
       </Stack.Screen>
     </Stack.Navigator>

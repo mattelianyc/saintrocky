@@ -1,11 +1,12 @@
 import { RULE_BYPASS_FEE_MODELS } from './rule-authoring.js';
 
-export const RULE_RUNTIME_SURFACES = ['browser_extension', 'desktop_runtime', 'chain_watcher'];
+export const RULE_RUNTIME_SURFACES = ['browser_extension', 'desktop_runtime', 'chain_watcher', 'mobile_observer'];
 
 export const RULE_RUNTIME_SURFACE_LABELS = {
   browser_extension: 'Browser extension',
   desktop_runtime: 'Desktop runtime',
-  chain_watcher: 'On-chain monitor'
+  chain_watcher: 'On-chain monitor',
+  mobile_observer: 'Mobile observer'
 };
 
 /**
@@ -94,9 +95,13 @@ export const RULE_RUNTIME_EVENT_TYPES = [
   'rule_triggered',
   'rule_blocked',
   'rule_warning',
+  'rule_complied',
   'bypass_offered',
   'bypass_accepted',
+  'bypass_confirmed',
+  'bypass_cancelled',
   'bypass_declined',
+  'override_request_failed',
   'chain_violation_detected',
   'escrow_penalty_applied'
 ];

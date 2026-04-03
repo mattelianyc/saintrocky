@@ -14,13 +14,21 @@ export function ProfileStack({ auth }) {
         contentStyle: { backgroundColor: theme.colors.background },
         header: ({ navigation, options, back }) => (
           <CustomHeader
-            title={options.title}
+            centerTitle={options.headerCenterTitle}
+            centerSubtitle={options.headerCenterSubtitle}
             canGoBack={!!back}
           />
         )
       }}
     >
-      <Stack.Screen name="ProfileOverview" options={{ title: '' }}>
+      <Stack.Screen
+        name="ProfileOverview"
+        options={{
+          title: '',
+          headerCenterTitle: 'Profile',
+          headerCenterSubtitle: 'Account'
+        }}
+      >
         {(props) => <ProfileScreen {...props} auth={auth} />}
       </Stack.Screen>
     </Stack.Navigator>

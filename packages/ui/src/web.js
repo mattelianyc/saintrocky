@@ -10,6 +10,8 @@ export { TacticsWorkspace } from './compounds/RulesWorkspace/TacticsWorkspace.js
 export { TacticsTable } from './compounds/TacticsTable/TacticsTable.jsx';
 export { SignInCard } from './compounds/SignInCard/SignInCard.jsx';
 export { SignUpCard } from './compounds/SignUpCard/SignUpCard.jsx';
+export { PendingActionsOverview } from './compounds/PendingActionsOverview/PendingActionsOverview.jsx';
+export { PendingActionsWidget } from './compounds/PendingActionsWidget/PendingActionsWidget.jsx';
 export { FriendsDashboard } from './compounds/SocialDashboards/FriendsDashboard.jsx';
 export { MessagesDashboard } from './compounds/SocialDashboards/MessagesDashboard.jsx';
 export { CampaignsDashboard } from './compounds/SocialDashboards/CampaignsDashboard.jsx';

@@ -298,6 +298,19 @@ function buildSessionResponse(user = null) {
   };
 }
 
+async function refreshRuntimeRules() {
+  if (!sessionUser?.email) {
+    return runtimeHub.getSnapshot();
+  }
+
+  try {
+    const response = await apiClient.rules.listRules(sessionUser.email);
+    return runtimeHub.replaceRules(response?.rules || []);
+  } catch {
+    return runtimeHub.getSnapshot();
+  }
+}
+
 export function getRuntimeInfo() {
   return {
     ok: true,
@@ -641,6 +654,58 @@ export async function cancelRuntimeOverride() {
     };
   } catch (error) {
     return buildErrorResponse(error, 'Failed to cancel override');
+  }
+}
+
+export async function confirmRuleOverrideRequest(ruleId, requestId) {
+  await loadPersistedAuthState();
+  try {
+    await apiClient.rules.confirmOverrideRequest(ruleId, requestId);
+    return {
+      ok: true,
+      runtimeHub: await refreshRuntimeRules()
+    };
+  } catch (error) {
+    return buildErrorResponse(error, 'Failed to confirm override request');
+  }
+}
+
+export async function cancelRuleOverrideRequest(ruleId, requestId) {
+  await loadPersistedAuthState();
+  try {
+    await apiClient.rules.cancelOverrideRequest(ruleId, requestId);
+    return {
+      ok: true,
+      runtimeHub: await refreshRuntimeRules()
+    };
+  } catch (error) {
+    return buildErrorResponse(error, 'Failed to cancel override request');
+  }
+}
+
+export async function confirmRuleDeactivationRequest(ruleId, requestId) {
+  await loadPersistedAuthState();
+  try {
+    await apiClient.rules.confirmDeactivationRequest(ruleId, requestId);
+    return {
+      ok: true,
+      runtimeHub: await refreshRuntimeRules()
+    };
+  } catch (error) {
+    return buildErrorResponse(error, 'Failed to confirm deactivation request');
+  }
+}
+
+export async function cancelRuleDeactivationRequest(ruleId, requestId) {
+  await loadPersistedAuthState();
+  try {
+    await apiClient.rules.cancelDeactivationRequest(ruleId, requestId);
+    return {
+      ok: true,
+      runtimeHub: await refreshRuntimeRules()
+    };
+  } catch (error) {
+    return buildErrorResponse(error, 'Failed to cancel deactivation request');
   }
 }
 

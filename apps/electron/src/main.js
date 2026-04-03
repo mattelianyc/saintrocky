@@ -1,11 +1,19 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { app, BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage, shell } from 'electron';
+import { app, BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage, nativeTheme, shell } from 'electron';
 
+import { clearStoredDesktopAuthState, loadStoredDesktopAuthState, saveStoredDesktopAuthState } from './auth-store.js';
 import { desktopRuntimeModels } from './runtime-models.js';
 import { getDesktopRuntimeConfig } from './runtime-config.js';
 import { loadDesktopEnvironment } from './load-environment.js';
+import {
+  checkForDesktopUpdates,
+  configureDesktopUpdater,
+  getUpdaterState,
+  onUpdaterStateChange,
+  quitAndInstallDesktopUpdate
+} from './updater.js';
 
 loadDesktopEnvironment();
 
@@ -23,10 +31,7 @@ let nativeRuntimeState = {
   chainViolationCount: 0,
   hideToTrayOnClose: true
 };
-let desktopAuthState = {
-  sessionUser: null,
-  sessionToken: ''
-};
+let desktopAuthState = loadStoredDesktopAuthState();
 
 function buildWindowTitle() {
   const companyName = desktopRuntimeModels.branding.companyName;
@@ -52,6 +57,20 @@ function getWindowIconPath() {
 
 function isRendererDevelopmentMode() {
   return Boolean(rendererDevelopmentUrl);
+}
+
+function buildDesktopThemeState() {
+  return {
+    theme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
+  };
+}
+
+function broadcastToRenderer(channel, payload) {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    return;
+  }
+
+  mainWindow.webContents.send(channel, payload);
 }
 
 function showMainWindow() {
@@ -153,6 +172,8 @@ function createMainWindow() {
 
   window.once('ready-to-show', () => {
     window.show();
+    broadcastToRenderer('desktop-theme:state', buildDesktopThemeState());
+    broadcastToRenderer('desktop-updater:state', getUpdaterState());
   });
 
   window.on('close', (event) => {
@@ -189,12 +210,24 @@ app.whenReady().then(() => {
   app.setName(runtimeConfig.ELECTRON_APP_NAME || desktopRuntimeModels.branding.productName);
   ensureTray();
   mainWindow = createMainWindow();
+  configureDesktopUpdater();
+  onUpdaterStateChange((updater) => {
+    broadcastToRenderer('desktop-updater:state', updater);
+  });
+
+  if (!isRendererDevelopmentMode()) {
+    checkForDesktopUpdates().catch(() => {});
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       mainWindow = createMainWindow();
     }
   });
+});
+
+nativeTheme.on('updated', () => {
+  broadcastToRenderer('desktop-theme:state', buildDesktopThemeState());
 });
 
 ipcMain.on('desktop-runtime:update-state', (_event, payload = {}) => {
@@ -242,23 +275,22 @@ ipcMain.handle('desktop-runtime:show-notification', async (_event, payload = {})
 });
 
 ipcMain.handle('desktop-auth:get-state', async () => {
+  desktopAuthState = loadStoredDesktopAuthState();
   return desktopAuthState;
 });
 
 ipcMain.handle('desktop-auth:set-state', async (_event, payload = {}) => {
-  desktopAuthState = {
-    sessionUser: payload.sessionUser || null,
-    sessionToken: payload.sessionToken || ''
-  };
+  desktopAuthState = saveStoredDesktopAuthState(payload);
   return { ok: true };
 });
 
 ipcMain.handle('desktop-auth:clear-state', async () => {
-  desktopAuthState = {
-    sessionUser: null,
-    sessionToken: ''
-  };
+  desktopAuthState = clearStoredDesktopAuthState();
   return { ok: true };
+});
+
+ipcMain.handle('desktop-theme:get-state', async () => {
+  return { ok: true, ...buildDesktopThemeState() };
 });
 
 ipcMain.handle('desktop-runtime:get-open-at-login', async () => {
@@ -269,6 +301,28 @@ ipcMain.handle('desktop-runtime:get-open-at-login', async () => {
 ipcMain.handle('desktop-runtime:set-open-at-login', async (_event, enabled) => {
   app.setLoginItemSettings({ openAtLogin: Boolean(enabled) });
   return { ok: true, openAtLogin: Boolean(enabled) };
+});
+
+ipcMain.handle('desktop-updater:get-state', async () => {
+  return { ok: true, updater: getUpdaterState() };
+});
+
+ipcMain.handle('desktop-updater:check', async () => {
+  try {
+    await checkForDesktopUpdates();
+    const updater = getUpdaterState();
+    broadcastToRenderer('desktop-updater:state', updater);
+    return { ok: true, updater };
+  } catch (error) {
+    const updater = getUpdaterState();
+    broadcastToRenderer('desktop-updater:state', updater);
+    return { ok: false, message: error?.message || 'Failed to check for desktop updates.', updater };
+  }
+});
+
+ipcMain.handle('desktop-updater:install', async () => {
+  quitAndInstallDesktopUpdate();
+  return { ok: true };
 });
 
 app.on('before-quit', () => {

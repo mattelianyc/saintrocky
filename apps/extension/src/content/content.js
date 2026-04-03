@@ -7,6 +7,7 @@ import {
   BROWSER_EXTENSION_MESSAGE_TYPES,
   isAllowedOrigin
 } from "@saintrocky/shared";
+import overlayThemeCss from "../theme/overlay-theme.css?raw";
 
 const MESSAGE_TYPES = BROWSER_EXTENSION_MESSAGE_TYPES;
 
@@ -38,17 +39,18 @@ function ensureOverlayStyles() {
   const styleElement = document.createElement("style");
   styleElement.id = OVERLAY_STYLE_ID;
   styleElement.textContent = `
+    ${overlayThemeCss}
     #${OVERLAY_ID} {
       position: fixed;
       inset: 0;
       z-index: 2147483647;
-      background: rgba(0, 0, 0, 0.88);
+      background: color-mix(in srgb, var(--ui-shell-background-strong) 88%, rgb(0 0 0));
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      font-family: Inter, system-ui, -apple-system, sans-serif;
-      color: #f0f0f0;
+      font-family: var(--ui-font);
+      color: var(--ui-shell-text);
     }
     #${OVERLAY_ID} * {
       box-sizing: border-box;
@@ -58,8 +60,8 @@ function ensureOverlayStyles() {
       max-width: 560px;
       width: 100%;
       min-height: 620px;
-      background-color: #141414;
-      border: 1px solid rgba(255,255,255,0.08);
+      background-color: var(--ui-shell-panel-strong);
+      border: 1px solid var(--ui-shell-border);
       border-radius: 12px;
       display: flex;
       align-items: flex-end;
@@ -69,6 +71,7 @@ function ensureOverlayStyles() {
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center center;
+      box-shadow: var(--ui-shell-shadow);
     }
     .saintrocky-overlay-card::before {
       content: "";
@@ -76,10 +79,10 @@ function ensureOverlayStyles() {
       inset: 0;
       background: linear-gradient(
         180deg,
-        rgba(10, 10, 10, 0.22) 0%,
-        rgba(10, 10, 10, 0.38) 30%,
-        rgba(10, 10, 10, 0.68) 65%,
-        rgba(10, 10, 10, 0.88) 100%
+        color-mix(in srgb, var(--ui-shell-background-strong) 20%, transparent) 0%,
+        color-mix(in srgb, var(--ui-shell-background-strong) 38%, transparent) 30%,
+        color-mix(in srgb, var(--ui-shell-background-strong) 68%, transparent) 65%,
+        color-mix(in srgb, var(--ui-shell-background-strong) 88%, transparent) 100%
       );
       pointer-events: none;
     }
@@ -96,7 +99,7 @@ function ensureOverlayStyles() {
       font-size: 11px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #00d084;
+      color: var(--ui-shell-accent);
       font-weight: 700;
     }
     .saintrocky-overlay-title {
@@ -104,30 +107,31 @@ function ensureOverlayStyles() {
       font-size: 22px;
       font-weight: 700;
       line-height: 1.2;
-      color: #ffffff;
+      color: var(--ui-shell-text);
     }
     .saintrocky-overlay-summary {
       margin: 0;
       font-size: 14px;
       line-height: 1.5;
-      color: rgba(255,255,255,0.65);
+      color: var(--ui-shell-text-muted);
     }
     .saintrocky-overlay-fee-display {
       display: grid;
       gap: 4px;
       padding: 14px;
-      background: rgba(255,255,255,0.04);
+      background: color-mix(in srgb, var(--ui-shell-accent) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--ui-shell-accent) 24%, transparent);
       border-radius: 8px;
     }
     .saintrocky-overlay-fee-amount {
       font-size: 28px;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
-      color: #00d084;
+      color: var(--ui-shell-accent);
     }
     .saintrocky-overlay-fee-countdown {
       font-size: 13px;
-      color: rgba(255,255,255,0.5);
+      color: var(--ui-shell-text-muted);
       font-variant-numeric: tabular-nums;
     }
     .saintrocky-overlay-actions {
@@ -152,12 +156,12 @@ function ensureOverlayStyles() {
       opacity: 0.85;
     }
     .saintrocky-overlay-button--primary {
-      background: #00d084;
-      color: #08110d;
+      background: var(--ui-shell-accent);
+      color: var(--ui-primary-contrast);
     }
     .saintrocky-overlay-button--secondary {
-      background: rgba(255,255,255,0.1);
-      color: #f0f0f0;
+      background: color-mix(in srgb, var(--ui-shell-text) 12%, transparent);
+      color: var(--ui-shell-text);
     }
   `;
   document.head.appendChild(styleElement);
@@ -173,11 +177,19 @@ function createButton(label, className, handler) {
 }
 
 async function sendRuntimeMessage(message) {
-  const response = await chrome.runtime.sendMessage(message);
-  if (!response?.ok && response?.message) {
-    globalThis.alert(response.message);
+  try {
+    const response = await chrome.runtime.sendMessage(message);
+    if (!response?.ok && response?.message) {
+      globalThis.alert(response.message);
+    }
+    return response;
+  } catch (error) {
+    if (isExtensionContextInvalidatedError(error)) {
+      clearOverlay();
+      return { ok: false, message: "Extension context invalidated." };
+    }
+    throw error;
   }
-  return response;
 }
 
 function renderOverlay(payload = {}) {
@@ -301,15 +313,24 @@ function renderOverrideCountdown(payload = {}) {
 }
 
 function publishPageContext() {
-  chrome.runtime.sendMessage({
-    type: MESSAGE_TYPES.pageContext,
-    payload: {
-      url: window.location.href,
-      domain: window.location.hostname,
-      title: document.title,
-      currentDomain: window.location.hostname.replace(/^www\./, "")
-    }
-  });
+  chrome.runtime
+    .sendMessage({
+      type: MESSAGE_TYPES.pageContext,
+      payload: {
+        url: window.location.href,
+        domain: window.location.hostname,
+        title: document.title,
+        currentDomain: window.location.hostname.replace(/^www\./, ""),
+        apiBaseUrl: window.__SAINTROCKY_API_BASE_URL__ || ""
+      }
+    })
+    .catch((error) => {
+      if (isExtensionContextInvalidatedError(error)) {
+        clearOverlay();
+        return;
+      }
+      console.error("Failed to publish browser extension page context.", error);
+    });
 }
 
 function instrumentHistory() {
@@ -337,10 +358,19 @@ window.addEventListener("message", (event) => {
     return;
   }
 
-  chrome.runtime.sendMessage({
-    type: MESSAGE_TYPES.authHandoff,
-    payload: event.data.payload
-  });
+  chrome.runtime
+    .sendMessage({
+      type: MESSAGE_TYPES.authHandoff,
+      payload: {
+        ...event.data.payload,
+        apiBaseUrl: window.__SAINTROCKY_API_BASE_URL__ || event.data.payload?.apiBaseUrl || ""
+      }
+    })
+    .catch((error) => {
+      if (!isExtensionContextInvalidatedError(error)) {
+        console.error("Failed to hand off auth state to the browser extension runtime.", error);
+      }
+    });
 });
 
 chrome.runtime.onMessage.addListener((message) => {
@@ -358,6 +388,11 @@ chrome.runtime.onMessage.addListener((message) => {
     clearOverlay();
   }
 });
+
+function isExtensionContextInvalidatedError(error) {
+  const message = error?.message || "";
+  return message.includes("Extension context invalidated");
+}
 
 publishPageContext();
 instrumentHistory();

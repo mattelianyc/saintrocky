@@ -63,10 +63,10 @@ export function DashboardSidebarShell() {
       brand={
         <div className="sr-WebDashboardBrand">
           <Image
-            src="/images/logonav.png"
-            alt={`${saintRockyBranding.productName} logo`}
-            width={384}
-            height={107}
+            src="/images/rocco-icon.png"
+            alt={`${saintRockyBranding.productName} mark`}
+            width={128}
+            height={176}
             className="sr-WebDashboardBrandLogo"
             priority
           />
