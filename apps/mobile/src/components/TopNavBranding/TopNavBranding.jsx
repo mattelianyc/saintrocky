@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@saintrocky/ui-native';
 
 import { brandImages } from '@/assets/images.js';
@@ -7,15 +7,27 @@ import { brandImages } from '@/assets/images.js';
 export function TopNavBranding({
   title,
   subtitle,
-  variant = 'header'
+  variant = 'header',
+  onPress
 }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const isAuthVariant = variant === 'auth';
   const shouldShowCopy = Boolean(title || subtitle);
+  const Container = onPress ? Pressable : View;
+  const interactiveProps = onPress
+    ? {
+        onPress,
+        accessibilityRole: 'button',
+        accessibilityLabel: 'Open live activity'
+      }
+    : {};
 
   return (
-    <View style={[styles.container, isAuthVariant ? styles.authContainer : styles.headerContainer]}>
+    <Container
+      style={[styles.container, isAuthVariant ? styles.authContainer : styles.headerContainer]}
+      {...interactiveProps}
+    >
       {!shouldShowCopy ? (
         <Image
           source={brandImages.navLogo}
@@ -43,7 +55,7 @@ export function TopNavBranding({
           ) : null}
         </View>
       )}
-    </View>
+    </Container>
   );
 }
 

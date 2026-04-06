@@ -18,6 +18,7 @@ import {
   requestRuleDeactivationController,
   requestRuleOverrideController,
   reportRuntimeEventController,
+  settleMeteredViolationPenaltyController,
   submitRuleDraftController,
   updateUserRuleStatusController
 } from '../../controllers/rules.controller.js';
@@ -44,6 +45,7 @@ export function createRulesRouter() {
   router.post('/:id/deactivation/:requestId/cancel', cancelRuleDeactivationRequestController);
   router.get('/runtime/assignments', listRuntimeAssignmentsController);
   router.post('/runtime/events', reportRuntimeEventController);
+  router.post('/:id/metered-penalty', settleMeteredViolationPenaltyController);
 
   return router;
 }

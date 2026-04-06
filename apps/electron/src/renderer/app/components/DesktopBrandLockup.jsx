@@ -13,7 +13,9 @@ export function DesktopBrandLockup({ className = '', eyebrow, detail, compact = 
       </div>
       <div className="desktop-BrandCopy">
         <p className="desktop-BrandEyebrow">{eyebrow || saintRockyBranding.companyName}</p>
-        <p className="ui-BrandWordmark desktop-BrandWordmark">{saintRockyBranding.wordmark || 'DEVIANT$TANDARD'}</p>
+        <p className="ui-BrandWordmark desktop-BrandWordmark">
+          {saintRockyBranding.inlineWordmark || saintRockyBranding.wordmark || '$TANDARD/DEVIANT$'}
+        </p>
         {detail ? <p className="desktop-BrandDetail">{detail}</p> : null}
       </div>
     </div>

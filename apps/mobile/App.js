@@ -141,12 +141,13 @@ function AppShell() {
       />
       <ErrorBoundary>
         <NotificationProvider ownerEmail={user?.email}>
-          <View style={styles.appFrame}>
-            <NavigationContainer ref={navigationRef} theme={navigationTheme}>
-              <RootNavigator auth={auth} />
-            </NavigationContainer>
-            <PendingActionsOverlay ownerEmail={user?.email} />
-          </View>
+          <PendingActionsOverlay ownerEmail={user?.email}>
+            <View style={styles.appFrame}>
+              <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+                <RootNavigator auth={auth} />
+              </NavigationContainer>
+            </View>
+          </PendingActionsOverlay>
         </NotificationProvider>
       </ErrorBoundary>
     </>

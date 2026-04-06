@@ -1,5 +1,7 @@
 import { createApiClient, setUnauthorizedHandler } from "@saintrocky/api-client";
+import { getScheduleWindowEndTime } from "@saintrocky/enforcement";
 import { buildRulesChannel, buildRuntimeChannel, createRealtimeClient } from "@saintrocky/realtime";
+import { FREE_OVERRIDE_AFTER_HOURS } from "@saintrocky/fuckyoupayme";
 import { BROWSER_EXTENSION_MESSAGE_TYPES, isScheduleActive } from "@saintrocky/shared";
 
 const STORAGE_KEY = "saintRockyExtensionRuntime";
@@ -26,6 +28,7 @@ function buildInitialState() {
     recentEvents: [],
     pendingViolation: null,
     pendingOverrideRequest: null,
+    activeOverrides: {},
     blockedTabIds: [],
     latestPageContext: null,
     runtimeConfig: {
@@ -64,6 +67,7 @@ async function clearAuthState() {
   state.rules = [];
   state.pendingViolation = null;
   state.pendingOverrideRequest = null;
+  state.activeOverrides = {};
   state.recentEvents = [];
   state.blockedTabIds = [];
   cleanupRuntimeSubscription?.();
@@ -163,6 +167,12 @@ function addRecentEvent(eventType, assignment, details = {}) {
   ].slice(0, 12);
 }
 
+function isExpectedOfflineApiError(error) {
+  const code = String(error?.code || "");
+  const message = String(error?.message || "");
+  return code === "ERR_NETWORK" || message === "Network Error";
+}
+
 async function reportRuntimeEvent(eventType, assignment, details = {}) {
   addRecentEvent(eventType, assignment, details);
   await persistState();
@@ -175,7 +185,9 @@ async function reportRuntimeEvent(eventType, assignment, details = {}) {
       details
     });
   } catch (error) {
-    console.error("Failed to report browser extension runtime event.", error);
+    if (!isExpectedOfflineApiError(error)) {
+      console.error("Failed to report browser extension runtime event.", error);
+    }
   }
 }
 
@@ -214,6 +226,85 @@ function findPendingOverrideForRule(ruleId) {
   return rule.pendingRuleChangeRequests.override || null;
 }
 
+function getFutureIsoTimestamp(value) {
+  const timestamp = new Date(value || "");
+  if (Number.isNaN(timestamp.getTime()) || timestamp.getTime() <= Date.now()) {
+    return null;
+  }
+
+  return timestamp.toISOString();
+}
+
+function buildScheduleOverrideExpiry(schedule, referenceDate = new Date()) {
+  const referenceTimestamp = referenceDate instanceof Date ? referenceDate : new Date(referenceDate);
+  if (Number.isNaN(referenceTimestamp.getTime())) {
+    return null;
+  }
+
+  const scheduleWindowEndTime = getScheduleWindowEndTime(schedule, referenceTimestamp);
+  if (scheduleWindowEndTime instanceof Date && !Number.isNaN(scheduleWindowEndTime.getTime())) {
+    return scheduleWindowEndTime.toISOString();
+  }
+
+  return new Date(
+    referenceTimestamp.getTime() + FREE_OVERRIDE_AFTER_HOURS * 60 * 60 * 1000
+  ).toISOString();
+}
+
+function pruneExpiredActiveOverrides() {
+  const nextActiveOverrides = Object.entries(state.activeOverrides || {}).reduce((activeOverrides, [ruleId, override]) => {
+    const overrideExpiresAt = getFutureIsoTimestamp(override?.overrideExpiresAt);
+    if (overrideExpiresAt) {
+      activeOverrides[ruleId] = {
+        ...override,
+        overrideExpiresAt
+      };
+    }
+
+    return activeOverrides;
+  }, {});
+
+  state.activeOverrides = nextActiveOverrides;
+}
+
+function syncActiveOverridesFromRules() {
+  pruneExpiredActiveOverrides();
+
+  const nextActiveOverrides = (state.rules || []).reduce((activeOverrides, rule) => {
+    if (!rule?.ruleId) {
+      return activeOverrides;
+    }
+
+    const overrideExpiresAt = getFutureIsoTimestamp(rule.activeOverride?.overrideExpiresAt);
+    if (!overrideExpiresAt) {
+      return activeOverrides;
+    }
+
+    activeOverrides[rule.ruleId] = {
+      requestId: rule.activeOverride?.requestId || "",
+      confirmedAt: rule.activeOverride?.confirmedAt || null,
+      overrideExpiresAt
+    };
+    return activeOverrides;
+  }, { ...state.activeOverrides });
+
+  state.activeOverrides = nextActiveOverrides;
+}
+
+function findActiveOverrideForRule(ruleId) {
+  const override = state.activeOverrides?.[ruleId];
+  const overrideExpiresAt = getFutureIsoTimestamp(override?.overrideExpiresAt);
+  if (!overrideExpiresAt) {
+    delete state.activeOverrides?.[ruleId];
+    return null;
+  }
+
+  return {
+    ...override,
+    overrideExpiresAt
+  };
+}
+
 function syncPendingOverrideFromRules() {
   if (!state.pendingViolation) return;
   const pending = findPendingOverrideForRule(state.pendingViolation.ruleId);
@@ -230,6 +321,7 @@ function subscribeRulesChannel() {
     async (message) => {
       if (message.type !== "channel.snapshot") return;
       state.rules = message.payload?.rules || [];
+      syncActiveOverridesFromRules();
       if (message.payload?.eventType === "chain_violation_detected") {
         addRecentEvent(
           "chain_violation_detected",
@@ -317,6 +409,9 @@ function isMissingTabReceiverError(error) {
 async function sendOverrideCountdownToBlockedTabs() {
   if (!state.pendingViolation || !state.pendingOverrideRequest) return;
   const rule = state.rules.find((r) => r.ruleId === state.pendingViolation.ruleId);
+  const overrideExpiresAt =
+    getFutureIsoTimestamp(state.pendingOverrideRequest.overrideExpiresAt) ||
+    buildScheduleOverrideExpiry(rule?.compiledRule?.schedule, new Date());
   const payload = {
     requestedAt: state.pendingOverrideRequest.requestedAt,
     freeAt: state.pendingOverrideRequest.currentQuote?.freeAt || state.pendingOverrideRequest.freeAt,
@@ -324,6 +419,7 @@ async function sendOverrideCountdownToBlockedTabs() {
     lockedStakeLamports: state.pendingOverrideRequest.lockedStakeLamports,
     ruleId: state.pendingViolation.ruleId,
     requestId: state.pendingOverrideRequest.requestId,
+    overrideExpiresAt,
     title: rule?.summary || state.pendingViolation.title,
     summary: state.pendingViolation.summary
   };
@@ -339,11 +435,21 @@ function domainMatchesTarget(domain, targetValue) {
   return domain === normalizedTarget || domain.endsWith(`.${normalizedTarget}`);
 }
 
-function getTriggeredAssignment(url = "") {
+function getMatchingAssignments(url = "") {
   const domain = getDomain(url);
-  if (!domain) return undefined;
+  if (!domain) return [];
 
-  return state.assignments.find((assignment) => {
+  return state.assignments.filter((assignment) => {
+    const activeUntil = getFutureIsoTimestamp(assignment?.enforcementState?.activeUntil);
+    const isEnforcementActive =
+      assignment?.enforcementState?.isEnforcementActive === false
+        ? false
+        : !assignment?.enforcementState?.activeUntil || Boolean(activeUntil);
+
+    if (!isEnforcementActive) {
+      return false;
+    }
+
     const targets = assignment.compiledRule?.targets || [];
     const domainTargets = targets.filter((target) => target.type === "domain");
     if (!domainTargets.length) return false;
@@ -353,13 +459,36 @@ function getTriggeredAssignment(url = "") {
   });
 }
 
+async function sendActiveOverrideBanner(tabId, assignment) {
+  const activeOverride = findActiveOverrideForRule(assignment?.ruleId);
+  if (!tabId || !assignment || !activeOverride) {
+    return;
+  }
+
+  await sendTabMessage(tabId, {
+    type: MESSAGE_TYPES.renderOverrideActive,
+    payload: {
+      ruleId: assignment.ruleId,
+      title: assignment.compiledRule?.summary || "Override active",
+      summary: assignment.compiledRule?.enforcement?.userMessage || "You can keep using this site until the schedule ends.",
+      overrideExpiresAt: activeOverride.overrideExpiresAt
+    }
+  });
+}
+
 async function evaluateTab(tabId, url = "") {
   if (!state.isArmed || !state.sessionUser?.email) {
     return sendTabMessage(tabId, { type: MESSAGE_TYPES.clearBlock });
   }
 
-  const assignment = getTriggeredAssignment(url);
-  if (!assignment) {
+  pruneExpiredActiveOverrides();
+  const matchingAssignments = getMatchingAssignments(url);
+  const blockingAssignment = matchingAssignments.find((assignment) => !findActiveOverrideForRule(assignment.ruleId));
+  const activeOverrideAssignment = !blockingAssignment
+    ? matchingAssignments.find((assignment) => findActiveOverrideForRule(assignment.ruleId))
+    : null;
+
+  if (!blockingAssignment && !activeOverrideAssignment) {
     state.pendingViolation = null;
     state.pendingOverrideRequest = null;
     state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
@@ -368,6 +497,17 @@ async function evaluateTab(tabId, url = "") {
     return sendTabMessage(tabId, { type: MESSAGE_TYPES.clearBlock });
   }
 
+  if (!blockingAssignment && activeOverrideAssignment) {
+    state.pendingViolation = null;
+    state.pendingOverrideRequest = null;
+    state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
+    await persistState();
+    await publishExtensionSession();
+    await sendActiveOverrideBanner(tabId, activeOverrideAssignment);
+    return state;
+  }
+
+  const assignment = blockingAssignment;
   state.pendingViolation = {
     violationId: crypto.randomUUID(),
     ruleId: assignment.ruleId,
@@ -443,9 +583,10 @@ async function handleConfirmOverride() {
   const requestId = state.pendingOverrideRequest.requestId;
 
   try {
-    await getApiClient().rules.confirmOverrideRequest(ruleId, requestId);
+    const result = await getApiClient().rules.confirmOverrideRequest(ruleId, requestId);
     const tabId = state.pendingViolation.tabId;
     const assignment = state.assignments.find((item) => item.ruleId === ruleId);
+    const rule = state.rules.find((item) => item.ruleId === ruleId);
     if (assignment) {
       await reportRuntimeEvent("bypass_confirmed", assignment, {
         tabId,
@@ -453,12 +594,31 @@ async function handleConfirmOverride() {
         requestId
       });
     }
+    const overrideExpiresAt =
+      getFutureIsoTimestamp(result?.request?.overrideExpiresAt) ||
+      buildScheduleOverrideExpiry(rule?.compiledRule?.schedule, new Date());
+    if (overrideExpiresAt) {
+      state.activeOverrides = {
+        ...(state.activeOverrides || {}),
+        [ruleId]: {
+          requestId,
+          confirmedAt: result?.request?.confirmedAt || new Date().toISOString(),
+          overrideExpiresAt
+        }
+      };
+    }
     state.blockedTabIds = state.blockedTabIds.filter((id) => id !== tabId);
-    await sendTabMessage(tabId, { type: MESSAGE_TYPES.clearBlock });
     state.pendingViolation = null;
     state.pendingOverrideRequest = null;
     await persistState();
     await publishExtensionSession();
+    await sendActiveOverrideBanner(tabId, assignment || rule || {
+      ruleId,
+      compiledRule: {
+        summary: rule?.summary || "Override active",
+        enforcement: { userMessage: "You can keep using this site until the schedule ends." }
+      }
+    });
   } catch (error) {
     throw error;
   }

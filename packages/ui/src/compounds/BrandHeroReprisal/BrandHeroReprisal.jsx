@@ -28,7 +28,10 @@ const REPRISAL_FOOTER_CHARACTER_EXIT_START = 0.03;
 const REPRISAL_FOOTER_CHARACTER_EXIT_STAGGER = 0.018;
 const REPRISAL_FOOTER_CHARACTER_EXIT_DURATION = 0.22;
 
-const REPRISAL_BRAND_NAME = saintRockyBranding.wordmark || saintRockyBranding.productName.toUpperCase();
+const REPRISAL_BRAND_NAME =
+  saintRockyBranding.inlineWordmark ||
+  saintRockyBranding.wordmark ||
+  saintRockyBranding.productName.toUpperCase();
 const REPRISAL_INSTAGRAM_URL = saintRockyBranding.social?.url || saintRockyBranding.siteUrl || "/";
 const REPRISAL_TERMINAL_COMMAND = saintRockyBranding.social?.handle || "@standarddeviants";
 
@@ -41,6 +44,28 @@ export function BrandHeroReprisal({
   const [viewportHeight, setViewportHeight] = useState(900);
 
   const brandCharacters = brandName.split("");
+  const leadingAccentCharacterIndex = brandCharacters.indexOf("$");
+  const trailingAccentCharacterIndex = brandCharacters.lastIndexOf("$");
+
+  function getCharacterClassName(innerClassName, character, index) {
+    const classNames = [innerClassName];
+
+    if (character === "$") {
+      if (index === leadingAccentCharacterIndex) {
+        classNames.push("c-BrandHeroReprisal__characterInner--accentLeading");
+      }
+
+      if (index === trailingAccentCharacterIndex) {
+        classNames.push("c-BrandHeroReprisal__characterInner--accentTrailing");
+      }
+    }
+
+    if (character === "/") {
+      classNames.push("c-BrandHeroReprisal__characterInner--divider");
+    }
+
+    return classNames.join(" ");
+  }
   const terminalRevealProgress = shouldReduceMotion
     ? 1
     : clamp(
@@ -192,7 +217,9 @@ export function BrandHeroReprisal({
           }}
           transition={{ duration: 0.08, ease: "linear" }}
         >
-          <span className={innerClassName}>{character === " " ? "\u00A0" : character}</span>
+          <span className={getCharacterClassName(innerClassName, character, index)}>
+            {character === " " ? "\u00A0" : character}
+          </span>
         </motion.span>
       );
     });
@@ -222,7 +249,7 @@ export function BrandHeroReprisal({
           }}
           transition={{ duration: 0.08, ease: "linear" }}
         >
-          <span className="c-BrandHeroReprisal__footerWordmarkCharacterInner">
+          <span className={getCharacterClassName("c-BrandHeroReprisal__footerWordmarkCharacterInner", character, index)}>
             {character === " " ? "\u00A0" : character}
           </span>
         </motion.span>

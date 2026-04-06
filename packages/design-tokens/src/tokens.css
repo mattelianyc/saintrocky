@@ -31,6 +31,7 @@
   --ui-shell-text-muted: rgba(13, 18, 17, 0.62);
   --ui-shell-accent: #0f5a46;
   --ui-shell-accent-strong: #e8b8c8;
+  --ui-shell-brand-divider: #b8a27d;
   --ui-shell-shadow: 0 24px 60px rgba(13, 18, 17, 0.08);
   --ui-shell-glow: rgba(232, 184, 200, 0.18);
   --ui-gradient-problem-start: #0f5a46;
@@ -96,6 +97,7 @@
   --ui-shell-text-muted: rgba(245, 250, 247, 0.68);
   --ui-shell-accent: #0f5a46;
   --ui-shell-accent-strong: #e3a7bc;
+  --ui-shell-brand-divider: #d6c4a5;
   --ui-shell-shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
   --ui-shell-glow: rgba(227, 167, 188, 0.14);
   --ui-gradient-problem-start: #0f5a46;

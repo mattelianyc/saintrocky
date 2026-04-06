@@ -87,13 +87,14 @@ export function useDesktopRuntimeShell() {
 
     updateNativeRuntimeState({
       monitorStatus: runtimeHub.monitorStatus,
-      pendingViolationCount: runtimeHub.pendingViolation ? 1 : 0,
+      pendingViolationCount: runtimeHub.pendingViolation || runtimeHub.meteredViolation ? 1 : 0,
       chainViolationCount: runtimeHub.chainViolations?.length || 0,
       hideToTrayOnClose: runtimeHub.preferences?.hideToTrayOnClose ?? true
     });
   }, [
     runtimeHub?.monitorStatus,
     runtimeHub?.pendingViolation?.violationId,
+    runtimeHub?.meteredViolation?.violationId,
     runtimeHub?.chainViolations?.length,
     runtimeHub?.preferences?.hideToTrayOnClose
   ]);

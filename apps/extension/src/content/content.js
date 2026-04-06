@@ -16,6 +16,30 @@ const OVERLAY_STYLE_ID = "saintrocky-extension-overlay-style";
 
 let countdownTimerId = null;
 const allowedOrigins = __SAINTROCKY_EXTENSION_ALLOWED_ORIGINS__;
+let extensionRuntimeUnavailable = false;
+
+function getExtensionRuntime() {
+  const runtime = globalThis.chrome?.runtime;
+  return runtime?.id ? runtime : null;
+}
+
+function formatAbsoluteTimestamp(value) {
+  const timestamp = new Date(value || "");
+  if (Number.isNaN(timestamp.getTime())) {
+    return "";
+  }
+
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(timestamp);
+  } catch {
+    return timestamp.toLocaleString();
+  }
+}
 
 function getOverlay() {
   return document.getElementById(OVERLAY_ID);
@@ -24,6 +48,11 @@ function getOverlay() {
 function clearOverlay() {
   stopCountdownTimer();
   getOverlay()?.remove();
+}
+
+function markExtensionRuntimeUnavailable() {
+  extensionRuntimeUnavailable = true;
+  clearOverlay();
 }
 
 function stopCountdownTimer() {
@@ -52,6 +81,14 @@ function ensureOverlayStyles() {
       font-family: var(--ui-font);
       color: var(--ui-shell-text);
     }
+    #${OVERLAY_ID}.is-banner {
+      inset: auto 16px 16px auto;
+      width: min(360px, calc(100vw - 32px));
+      padding: 0;
+      background: transparent;
+      display: block;
+      pointer-events: none;
+    }
     #${OVERLAY_ID} * {
       box-sizing: border-box;
     }
@@ -73,6 +110,13 @@ function ensureOverlayStyles() {
       background-position: center center;
       box-shadow: var(--ui-shell-shadow);
     }
+    #${OVERLAY_ID}.is-banner .saintrocky-overlay-card {
+      min-height: 0;
+      border-radius: 18px;
+      background-color: color-mix(in srgb, var(--ui-shell-panel-strong) 96%, rgb(0 0 0));
+      box-shadow: 0 20px 36px rgb(0 0 0 / 0.28);
+      backdrop-filter: blur(16px);
+    }
     .saintrocky-overlay-card::before {
       content: "";
       position: absolute;
@@ -86,6 +130,13 @@ function ensureOverlayStyles() {
       );
       pointer-events: none;
     }
+    #${OVERLAY_ID}.is-banner .saintrocky-overlay-card::before {
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--ui-shell-accent) 16%, transparent) 0%,
+        color-mix(in srgb, var(--ui-shell-background-strong) 92%, transparent) 100%
+      );
+    }
     .saintrocky-overlay-body {
       position: relative;
       z-index: 1;
@@ -93,6 +144,10 @@ function ensureOverlayStyles() {
       padding: 24px 24px 28px;
       display: grid;
       gap: 14px;
+    }
+    #${OVERLAY_ID}.is-banner .saintrocky-overlay-body {
+      padding: 16px 18px 18px;
+      gap: 10px;
     }
     .saintrocky-overlay-eyebrow {
       margin: 0;
@@ -130,6 +185,11 @@ function ensureOverlayStyles() {
       color: var(--ui-shell-accent);
     }
     .saintrocky-overlay-fee-countdown {
+      font-size: 13px;
+      color: var(--ui-shell-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .saintrocky-overlay-runtime {
       font-size: 13px;
       color: var(--ui-shell-text-muted);
       font-variant-numeric: tabular-nums;
@@ -172,23 +232,79 @@ function createButton(label, className, handler) {
   button.type = "button";
   button.textContent = label;
   button.className = `saintrocky-overlay-button ${className}`;
-  button.addEventListener("click", handler);
+  button.addEventListener("click", () => {
+    Promise.resolve(handler()).catch((error) => {
+      if (isExtensionContextInvalidatedError(error)) {
+        markExtensionRuntimeUnavailable();
+        return;
+      }
+
+      console.error("Saint Rocky overlay action failed.", error);
+    });
+  });
   return button;
 }
 
 async function sendRuntimeMessage(message) {
+  if (extensionRuntimeUnavailable) {
+    return { ok: false, message: "Extension runtime unavailable." };
+  }
+
   try {
-    const response = await chrome.runtime.sendMessage(message);
+    const runtime = getExtensionRuntime();
+    if (!runtime?.sendMessage) {
+      markExtensionRuntimeUnavailable();
+      return { ok: false, message: "Extension runtime unavailable." };
+    }
+
+    const response = await runtime.sendMessage(message);
     if (!response?.ok && response?.message) {
       globalThis.alert(response.message);
     }
     return response;
   } catch (error) {
     if (isExtensionContextInvalidatedError(error)) {
-      clearOverlay();
+      markExtensionRuntimeUnavailable();
       return { ok: false, message: "Extension context invalidated." };
     }
     throw error;
+  }
+}
+
+function sendRuntimeMessageQuietly(message, onSuccess) {
+  if (extensionRuntimeUnavailable) {
+    return;
+  }
+
+  try {
+    const runtime = getExtensionRuntime();
+    if (!runtime?.sendMessage) {
+      markExtensionRuntimeUnavailable();
+      return;
+    }
+
+    const responsePromise = runtime.sendMessage(message);
+    Promise.resolve(responsePromise)
+      .then((response) => {
+        if (typeof onSuccess === "function") {
+          onSuccess(response);
+        }
+      })
+      .catch((error) => {
+        if (isExtensionContextInvalidatedError(error)) {
+          markExtensionRuntimeUnavailable();
+          return;
+        }
+
+        console.error("Failed to send quiet Saint Rocky runtime message.", error);
+      });
+  } catch (error) {
+    if (isExtensionContextInvalidatedError(error)) {
+      markExtensionRuntimeUnavailable();
+      return;
+    }
+
+    console.error("Failed to send quiet Saint Rocky runtime message.", error);
   }
 }
 
@@ -268,7 +384,10 @@ function renderOverrideCountdown(payload = {}) {
   const feeCountdown = document.createElement("div");
   feeCountdown.className = "saintrocky-overlay-fee-countdown";
 
-  feeDisplay.append(feeAmount, feeCountdown);
+  const overrideRuntime = document.createElement("div");
+  overrideRuntime.className = "saintrocky-overlay-runtime";
+
+  feeDisplay.append(feeAmount, feeCountdown, overrideRuntime);
 
   const actions = document.createElement("div");
   actions.className = "saintrocky-overlay-actions";
@@ -306,31 +425,79 @@ function renderOverrideCountdown(payload = {}) {
       feeCountdown.textContent = `Free in ${formatRemainingDuration(quote.freeAt, now)}`;
       confirmButton.textContent = `Override now for ${solLabel}`;
     }
+
+    if (payload.overrideExpiresAt) {
+      overrideRuntime.textContent = `This override lasts until ${formatAbsoluteTimestamp(payload.overrideExpiresAt)} (${formatRemainingDuration(payload.overrideExpiresAt, now)} from now).`;
+    } else {
+      overrideRuntime.textContent = "This override stays active until the current schedule window ends.";
+    }
   }
 
   updateFeeDisplay();
   countdownTimerId = setInterval(updateFeeDisplay, 1000);
 }
 
+function renderActiveOverride(payload = {}) {
+  clearOverlay();
+  ensureOverlayStyles();
+
+  const overlay = document.createElement("div");
+  overlay.id = OVERLAY_ID;
+  overlay.className = "is-banner";
+
+  const card = document.createElement("div");
+  card.className = "saintrocky-overlay-card";
+
+  const body = document.createElement("div");
+  body.className = "saintrocky-overlay-body";
+
+  const eyebrow = document.createElement("p");
+  eyebrow.textContent = "Override active";
+  eyebrow.className = "saintrocky-overlay-eyebrow";
+
+  const title = document.createElement("h2");
+  title.textContent = payload.title || "You can keep using this site";
+  title.className = "saintrocky-overlay-title";
+
+  const summary = document.createElement("p");
+  summary.textContent = payload.summary || "This override stays active until the current schedule window ends.";
+  summary.className = "saintrocky-overlay-summary";
+
+  const runtime = document.createElement("div");
+  runtime.className = "saintrocky-overlay-runtime";
+
+  body.append(eyebrow, title, summary, runtime);
+  card.appendChild(body);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  function updateRuntimeCopy() {
+    const now = new Date();
+    const overrideExpiresAt = payload.overrideExpiresAt ? new Date(payload.overrideExpiresAt) : null;
+
+    if (!overrideExpiresAt || Number.isNaN(overrideExpiresAt.getTime()) || overrideExpiresAt.getTime() <= now.getTime()) {
+      clearOverlay();
+      return;
+    }
+
+    runtime.textContent = `Active for ${formatRemainingDuration(overrideExpiresAt, now)} more, until ${formatAbsoluteTimestamp(overrideExpiresAt)}.`;
+  }
+
+  updateRuntimeCopy();
+  countdownTimerId = setInterval(updateRuntimeCopy, 1000);
+}
+
 function publishPageContext() {
-  chrome.runtime
-    .sendMessage({
-      type: MESSAGE_TYPES.pageContext,
-      payload: {
-        url: window.location.href,
-        domain: window.location.hostname,
-        title: document.title,
-        currentDomain: window.location.hostname.replace(/^www\./, ""),
-        apiBaseUrl: window.__SAINTROCKY_API_BASE_URL__ || ""
-      }
-    })
-    .catch((error) => {
-      if (isExtensionContextInvalidatedError(error)) {
-        clearOverlay();
-        return;
-      }
-      console.error("Failed to publish browser extension page context.", error);
-    });
+  sendRuntimeMessageQuietly({
+    type: MESSAGE_TYPES.pageContext,
+    payload: {
+      url: window.location.href,
+      domain: window.location.hostname,
+      title: document.title,
+      currentDomain: window.location.hostname.replace(/^www\./, ""),
+      apiBaseUrl: window.__SAINTROCKY_API_BASE_URL__ || ""
+    }
+  });
 }
 
 function instrumentHistory() {
@@ -358,42 +525,63 @@ window.addEventListener("message", (event) => {
     return;
   }
 
-  chrome.runtime
-    .sendMessage({
-      type: MESSAGE_TYPES.authHandoff,
-      payload: {
-        ...event.data.payload,
-        apiBaseUrl: window.__SAINTROCKY_API_BASE_URL__ || event.data.payload?.apiBaseUrl || ""
+  sendRuntimeMessageQuietly({
+    type: MESSAGE_TYPES.authHandoff,
+    payload: {
+      ...event.data.payload,
+      apiBaseUrl: window.__SAINTROCKY_API_BASE_URL__ || event.data.payload?.apiBaseUrl || ""
+    }
+  });
+});
+
+function registerRuntimeMessageListener() {
+  try {
+    const runtime = getExtensionRuntime();
+    if (!runtime?.onMessage?.addListener) {
+      markExtensionRuntimeUnavailable();
+      return;
+    }
+
+    runtime.onMessage.addListener((message) => {
+      if (message?.type === MESSAGE_TYPES.renderBlock) {
+        renderOverlay(message.payload || {});
+        return;
       }
-    })
-    .catch((error) => {
-      if (!isExtensionContextInvalidatedError(error)) {
-        console.error("Failed to hand off auth state to the browser extension runtime.", error);
+
+      if (message?.type === MESSAGE_TYPES.renderOverrideCountdown) {
+        renderOverrideCountdown(message.payload || {});
+        return;
+      }
+
+      if (message?.type === MESSAGE_TYPES.renderOverrideActive) {
+        renderActiveOverride(message.payload || {});
+        return;
+      }
+
+      if (message?.type === MESSAGE_TYPES.clearBlock) {
+        clearOverlay();
       }
     });
-});
+  } catch (error) {
+    if (isExtensionContextInvalidatedError(error)) {
+      markExtensionRuntimeUnavailable();
+      return;
+    }
 
-chrome.runtime.onMessage.addListener((message) => {
-  if (message?.type === MESSAGE_TYPES.renderBlock) {
-    renderOverlay(message.payload || {});
-    return;
+    console.error("Failed to register Saint Rocky runtime listener.", error);
   }
-
-  if (message?.type === MESSAGE_TYPES.renderOverrideCountdown) {
-    renderOverrideCountdown(message.payload || {});
-    return;
-  }
-
-  if (message?.type === MESSAGE_TYPES.clearBlock) {
-    clearOverlay();
-  }
-});
+}
 
 function isExtensionContextInvalidatedError(error) {
   const message = error?.message || "";
-  return message.includes("Extension context invalidated");
+  return (
+    message.includes("Extension context invalidated") ||
+    message.includes("Cannot read properties of undefined (reading 'sendMessage')") ||
+    message.includes("Cannot read properties of undefined (reading 'onMessage')")
+  );
 }
 
+registerRuntimeMessageListener();
 publishPageContext();
 instrumentHistory();
 window.addEventListener("focus", publishPageContext);

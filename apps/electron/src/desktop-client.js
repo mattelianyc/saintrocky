@@ -79,12 +79,16 @@ const runtimeHub = createRuntimeHub({
   },
   cancelOverride(ruleId, requestId) {
     return apiClient.rules.cancelOverrideRequest(ruleId, requestId);
+  },
+  settleMeteredPenalty(ruleId, payload) {
+    return apiClient.rules.settleMeteredPenalty(ruleId, payload);
   }
 });
 const runtimeHubListeners = new Set();
 let hasLoadedPersistedAuthState = false;
 
 runtimeHub.onStateChange((snapshot) => {
+  syncMeterOverlay(snapshot?.meteredViolation || null);
   runtimeHubListeners.forEach((listener) => {
     try {
       listener(snapshot);
@@ -97,14 +101,33 @@ runtimeHub.onNotifiableEvent((event) => {
   if (!notificationsEnabled) {
     return;
   }
-  fireNativeNotification(event.title, event.body);
+  fireNativeNotification(event);
 });
 
-function fireNativeNotification(title, body) {
+runtimeHub.onEnforcementAction((action) => {
+  requestNativeAttention(action);
+});
+
+function fireNativeNotification(event = {}) {
   ipcRenderer.invoke('desktop-runtime:show-notification', {
-    title: title || 'Saint Rocky',
-    body: body || ''
+    title: event.title || 'Saint Rocky',
+    body: event.body || '',
+    navigateTo: event.navigateTo || '',
+    silent: Boolean(event.silent)
   }).catch(() => {});
+}
+
+function requestNativeAttention(action = {}) {
+  ipcRenderer.invoke('desktop-runtime:request-attention', {
+    bounceType: action.bounceType || 'critical',
+    pinOnTop: Boolean(action.pinOnTop),
+    violationId: action.violationId || '',
+    type: action.type || 'desktop_attention'
+  }).catch(() => {});
+}
+
+function syncMeterOverlay(meteredViolation = null) {
+  ipcRenderer.invoke('desktop-runtime:sync-meter-overlay', meteredViolation).catch(() => {});
 }
 
 realtimeClient.onConnectionStateChange((connection) => {
@@ -332,6 +355,7 @@ export async function getSession() {
       ensureRealtimeConnection();
       const extensionSessionsResponse = await apiClient.extensionSessions.list(response.user.email);
       runtimeHub.replaceExtensionSessions(extensionSessionsResponse?.sessions || []);
+      await refreshRuntimeRules();
       await persistAuthState();
       await runtimeHub.start();
       startDashboardRefresh();
@@ -575,6 +599,7 @@ export async function getRuntimeHubSnapshot() {
   }
 
   try {
+    await refreshRuntimeRules();
     const snapshot = await runtimeHub.start();
     return {
       ok: true,
@@ -636,9 +661,10 @@ export async function resolveRuntimeViolation(action) {
 export async function confirmRuntimeOverride() {
   await loadPersistedAuthState();
   try {
+    await runtimeHub.confirmPendingOverride();
     return {
       ok: true,
-      runtimeHub: await runtimeHub.confirmPendingOverride()
+      runtimeHub: await refreshRuntimeRules()
     };
   } catch (error) {
     return buildErrorResponse(error, 'Failed to confirm override');
@@ -648,9 +674,10 @@ export async function confirmRuntimeOverride() {
 export async function cancelRuntimeOverride() {
   await loadPersistedAuthState();
   try {
+    await runtimeHub.cancelPendingOverride();
     return {
       ok: true,
-      runtimeHub: await runtimeHub.cancelPendingOverride()
+      runtimeHub: await refreshRuntimeRules()
     };
   } catch (error) {
     return buildErrorResponse(error, 'Failed to cancel override');

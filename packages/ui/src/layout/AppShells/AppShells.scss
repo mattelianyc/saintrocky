@@ -118,6 +118,11 @@
 }
 
 .sr-WebDashboardLayout {
+  --ui-live-activity-rail-width: 22rem;
+  --ui-live-activity-rail-height: calc(100vh - 4rem);
+  --ui-live-activity-full-height: calc(100vh - 4rem);
+  --ui-live-activity-shell-gap: 1.5rem;
+
   min-height: 100vh;
   height: 100vh;
   overflow: hidden;
@@ -147,6 +152,25 @@
   height: 100vh;
   overflow-y: auto;
   padding: 2rem 1.5rem;
+}
+
+.sr-WebDashboardLayout .c-PageLayout__trailingPanel {
+  position: sticky;
+  top: 0;
+  align-self: stretch;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.sr-WebDashboardLayout .c-PageLayout__trailingPanel--liveActivityRail {
+  flex: 0 0 var(--ui-live-activity-rail-width);
+  width: var(--ui-live-activity-rail-width);
+}
+
+.sr-WebDashboardLayout .c-PageLayout__trailingPanel--liveActivityFull {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .sr-WebDashboardSidebar {
@@ -307,6 +331,11 @@
 
 .desktop-App,
 .desktop-Layout {
+  --ui-live-activity-rail-width: 22rem;
+  --ui-live-activity-rail-height: calc(100vh - 72px);
+  --ui-live-activity-full-height: calc(100vh - 72px);
+  --ui-live-activity-shell-gap: 24px;
+
   min-height: 100vh;
   height: 100vh;
   overflow: hidden;
@@ -317,6 +346,25 @@
   padding: 32px 24px 40px;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+.desktop-Layout .c-PageLayout__trailingPanel {
+  position: sticky;
+  top: 0;
+  align-self: stretch;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.desktop-Layout .c-PageLayout__trailingPanel--liveActivityRail {
+  flex: 0 0 var(--ui-live-activity-rail-width);
+  width: var(--ui-live-activity-rail-width);
+}
+
+.desktop-Layout .c-PageLayout__trailingPanel--liveActivityFull {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .desktop-Layout .c-PageLayout__sidebar {
@@ -693,6 +741,90 @@
   background: color-mix(in srgb, var(--ui-desktop-kicker) 16%, var(--ui-desktop-surface));
 }
 
+.desktop-ViolationOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.desktop-ViolationOverlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(8 14 18 / 0.82) 0%, rgb(3 7 10 / 0.9) 100%);
+  backdrop-filter: blur(14px);
+}
+
+.desktop-ViolationOverlay__card {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 100%);
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ui-desktop-card-surface) 98%, white) 0%,
+      color-mix(in srgb, var(--ui-desktop-surface) 96%, white) 100%
+    );
+  border: 1px solid color-mix(in srgb, var(--ui-shell-accent) 32%, white);
+  box-shadow:
+    0 32px 72px rgb(0 0 0 / 0.42),
+    inset 0 0 0 1px color-mix(in srgb, var(--ui-shell-accent) 14%, white);
+}
+
+.desktop-ViolationOverlay__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.desktop-ViolationOverlay__header h2,
+.desktop-ViolationOverlay__summary {
+  margin: 0;
+}
+
+.desktop-ViolationOverlay__status {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--ui-shell-accent) 38%, white);
+  background: color-mix(in srgb, var(--ui-shell-accent) 14%, transparent);
+  color: var(--ui-shell-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.desktop-ViolationOverlay__summary {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ui-desktop-text);
+}
+
+.desktop-ViolationOverlay__meta {
+  display: grid;
+  gap: 12px;
+}
+
+.desktop-ViolationOverlay__targetList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.desktop-ViolationOverlay__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .desktop-FilterRow {
   display: flex;
   gap: 6px;
@@ -784,6 +916,20 @@
   .desktop-RuntimeGrid {
     min-width: 0;
     width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .desktop-ViolationOverlay {
+    padding: 16px;
+  }
+
+  .desktop-ViolationOverlay__card {
+    padding: 22px;
+  }
+
+  .desktop-ViolationOverlay__header {
+    flex-direction: column;
   }
 }
 

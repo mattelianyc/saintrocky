@@ -35,6 +35,7 @@ function toCssVars(mode, tokens) {
     `  --ui-shell-text-muted: ${tokens.shell.textMuted};`,
     `  --ui-shell-accent: ${tokens.shell.accent};`,
     `  --ui-shell-accent-strong: ${tokens.shell.accentStrong};`,
+    `  --ui-shell-brand-divider: ${tokens.shell.brandDivider};`,
     `  --ui-shell-shadow: ${tokens.shell.shadow};`,
     `  --ui-shell-glow: ${tokens.shell.glow};`,
     `  --ui-gradient-problem-start: ${tokens.gradients.problemStart};`,

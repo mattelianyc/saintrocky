@@ -61,6 +61,9 @@ contextBridge.exposeInMainWorld('saintRockyDesktop', {
   showNativeNotification(payload) {
     return ipcRenderer.invoke('desktop-runtime:show-notification', payload);
   },
+  requestNativeAttention(payload) {
+    return ipcRenderer.invoke('desktop-runtime:request-attention', payload);
+  },
   getOpenAtLogin() {
     return ipcRenderer.invoke('desktop-runtime:get-open-at-login');
   },
@@ -91,5 +94,10 @@ contextBridge.exposeInMainWorld('saintRockyDesktop', {
   },
   onNavigateFromMain(callback) {
     ipcRenderer.on('desktop-runtime:navigate', (_event, target) => callback(target));
+  },
+  onMeterOverlayStateChange(callback) {
+    const listener = (_event, payload) => callback(payload);
+    ipcRenderer.on('desktop-runtime:meter-overlay-state', listener);
+    return () => ipcRenderer.off('desktop-runtime:meter-overlay-state', listener);
   }
 });

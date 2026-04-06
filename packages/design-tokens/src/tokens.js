@@ -34,6 +34,7 @@ export const lightTokens = {
     textMuted: 'rgba(13, 18, 17, 0.62)',
     accent: '#0f5a46',
     accentStrong: '#e8b8c8',
+    brandDivider: '#b8a27d',
     shadow: '0 24px 60px rgba(13, 18, 17, 0.08)',
     glow: 'rgba(232, 184, 200, 0.18)'
   },
@@ -150,6 +151,7 @@ export const darkTokens = {
     textMuted: 'rgba(245, 250, 247, 0.68)',
     accent: '#0f5a46',
     accentStrong: '#e3a7bc',
+    brandDivider: '#d6c4a5',
     shadow: '0 24px 60px rgba(0, 0, 0, 0.34)',
     glow: 'rgba(227, 167, 188, 0.14)'
   },

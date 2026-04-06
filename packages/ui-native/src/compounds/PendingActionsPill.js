@@ -117,13 +117,18 @@ export function PendingActionsPill({
   submittingActionId = '',
   onConfirmAction,
   onCancelAction,
-  bottomInset = 0
+  bottomInset = 0,
+  visible,
+  onOpenChange,
+  showFloatingTrigger = true
 }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme, bottomInset), [theme, bottomInset]);
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [now, setNow] = useState(createNowSnapshot);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
+  const isControlled = typeof visible === 'boolean';
+  const open = isControlled ? visible : uncontrolledOpen;
 
   useEffect(() => {
     const intervalId = setInterval(() => setNow(createNowSnapshot()), 1000);
@@ -150,24 +155,36 @@ export function PendingActionsPill({
   );
   const hasPendingActions = liveActions.length > 0;
 
+  function setOpen(nextValue) {
+    const resolvedValue = typeof nextValue === 'function' ? nextValue(open) : nextValue;
+
+    if (!isControlled) {
+      setUncontrolledOpen(resolvedValue);
+    }
+
+    onOpenChange?.(resolvedValue);
+  }
+
   return (
     <>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Open pending actions"
-        onPress={() => setOpen(true)}
-        style={styles.pill}
-      >
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{liveActions.length}</Text>
-        </View>
-        <View style={styles.pillCopy}>
-          <Text style={styles.pillTitle}>{hasPendingActions ? 'Pending actions' : 'No pending actions'}</Text>
-          <Text style={styles.pillMeta}>
-            {hasPendingActions ? `${formatFeeSol(totalFeeLamports)} SOL live fee` : 'Decay timers show up here'}
-          </Text>
-        </View>
-      </Pressable>
+      {showFloatingTrigger ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open pending actions"
+          onPress={() => setOpen(true)}
+          style={styles.pill}
+        >
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{liveActions.length}</Text>
+          </View>
+          <View style={styles.pillCopy}>
+            <Text style={styles.pillTitle}>{hasPendingActions ? 'Pending actions' : 'No pending actions'}</Text>
+            <Text style={styles.pillMeta}>
+              {hasPendingActions ? `${formatFeeSol(totalFeeLamports)} SOL live fee` : 'Decay timers show up here'}
+            </Text>
+          </View>
+        </Pressable>
+      ) : null}
 
       <Modal
         visible={open}

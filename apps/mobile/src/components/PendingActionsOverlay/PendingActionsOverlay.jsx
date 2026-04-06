@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/api/client.js';
@@ -7,10 +7,13 @@ import { buildRulesChannel } from '@saintrocky/realtime';
 import { extractPendingActions } from '@saintrocky/shared';
 import { PendingActionsPill } from '@saintrocky/ui-native';
 
-export function PendingActionsOverlay({ ownerEmail }) {
+const PendingActionsOverlayContext = createContext(null);
+
+export function PendingActionsOverlay({ ownerEmail, children }) {
   const insets = useSafeAreaInsets();
   const [rules, setRules] = useState([]);
   const [submittingActionId, setSubmittingActionId] = useState('');
+  const [sheetVisible, setSheetVisible] = useState(false);
 
   const loadRules = useCallback(async () => {
     if (!ownerEmail) {
@@ -30,6 +33,12 @@ export function PendingActionsOverlay({ ownerEmail }) {
     loadRules();
   }, [loadRules]);
 
+  useEffect(() => {
+    if (!ownerEmail) {
+      setSheetVisible(false);
+    }
+  }, [ownerEmail]);
+
   const rulesChannel = ownerEmail ? buildRulesChannel(ownerEmail) : null;
 
   useRealtimeChannel(rulesChannel, {
@@ -42,6 +51,7 @@ export function PendingActionsOverlay({ ownerEmail }) {
   });
 
   const pendingActions = useMemo(() => extractPendingActions(rules), [rules]);
+  const pendingActionsCount = pendingActions.length;
 
   const handleConfirmAction = useCallback(async (action) => {
     if (!action?.ruleId || !action?.requestId) return;
@@ -79,13 +89,63 @@ export function PendingActionsOverlay({ ownerEmail }) {
     }
   }, [loadRules]);
 
+  const openSheet = useCallback(() => {
+    if (!ownerEmail) return;
+    setSheetVisible(true);
+  }, [ownerEmail]);
+
+  const closeSheet = useCallback(() => {
+    setSheetVisible(false);
+  }, []);
+
+  const toggleSheet = useCallback(() => {
+    if (!ownerEmail) return;
+    setSheetVisible((previousValue) => !previousValue);
+  }, [ownerEmail]);
+
+  const contextValue = useMemo(() => ({
+    hasActivityAccess: Boolean(ownerEmail),
+    pendingActions,
+    pendingActionsCount,
+    submittingActionId,
+    sheetVisible,
+    openSheet,
+    closeSheet,
+    toggleSheet
+  }), [closeSheet, openSheet, ownerEmail, pendingActions, pendingActionsCount, sheetVisible, submittingActionId, toggleSheet]);
+
   return (
-    <PendingActionsPill
-      pendingActions={pendingActions}
-      submittingActionId={submittingActionId}
-      onConfirmAction={handleConfirmAction}
-      onCancelAction={handleCancelAction}
-      bottomInset={insets.bottom}
-    />
+    <PendingActionsOverlayContext.Provider value={contextValue}>
+      {children}
+      <PendingActionsPill
+        pendingActions={pendingActions}
+        submittingActionId={submittingActionId}
+        onConfirmAction={handleConfirmAction}
+        onCancelAction={handleCancelAction}
+        bottomInset={insets.bottom}
+        visible={sheetVisible}
+        onOpenChange={setSheetVisible}
+        showFloatingTrigger={false}
+      />
+    </PendingActionsOverlayContext.Provider>
   );
+}
+
+export function usePendingActionsOverlay() {
+  const context = useContext(PendingActionsOverlayContext);
+
+  if (!context) {
+    return {
+      hasActivityAccess: false,
+      pendingActions: [],
+      pendingActionsCount: 0,
+      submittingActionId: '',
+      sheetVisible: false,
+      openSheet: () => {},
+      closeSheet: () => {},
+      toggleSheet: () => {}
+    };
+  }
+
+  return context;
 }

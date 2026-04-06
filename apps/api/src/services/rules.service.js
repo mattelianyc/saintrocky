@@ -37,7 +37,8 @@ import {
   saveUserRule
 } from './rule-runtime-store.service.js';
 import { publishEvent, publishSnapshot } from './realtime.service.js';
-import { listPendingRuleChangeRequestsByRuleId } from './override.service.js';
+import { listActiveOverridesByRuleId, listPendingRuleChangeRequestsByRuleId } from './override.service.js';
+import { listUserWalletAddresses, resolveBrowserRuleEnforcementState } from './chain-rule-enforcement.service.js';
 
 function buildValidationError(message, validation) {
   const error = new Error(message);
@@ -246,13 +247,33 @@ async function attachRuleRuntimeSnapshot(userRule, options = {}) {
       override: null,
       deactivation: null
     };
+  const activeOverride = options.activeOverridesByRuleId?.[resolvedRule.ruleId] || null;
+  const enforcementState = options.enforcementStatesByRuleId?.[resolvedRule.ruleId] || null;
 
   return {
     ...resolvedRule,
     statusLabel: RULE_USER_RULE_STATUS_LABELS[resolvedRule.status] || resolvedRule.status,
     latestRuntimeEvent: latestEvent,
-    pendingRuleChangeRequests
+    pendingRuleChangeRequests,
+    activeOverride,
+    enforcementState
   };
+}
+
+async function buildEnforcementStatesByRuleId(rules = [], ownerUserId = '') {
+  if (!Array.isArray(rules) || rules.length === 0 || !ownerUserId) {
+    return {};
+  }
+
+  const walletAddresses = await listUserWalletAddresses(ownerUserId);
+  const enforcementEntries = await Promise.all(
+    rules.map(async (rule) => [
+      rule.ruleId,
+      await resolveBrowserRuleEnforcementState(rule, walletAddresses)
+    ])
+  );
+
+  return Object.fromEntries(enforcementEntries);
 }
 
 export async function publishOwnerRuleState(ownerUserId, ownerEmail, eventName, payload = {}) {
@@ -260,8 +281,14 @@ export async function publishOwnerRuleState(ownerUserId, ownerEmail, eventName, 
   const pendingRequestsByRuleId = await listPendingRuleChangeRequestsByRuleId(
     storedRules.map((rule) => rule.ruleId)
   );
+  const activeOverridesByRuleId = await listActiveOverridesByRuleId(
+    storedRules.map((rule) => rule.ruleId)
+  );
+  const enforcementStatesByRuleId = await buildEnforcementStatesByRuleId(storedRules, ownerUserId);
   const rules = await Promise.all(
-    storedRules.map((rule) => attachRuleRuntimeSnapshot(rule, { pendingRequestsByRuleId }))
+    storedRules.map((rule) =>
+      attachRuleRuntimeSnapshot(rule, { pendingRequestsByRuleId, activeOverridesByRuleId, enforcementStatesByRuleId })
+    )
   );
   const drafts = await listStoredRuleDrafts({ authorUserId: ownerUserId });
   const activeRules = rules.filter((rule) => rule.status === 'active');
@@ -282,7 +309,8 @@ export async function publishOwnerRuleState(ownerUserId, ownerEmail, eventName, 
         ruleId: rule.ruleId,
         ownerUserId: rule.ownerUserId,
         ownerEmail: rule.ownerEmail,
-        compiledRule: rule.compiledRule
+        compiledRule: rule.compiledRule,
+        enforcementState: rule.enforcementState || null
       }));
 
     if (assignments.length > 0) {
@@ -372,8 +400,14 @@ export async function listUserRules(payload = {}) {
   const pendingRequestsByRuleId = await listPendingRuleChangeRequestsByRuleId(
     storedRules.map((rule) => rule.ruleId)
   );
+  const activeOverridesByRuleId = await listActiveOverridesByRuleId(
+    storedRules.map((rule) => rule.ruleId)
+  );
+  const enforcementStatesByRuleId = await buildEnforcementStatesByRuleId(storedRules, owner.id);
   const rules = await Promise.all(
-    storedRules.map((rule) => attachRuleRuntimeSnapshot(rule, { pendingRequestsByRuleId }))
+    storedRules.map((rule) =>
+      attachRuleRuntimeSnapshot(rule, { pendingRequestsByRuleId, activeOverridesByRuleId, enforcementStatesByRuleId })
+    )
   );
   const drafts = await listStoredRuleDrafts({ authorUserId: owner.id });
   const owners = await listManageableRuleOwners(actor);
@@ -416,7 +450,9 @@ export async function createUserRuleFromTemplate(payload = {}) {
     ok: true,
     owner: author,
     rule: await attachRuleRuntimeSnapshot(userRule, {
-      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([userRule.ruleId])
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([userRule.ruleId]),
+      activeOverridesByRuleId: await listActiveOverridesByRuleId([userRule.ruleId]),
+      enforcementStatesByRuleId: await buildEnforcementStatesByRuleId([userRule], author.id)
     })
   };
 }
@@ -454,7 +490,9 @@ export async function publishRuleDraft(payload = {}) {
     ok: true,
     owner: author,
     rule: await attachRuleRuntimeSnapshot(userRule, {
-      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([userRule.ruleId])
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([userRule.ruleId]),
+      activeOverridesByRuleId: await listActiveOverridesByRuleId([userRule.ruleId]),
+      enforcementStatesByRuleId: await buildEnforcementStatesByRuleId([userRule], author.id)
     }),
     draft
   };
@@ -506,7 +544,9 @@ export async function updateUserRuleStatus(payload = {}) {
   return {
     ok: true,
     rule: await attachRuleRuntimeSnapshot(nextRule, {
-      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId])
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId]),
+      activeOverridesByRuleId: await listActiveOverridesByRuleId([nextRule.ruleId]),
+      enforcementStatesByRuleId: await buildEnforcementStatesByRuleId([nextRule], nextRule.ownerUserId)
     })
   };
 }
@@ -617,7 +657,9 @@ export async function editUserRule(payload = {}) {
     ok: true,
     editQuote: timingQuote,
     rule: await attachRuleRuntimeSnapshot(nextRule, {
-      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId])
+      pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId]),
+      activeOverridesByRuleId: await listActiveOverridesByRuleId([nextRule.ruleId]),
+      enforcementStatesByRuleId: await buildEnforcementStatesByRuleId([nextRule], nextRule.ownerUserId)
     })
   };
 }
@@ -628,6 +670,7 @@ export async function listRuntimeAssignments(payload = {}) {
   const owner = await resolveRequestedRuleOwner(actor, payload.ownerEmail);
   const storedRules = await listStoredUserRules({ ownerUserId: owner.id });
   const resolvedRules = await Promise.all(storedRules.map(materializeDueRuleEdit));
+  const enforcementStatesByRuleId = await buildEnforcementStatesByRuleId(resolvedRules, owner.id);
   const assignments = resolvedRules
     .filter(
       (rule) =>
@@ -641,7 +684,8 @@ export async function listRuntimeAssignments(payload = {}) {
       ruleId: rule.ruleId,
       ownerUserId: rule.ownerUserId,
       ownerEmail: rule.ownerEmail,
-      compiledRule: rule.compiledRule
+      compiledRule: rule.compiledRule,
+      enforcementState: enforcementStatesByRuleId[rule.ruleId] || null
     }));
 
   return {

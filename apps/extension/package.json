@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@saintrocky/api-client": "0.1.0",
+    "@saintrocky/enforcement": "0.1.0",
     "@saintrocky/fuckyoupayme": "0.1.0",
     "@saintrocky/realtime": "0.1.0",
     "@saintrocky/shared": "0.1.0"

@@ -18,6 +18,7 @@ const OverrideRequestSchema = new mongoose.Schema(
     freeAt: { type: String, required: true, index: true },
     status: { type: String, required: true, index: true, default: 'pending' },
     confirmedAt: { type: String, default: null },
+    overrideExpiresAt: { type: String, default: null, index: true },
     cancelledAt: { type: String, default: null },
     transactionSignature: { type: String, default: null },
     metadata: { type: Mixed, default: {} }

@@ -16,7 +16,8 @@ import {
   confirmRuleChangeRequest,
   getRuleChangeRequest,
   requestRuleDeactivation,
-  requestRuleOverride
+  requestRuleOverride,
+  settleMeteredViolationPenalty
 } from '../services/override.service.js';
 import { requireUser } from '../utils/auth.js';
 
@@ -246,6 +247,16 @@ export async function listRuntimeAssignmentsController(req, res) {
 export async function reportRuntimeEventController(req, res) {
   try {
     return res.status(201).json(await reportRuntimeEvent({ ...req.body, actor: await getActor(req) }));
+  } catch (error) {
+    return respondWithError(res, error);
+  }
+}
+
+export async function settleMeteredViolationPenaltyController(req, res) {
+  try {
+    return res.status(201).json(
+      await settleMeteredViolationPenalty({ ...req.body, actor: await getActor(req), ruleId: req.params.id })
+    );
   } catch (error) {
     return respondWithError(res, error);
   }

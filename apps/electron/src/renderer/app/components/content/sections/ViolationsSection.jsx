@@ -1,7 +1,8 @@
-import { Button, Card, RuleChangeRequestCard } from '@saintrocky/ui';
+import { Card } from '@saintrocky/ui';
+import { formatFeeSol, formatMeteredViolationRate } from '@saintrocky/fuckyoupayme';
 
-export function ViolationsSection({ runtimeHub, onViolationAction, onConfirmOverride, onCancelOverride }) {
-  const { pendingViolation, pendingOverrideRequest } = runtimeHub;
+export function ViolationsSection({ runtimeHub }) {
+  const meteredViolation = runtimeHub?.meteredViolation;
 
   return (
     <Card className="desktop-HubPanel">
@@ -11,35 +12,25 @@ export function ViolationsSection({ runtimeHub, onViolationAction, onConfirmOver
           <h2>Live rule hits</h2>
         </div>
       </div>
-      {pendingViolation ? (
+      {meteredViolation ? (
         <div className="desktop-ViolationCard">
-          <strong>{pendingViolation.title}</strong>
-          <p>{pendingViolation.summary}</p>
+          <strong>{meteredViolation.title}</strong>
+          <p>{meteredViolation.summary}</p>
           <span className="desktop-HubMeta">
-            Matched targets: {pendingViolation.matchedTargets.join(', ') || 'Unknown'}
+            Matched targets: {meteredViolation.matchedTargets.join(', ') || 'Unknown'}
           </span>
-          {pendingOverrideRequest ? (
-            <RuleChangeRequestCard
-              title="Override rule"
-              pendingRequest={pendingOverrideRequest}
-              problemIndex={pendingOverrideRequest.problemIndex ?? 50}
-              lockedStakeLamports={pendingOverrideRequest.lockedStakeLamports ?? 0}
-              onConfirmRequest={onConfirmOverride}
-              onCancelRequest={onCancelOverride}
-            />
-          ) : (
-            <div className="desktop-HubActions">
-              <Button variant="secondary" onClick={() => onViolationAction('comply')}>
-                Stay blocked
-              </Button>
-              <Button onClick={() => onViolationAction('pay_to_bypass')}>
-                Start override countdown
-              </Button>
-            </div>
-          )}
+          <span className="desktop-HubMeta">
+            Status: {meteredViolation.status === 'grace_period' ? 'Grace period' : 'Meter running'}
+          </span>
+          <span className="desktop-HubMeta">
+            Running total: {formatFeeSol(meteredViolation.accruedLamports || 0)}
+          </span>
+          <span className="desktop-HubMeta">
+            Rate: {formatMeteredViolationRate(meteredViolation.ratePerSecondLamports || 0)}
+          </span>
         </div>
       ) : (
-        <p className="desktop-HubEmpty">No pending violations. The runtime is monitoring desktop and chain signals.</p>
+        <p className="desktop-HubEmpty">No active metered violations. The runtime is monitoring desktop and chain signals.</p>
       )}
     </Card>
   );

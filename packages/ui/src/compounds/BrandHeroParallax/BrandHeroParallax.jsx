@@ -9,10 +9,6 @@ import {
   HERO_BLACK_PANEL_FINAL_SPLIT_COVERAGE,
   HERO_DOG_IMAGE_SRC,
   HERO_DOG_REVEAL_END_PROGRESS,
-  HERO_DOG_REVEAL_START_PROGRESS,
-  HERO_TREE_IMAGE_SRC,
-  HERO_TREE_REVEAL_END_PROGRESS,
-  HERO_TREE_REVEAL_START_PROGRESS,
   HERO_INTRO_LINES,
   HERO_INTRO_REVEAL_END_PROGRESS,
   HERO_INTRO_REVEAL_START_PROGRESS,
@@ -31,7 +27,6 @@ import {
   HERO_MEDIA_SETTLE_DURATION,
   HERO_OVERLAY_COVER_PROGRESS,
   HERO_REVEAL_DELAY_MS,
-  HERO_VIDEO_FADE_OUT_PROGRESS,
   OUTRO_SCROLL_DISTANCE_FACTOR,
   REVENUE_SCROLL_EXTENSION_FACTOR,
   REVENUE_REVEAL_START,
@@ -57,6 +52,37 @@ export function BrandHeroParallax({
   const [viewportHeight, setViewportHeight] = useState(900);
   const [isHeroRevealReady, setIsHeroRevealReady] = useState(Boolean(prefersReducedMotion));
   const brandWords = heroWordmark.split(" ");
+  const compactWordmarkCharacters = heroWordmark.replaceAll(" ", "").split("");
+  const leadingAccentCharacterIndex = compactWordmarkCharacters.indexOf("$");
+  const trailingAccentCharacterIndex = compactWordmarkCharacters.lastIndexOf("$");
+  const wordmarkFadeProgress = clamp(scrollProgress / 0.16, 0, 1);
+  const wordmarkPanelOpacity = isHeroRevealReady ? 1 - wordmarkFadeProgress : 0;
+  const loadOverlayOpacity = isHeroRevealReady ? 1 - wordmarkFadeProgress : 1;
+  const wordmarkTextBlendPercentage = Math.round(clamp(wordmarkFadeProgress * 100, 0, 100));
+  const wordmarkPrimaryColor = `color-mix(in srgb, var(--ui-dark-fg) ${
+    100 - wordmarkTextBlendPercentage
+  }%, var(--ui-shell-text) ${wordmarkTextBlendPercentage}%)`;
+  const stencilPanelOpacity = isHeroRevealReady ? 1 : 0;
+
+  function getCharacterClassName(innerClassName, character, index) {
+    const classNames = [innerClassName];
+
+    if (character === "$") {
+      if (index === leadingAccentCharacterIndex) {
+        classNames.push("c-BrandHeroParallax__characterInner--accentLeading");
+      }
+
+      if (index === trailingAccentCharacterIndex) {
+        classNames.push("c-BrandHeroParallax__characterInner--accentTrailing");
+      }
+    }
+
+    if (character === "/") {
+      classNames.push("c-BrandHeroParallax__characterInner--divider");
+    }
+
+    return classNames.join(" ");
+  }
 
   useEffect(() => {
     const heroMediaElement = heroMediaReference.current;
@@ -135,7 +161,6 @@ export function BrandHeroParallax({
   const shouldReduceMotion = Boolean(prefersReducedMotion);
   const isMobileViewport = viewportWidth < 640;
   const isTabletViewport = viewportWidth >= 640 && viewportWidth < 1024;
-  const heroVideoOpacity = 1 - clamp(scrollProgress / HERO_VIDEO_FADE_OUT_PROGRESS, 0, 1);
   const overlayCoverProgress = clamp(scrollProgress / HERO_OVERLAY_COVER_PROGRESS, 0, 1);
   const panelProgress = Math.sin((overlayCoverProgress * Math.PI) / 2);
   let blackPanelClipPath;
@@ -161,22 +186,6 @@ export function BrandHeroParallax({
       initialTipYCoverage + (100 - initialTipYCoverage) * panelProgress;
     blackPanelClipPath = `polygon(0 0, ${topRightXCoverage}% ${topRightYCoverage}%, ${bottomRightXCoverage}% ${bottomRightYCoverage}%, 0 100%)`;
   }
-  const dogRevealProgress = shouldReduceMotion
-    ? 1
-    : clamp(
-        (panelProgress - HERO_DOG_REVEAL_START_PROGRESS) /
-          (HERO_DOG_REVEAL_END_PROGRESS - HERO_DOG_REVEAL_START_PROGRESS),
-        0,
-        1
-      );
-  const treeRevealProgress = shouldReduceMotion
-    ? 1
-    : clamp(
-        (panelProgress - HERO_TREE_REVEAL_START_PROGRESS) /
-          (HERO_TREE_REVEAL_END_PROGRESS - HERO_TREE_REVEAL_START_PROGRESS),
-        0,
-        1
-      );
   const introRevealProgress = shouldReduceMotion
     ? 1
     : clamp(
@@ -185,8 +194,15 @@ export function BrandHeroParallax({
         0,
         1
       );
+  const roccoWalkProgress = shouldReduceMotion
+    ? 1
+    : clamp((panelProgress - 0.28) / (0.62 - 0.28), 0, 1);
+  const isRoccoWalking = !shouldReduceMotion && roccoWalkProgress > 0 && roccoWalkProgress < 1;
   const overviewRevealProgress = shouldReduceMotion ? 1 : clamp((scrollProgress - 0.68) / 0.32, 0, 1);
-  const dogStageOpacity = Math.max(dogRevealProgress * (1 - overviewRevealProgress * 1.3), 0);
+  const heroVideoOpacity = shouldReduceMotion ? 1 : 1 - overviewRevealProgress;
+  const introMediaVeilOpacity = shouldReduceMotion
+    ? 0.22
+    : clamp(0.08 + introRevealProgress * 0.22 - overviewRevealProgress * 0.3, 0, 0.3);
 
   let overviewDoorClipPath;
 
@@ -299,7 +315,7 @@ export function BrandHeroParallax({
             }}
             transition={{ duration: 0.08, ease: "linear" }}
           >
-            <span className={innerClassName}>{character}</span>
+            <span className={getCharacterClassName(innerClassName, character, index)}>{character}</span>
           </motion.span>
         );
       });
@@ -339,7 +355,7 @@ export function BrandHeroParallax({
     <div
       ref={heroContainerReference}
       id="marketing-hero-section"
-      className="c-BrandHeroParallax"
+      className={`c-BrandHeroParallax ${isHeroRevealReady ? "c-BrandHeroParallax--heroRevealReady" : ""}`}
     >
       <div className="c-BrandHeroParallax__viewport">
         <section className="c-BrandHeroParallax__section" aria-label={`${heroWordmark} hero`}>
@@ -364,7 +380,7 @@ export function BrandHeroParallax({
                     }
               }
               transition={{
-                opacity: { duration: 0.28, ease: "linear" },
+                opacity: { duration: 0.18, ease: "linear" },
                 scale: {
                   duration: shouldReduceMotion ? 0 : HERO_MEDIA_SETTLE_DURATION,
                   ease: [0.16, 1, 0.3, 1]
@@ -374,39 +390,42 @@ export function BrandHeroParallax({
           </div>
 
           <motion.div
-            className="c-BrandHeroParallax__dogStage"
+            aria-hidden="true"
+            className="c-BrandHeroParallax__loadOverlay"
             initial={false}
-            animate={{ opacity: dogStageOpacity }}
+            animate={{ opacity: loadOverlayOpacity }}
+            transition={{ duration: shouldReduceMotion ? 0.12 : 0.16, ease: "linear" }}
+          />
+
+          <motion.div
+            aria-hidden="true"
+            className="c-BrandHeroParallax__introMediaVeil"
+            initial={false}
+            animate={{ opacity: introMediaVeilOpacity }}
             transition={{ duration: 0.18, ease: "linear" }}
+          />
+
+          <motion.div
+            aria-hidden="true"
+            className={`c-BrandHeroParallax__introDog ${isRoccoWalking ? "c-BrandHeroParallax__introDog--walking" : ""}`}
+            initial={false}
+            animate={
+              shouldReduceMotion
+                ? { opacity: 1, x: 0, y: 0, scaleX: -1 }
+                : {
+                    opacity: clamp(roccoWalkProgress / 0.15, 0, 1),
+                    x: `${(1 - roccoWalkProgress) * 120}%`,
+                    y: `${(1 - roccoWalkProgress) * 2}%`,
+                    scaleX: -1
+                  }
+            }
+            transition={{ duration: 0.08, ease: "linear" }}
           >
-            <motion.div
-              className="c-BrandHeroParallax__treeReveal"
-              initial={false}
-              animate={{
-                opacity: treeRevealProgress,
-                clipPath: `inset(${(1 - treeRevealProgress) * 100}% 0 0 0 round 0)`,
-                scale: 0.9 + treeRevealProgress * 0.1,
-                y: `${(1 - treeRevealProgress) * 10}%`
-              }}
-              transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <img
-                src={HERO_TREE_IMAGE_SRC}
-                alt=""
-                aria-hidden="true"
-                className="c-BrandHeroParallax__treeImage"
-              />
-            </motion.div>
-            <motion.img
+            <img
               src={HERO_DOG_IMAGE_SRC}
               alt=""
               aria-hidden="true"
-              className="c-BrandHeroParallax__dogImage"
-              initial={false}
-              animate={{
-                y: `${(1 - dogRevealProgress) * 100}%`
-              }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="c-BrandHeroParallax__introDogImage"
             />
           </motion.div>
 
@@ -420,9 +439,9 @@ export function BrandHeroParallax({
               }
               animate={
                 shouldReduceMotion
-                  ? { opacity: isHeroRevealReady ? 1 : 0 }
+                  ? { opacity: wordmarkPanelOpacity }
                   : {
-                      opacity: isHeroRevealReady ? 1 : 0,
+                      opacity: wordmarkPanelOpacity,
                       y: isHeroRevealReady ? 0 : 28,
                       filter: isHeroRevealReady ? "blur(0px)" : `blur(${HERO_CONTENT_BLUR_AMOUNT}px)`
                     }
@@ -448,6 +467,7 @@ export function BrandHeroParallax({
               <h1
                 aria-label={heroWordmark}
                 className="c-BrandHeroParallax__wordmark c-BrandHeroParallax__wordmarkPrimary"
+                style={{ color: wordmarkPrimaryColor }}
               >
                 {renderWordmarkCharacters("c-BrandHeroParallax__characterInner")}
               </h1>
@@ -463,9 +483,9 @@ export function BrandHeroParallax({
               }
               animate={
                 shouldReduceMotion
-                  ? { opacity: isHeroRevealReady ? 1 : 0, clipPath: blackPanelClipPath }
+                  ? { opacity: stencilPanelOpacity, clipPath: blackPanelClipPath }
                   : {
-                      opacity: isHeroRevealReady ? 1 : 0,
+                      opacity: stencilPanelOpacity,
                       y: isHeroRevealReady ? 0 : 28,
                       filter: isHeroRevealReady ? "blur(0px)" : `blur(${HERO_CONTENT_BLUR_AMOUNT}px)`,
                       clipPath: blackPanelClipPath
@@ -562,23 +582,6 @@ export function BrandHeroParallax({
               }}
               transition={{ duration: 0.08, ease: "linear" }}
             />
-            <motion.img
-              src={HERO_DOG_IMAGE_SRC}
-              alt=""
-              aria-hidden="true"
-              className="c-BrandHeroParallax__leaderboardDog"
-              initial={false}
-              animate={
-                shouldReduceMotion
-                  ? { x: 0, y: 0, scaleX: -1 }
-                  : {
-                      x: `${(1 - overviewRevealProgress) * 80}%`,
-                      y: `${(1 - overviewRevealProgress) * 4}%`,
-                      scaleX: -1
-                    }
-              }
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            />
             <BrandHeroParallaxOverview />
 
             <motion.div
@@ -660,6 +663,7 @@ export function BrandHeroParallax({
               </motion.p>
             </motion.div>
           </motion.div>
+
         </section>
       </div>
       <div

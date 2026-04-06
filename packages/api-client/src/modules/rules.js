@@ -87,6 +87,10 @@ export function createRulesClient(httpClient) {
     async reportRuntimeEvent(payload) {
       const response = await httpClient.post('/v1/rules/runtime/events', payload);
       return response.data;
+    },
+    async settleMeteredPenalty(ruleId, payload = {}) {
+      const response = await httpClient.post(`/v1/rules/${ruleId}/metered-penalty`, payload);
+      return response.data;
     }
   };
 }

@@ -199,6 +199,27 @@
   display: inline-block;
 }
 
+.c-BrandHeroReprisal__characterInner--accentLeading,
+.c-BrandHeroReprisal__stencilCharacterInner--accentLeading,
+.c-BrandHeroReprisal__baseCharacterInner--accentLeading,
+.c-BrandHeroReprisal__footerWordmarkCharacterInner.c-BrandHeroReprisal__characterInner--accentLeading {
+  color: var(--ui-shell-accent-strong);
+}
+
+.c-BrandHeroReprisal__characterInner--accentTrailing,
+.c-BrandHeroReprisal__stencilCharacterInner--accentTrailing,
+.c-BrandHeroReprisal__baseCharacterInner--accentTrailing,
+.c-BrandHeroReprisal__footerWordmarkCharacterInner.c-BrandHeroReprisal__characterInner--accentTrailing {
+  color: var(--ui-mint);
+}
+
+.c-BrandHeroReprisal__characterInner--divider,
+.c-BrandHeroReprisal__stencilCharacterInner--divider,
+.c-BrandHeroReprisal__baseCharacterInner--divider,
+.c-BrandHeroReprisal__footerWordmarkCharacterInner.c-BrandHeroReprisal__characterInner--divider {
+  color: var(--ui-shell-brand-divider);
+}
+
 .c-BrandHeroReprisal__terminal {
   position: absolute;
   right: clamp(1.5rem, 4vw, 3rem);

@@ -7,6 +7,8 @@ export function formatMonitorLabel(status) {
     {
       idle: 'Idle',
       armed: 'Armed',
+      gracePeriod: 'Grace period',
+      meterRunning: 'Meter running',
       awaitingBypassDecision: 'Violation pending',
       overrideCountdown: 'Override countdown',
       overrideActive: 'Override active',

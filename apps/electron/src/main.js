@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { app, BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage, nativeTheme, shell } from 'electron';
+import { app, BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage, nativeTheme, screen, shell } from 'electron';
 
 import { clearStoredDesktopAuthState, loadStoredDesktopAuthState, saveStoredDesktopAuthState } from './auth-store.js';
 import { desktopRuntimeModels } from './runtime-models.js';
@@ -25,6 +25,10 @@ const rendererDevelopmentUrl = process.env.ELECTRON_RENDERER_URL || '';
 const trayTooltipBase = 'Saint Rocky Desktop Runtime';
 let tray = null;
 let isQuitting = false;
+let dockBounceId = 0;
+let alwaysOnTopResetTimer = null;
+let meterOverlayWindow = null;
+let latestMeterOverlayState = null;
 let nativeRuntimeState = {
   monitorStatus: 'idle',
   pendingViolationCount: 0,
@@ -45,6 +49,10 @@ function getPreloadPath() {
 
 function getRendererBuildHtmlPath() {
   return path.join(currentDirectoryPath, '..', 'dist-renderer', 'index.html');
+}
+
+function getMeterOverlayHtmlPath() {
+  return path.join(currentDirectoryPath, 'renderer', 'meter-overlay', 'index.html');
 }
 
 function getTrayIconPath() {
@@ -88,6 +96,135 @@ function showMainWindow() {
   }
 
   mainWindow.focus();
+}
+
+function buildMeterOverlayBounds() {
+  const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+  const { workArea } = display;
+  const width = 360;
+  const height = 200;
+  const horizontalMargin = 24;
+  const verticalMargin = 48;
+
+  return {
+    width,
+    height,
+    x: Math.max(workArea.x, Math.round(workArea.x + workArea.width - width - horizontalMargin)),
+    y: Math.max(workArea.y, Math.round(workArea.y + verticalMargin))
+  };
+}
+
+function sendMeterOverlayState(payload = null) {
+  if (!meterOverlayWindow || meterOverlayWindow.isDestroyed()) {
+    return;
+  }
+
+  meterOverlayWindow.webContents.send('desktop-runtime:meter-overlay-state', payload);
+}
+
+function closeMeterOverlayWindow() {
+  latestMeterOverlayState = null;
+  if (!meterOverlayWindow || meterOverlayWindow.isDestroyed()) {
+    meterOverlayWindow = null;
+    return;
+  }
+
+  meterOverlayWindow.destroy();
+  meterOverlayWindow = null;
+}
+
+function showMeterOverlayWindow(overlayWindow) {
+  if (!overlayWindow || overlayWindow.isDestroyed()) {
+    return;
+  }
+
+  overlayWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+  overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  overlayWindow.show();
+  overlayWindow.moveTop();
+}
+
+function ensureMeterOverlayWindow() {
+  if (meterOverlayWindow && !meterOverlayWindow.isDestroyed()) {
+    return meterOverlayWindow;
+  }
+
+  const bounds = buildMeterOverlayBounds();
+  meterOverlayWindow = new BrowserWindow({
+    ...bounds,
+    show: false,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    focusable: false,
+    hasShadow: true,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      preload: getPreloadPath(),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+      webSecurity: true,
+      partition: desktopPartition
+    }
+  });
+
+  meterOverlayWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+  meterOverlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  meterOverlayWindow.setIgnoreMouseEvents(true);
+
+  meterOverlayWindow.once('ready-to-show', () => {
+    if (meterOverlayWindow && !meterOverlayWindow.isDestroyed()) {
+      showMeterOverlayWindow(meterOverlayWindow);
+      sendMeterOverlayState(latestMeterOverlayState);
+    }
+  });
+
+  meterOverlayWindow.on('closed', () => {
+    meterOverlayWindow = null;
+  });
+
+  meterOverlayWindow.loadFile(getMeterOverlayHtmlPath());
+  return meterOverlayWindow;
+}
+
+function syncMeterOverlayWindow(payload = null) {
+  latestMeterOverlayState = payload || null;
+
+  if (!payload) {
+    closeMeterOverlayWindow();
+    return;
+  }
+
+  const overlayWindow = ensureMeterOverlayWindow();
+  const bounds = buildMeterOverlayBounds();
+  overlayWindow.setBounds(bounds);
+  showMeterOverlayWindow(overlayWindow);
+  sendMeterOverlayState(payload);
+}
+
+function clearAttentionSignals() {
+  if (alwaysOnTopResetTimer) {
+    clearTimeout(alwaysOnTopResetTimer);
+    alwaysOnTopResetTimer = null;
+  }
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.flashFrame(false);
+    if (mainWindow.isAlwaysOnTop()) {
+      mainWindow.setAlwaysOnTop(false);
+    }
+  }
+
+  if (process.platform === 'darwin' && app.dock && dockBounceId) {
+    app.dock.cancelBounce(dockBounceId);
+    dockBounceId = 0;
+  }
 }
 
 function updateTrayMenu() {
@@ -174,6 +311,10 @@ function createMainWindow() {
     window.show();
     broadcastToRenderer('desktop-theme:state', buildDesktopThemeState());
     broadcastToRenderer('desktop-updater:state', getUpdaterState());
+  });
+
+  window.on('focus', () => {
+    clearAttentionSignals();
   });
 
   window.on('close', (event) => {
@@ -274,6 +415,41 @@ ipcMain.handle('desktop-runtime:show-notification', async (_event, payload = {})
   return { ok: true };
 });
 
+ipcMain.handle('desktop-runtime:request-attention', async (_event, payload = {}) => {
+  showMainWindow();
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.flashFrame(true);
+
+    if (payload.pinOnTop) {
+      mainWindow.setAlwaysOnTop(true, 'screen-saver');
+      if (alwaysOnTopResetTimer) {
+        clearTimeout(alwaysOnTopResetTimer);
+      }
+      alwaysOnTopResetTimer = setTimeout(() => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.setAlwaysOnTop(false);
+        }
+        alwaysOnTopResetTimer = null;
+      }, 15_000);
+    }
+  }
+
+  if (process.platform === 'darwin' && app.dock) {
+    if (dockBounceId) {
+      app.dock.cancelBounce(dockBounceId);
+    }
+    dockBounceId = app.dock.bounce(payload.bounceType || 'critical');
+  }
+
+  return { ok: true };
+});
+
+ipcMain.handle('desktop-runtime:sync-meter-overlay', async (_event, payload = null) => {
+  syncMeterOverlayWindow(payload);
+  return { ok: true };
+});
+
 ipcMain.handle('desktop-auth:get-state', async () => {
   desktopAuthState = loadStoredDesktopAuthState();
   return desktopAuthState;
@@ -327,6 +503,7 @@ ipcMain.handle('desktop-updater:install', async () => {
 
 app.on('before-quit', () => {
   isQuitting = true;
+  closeMeterOverlayWindow();
 });
 
 app.on('window-all-closed', () => {

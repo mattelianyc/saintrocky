@@ -6,8 +6,12 @@ import { isScheduleActive } from '@saintrocky/shared';
 import { ChainTrade } from '../models/chain-trade.model.js';
 import { WalletLink } from '../models/wallet-link.model.js';
 import { UserRule } from '../models/user-rule.model.js';
-import { publishSnapshot } from './realtime.service.js';
-import { buildRulesChannel } from '@saintrocky/realtime';
+import {
+  getTodaySellVolumeForWalletAddresses,
+  getTodayTradeCountForWalletAddresses,
+  listUserWalletAddresses
+} from './chain-rule-enforcement.service.js';
+import { publishOwnerRuleState } from './rules.service.js';
 
 export async function handleHeliusWebhook(payload) {
   if (!payload || (!Array.isArray(payload) && typeof payload !== 'object')) return [];
@@ -41,10 +45,11 @@ async function processChainTrade(trade, walletLink) {
     status: 'active',
     'compiledRule.chainConstraints': { $ne: null }
   }).lean();
+  const walletAddresses = await listUserWalletAddresses(walletLink.userId);
 
   const violations = [];
   for (const rule of activeRules) {
-    const result = evaluateChainConstraint(rule, trade, walletLink);
+    const result = await evaluateChainConstraint(rule, trade, walletAddresses);
     if (result.violated) {
       violations.push({
         violationId: randomUUID(),
@@ -81,8 +86,7 @@ async function processChainTrade(trade, walletLink) {
   );
 
   if (violations.length > 0) {
-    publishSnapshot(buildRulesChannel(walletLink.userEmail), {
-      eventType: 'chain_violation_detected',
+    await publishOwnerRuleState(walletLink.userId, walletLink.userEmail, 'chain_violation_detected', {
       violations,
       trade: {
         signature: trade.signature,
@@ -97,7 +101,7 @@ async function processChainTrade(trade, walletLink) {
   return { trade: chainTrade.toObject(), violations };
 }
 
-function evaluateChainConstraint(rule, trade, walletLink) {
+async function evaluateChainConstraint(rule, trade, walletAddresses = []) {
   const constraints = rule.compiledRule?.chainConstraints;
   if (!constraints?.type) return { violated: false };
 
@@ -107,11 +111,11 @@ function evaluateChainConstraint(rule, trade, walletLink) {
 
   switch (constraints.type) {
     case 'max_trades_per_day':
-      return evaluateMaxTradesPerDay(constraints, trade, walletLink);
+      return evaluateMaxTradesPerDay(constraints, trade, walletAddresses);
     case 'max_position_size':
       return evaluateMaxPositionSize(constraints, trade);
     case 'max_daily_loss':
-      return evaluateMaxDailyLoss(constraints, trade, walletLink);
+      return evaluateMaxDailyLoss(constraints, trade, walletAddresses);
     case 'blocked_tokens':
       return evaluateBlockedTokens(constraints, trade);
     case 'schedule_violation':
@@ -121,15 +125,8 @@ function evaluateChainConstraint(rule, trade, walletLink) {
   }
 }
 
-async function evaluateMaxTradesPerDay(constraints, trade, walletLink) {
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const todayTradeCount = await ChainTrade.countDocuments({
-    walletAddress: walletLink.walletAddress,
-    timestamp: { $gte: startOfDay }
-  });
-
+async function evaluateMaxTradesPerDay(constraints, trade, walletAddresses = []) {
+  const todayTradeCount = await getTodayTradeCountForWalletAddresses(walletAddresses);
   const maxTrades = constraints.maxTrades || 5;
   if (todayTradeCount >= maxTrades) {
     return {
@@ -151,17 +148,8 @@ function evaluateMaxPositionSize(constraints, trade) {
   return { violated: false };
 }
 
-async function evaluateMaxDailyLoss(constraints, trade, walletLink) {
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const todayTrades = await ChainTrade.find({
-    walletAddress: walletLink.walletAddress,
-    timestamp: { $gte: startOfDay },
-    direction: 'sell'
-  }).lean();
-
-  const totalLoss = todayTrades.reduce((sum, pastTrade) => sum + pastTrade.solAmount, 0);
+async function evaluateMaxDailyLoss(constraints, trade, walletAddresses = []) {
+  const totalLoss = await getTodaySellVolumeForWalletAddresses(walletAddresses);
   const maxLoss = constraints.maxDailyLossSol || 5;
 
   if (trade.direction === 'sell' && totalLoss + trade.solAmount > maxLoss) {

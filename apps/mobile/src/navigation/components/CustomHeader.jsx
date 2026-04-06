@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { IconButton, Badge, useTheme } from '@saintrocky/ui-native';
-import { useNotificationContext } from '@/context/NotificationContext.jsx';
 import { TopNavBranding } from '@/components/TopNavBranding/TopNavBranding.jsx';
+import { usePendingActionsOverlay } from '@/components/PendingActionsOverlay/PendingActionsOverlay.jsx';
 
 export function CustomHeader({
   centerTitle,
@@ -16,7 +16,8 @@ export function CustomHeader({
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const { unreadCount, toggleSheet } = useNotificationContext();
+  const { hasActivityAccess, pendingActionsCount, toggleSheet } = usePendingActionsOverlay();
+  const hasCenteredCopy = Boolean(centerTitle || centerSubtitle);
 
   const handleLeftPress = () => {
     if (canGoBack) {
@@ -27,6 +28,7 @@ export function CustomHeader({
   };
 
   const leftIconName = canGoBack ? 'arrowLeft' : 'menu';
+  const activityAccessibilityLabel = `Live activity${pendingActionsCount > 0 ? `, ${pendingActionsCount} pending` : ''}`;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -42,28 +44,33 @@ export function CustomHeader({
           />
         </View>
 
-        <View style={styles.centerSlot} pointerEvents="none">
+        <View style={styles.centerSlot}>
           <TopNavBranding
             title={centerTitle}
             subtitle={centerSubtitle}
+            onPress={!hasCenteredCopy && hasActivityAccess ? toggleSheet : undefined}
           />
         </View>
 
         <View style={styles.sideSlot}>
-          <IconButton
-            name="notifications"
-            size={22}
-            color={theme.colors.foreground}
-            onPress={toggleSheet}
-            accessibilityLabel={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-          />
-          {unreadCount > 0 && (
-            <View style={styles.badgeContainer}>
-              <Badge variant="error" size="xs">
-                {unreadCount > 99 ? '99+' : String(unreadCount)}
-              </Badge>
-            </View>
-          )}
+          {hasActivityAccess ? (
+            <>
+              <IconButton
+                name="schedule"
+                size={22}
+                color={theme.colors.foreground}
+                onPress={toggleSheet}
+                accessibilityLabel={activityAccessibilityLabel}
+              />
+              {pendingActionsCount > 0 && (
+                <View style={styles.badgeContainer}>
+                  <Badge variant="error" size="xs">
+                    {pendingActionsCount > 99 ? '99+' : String(pendingActionsCount)}
+                  </Badge>
+                </View>
+              )}
+            </>
+          ) : null}
         </View>
       </View>
     </View>

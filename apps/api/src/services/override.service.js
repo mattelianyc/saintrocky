@@ -4,8 +4,10 @@ import {
   calculateLockedStake,
   calculateOverrideFee,
   clampProblemIndex,
+  FREE_OVERRIDE_AFTER_HOURS,
   WITHDRAWAL_COOLDOWN_HOURS
 } from '@saintrocky/fuckyoupayme';
+import { getScheduleWindowEndTime } from '@saintrocky/enforcement';
 
 import { OverrideRequest } from '../models/override-request.model.js';
 import { WalletLink } from '../models/wallet-link.model.js';
@@ -42,6 +44,7 @@ function serializeRequest(request, quote) {
     freeAt: request.freeAt,
     status: request.status,
     confirmedAt: request.confirmedAt,
+    overrideExpiresAt: request.overrideExpiresAt || null,
     cancelledAt: request.cancelledAt,
     transactionSignature: request.transactionSignature,
     metadata: request.metadata || {},
@@ -118,6 +121,20 @@ function buildQuoteFromRequest(request, now = new Date()) {
   });
 }
 
+function buildOverrideExpiryDate(schedule, confirmedAt = new Date()) {
+  const confirmedAtDate = confirmedAt instanceof Date ? confirmedAt : new Date(confirmedAt);
+  if (Number.isNaN(confirmedAtDate.getTime())) {
+    return null;
+  }
+
+  const scheduleWindowEndTime = getScheduleWindowEndTime(schedule, confirmedAtDate);
+  if (scheduleWindowEndTime instanceof Date && !Number.isNaN(scheduleWindowEndTime.getTime())) {
+    return scheduleWindowEndTime;
+  }
+
+  return new Date(confirmedAtDate.getTime() + FREE_OVERRIDE_AFTER_HOURS * 60 * 60 * 1000);
+}
+
 export async function listPendingRuleChangeRequestsByRuleId(ruleIds = []) {
   const normalizedRuleIds = Array.from(
     new Set(
@@ -153,6 +170,42 @@ export async function listPendingRuleChangeRequestsByRuleId(ruleIds = []) {
 
     requestsByRuleId[request.ruleId] = currentEntry;
     return requestsByRuleId;
+  }, {});
+}
+
+export async function listActiveOverridesByRuleId(ruleIds = [], now = new Date()) {
+  const normalizedRuleIds = Array.from(
+    new Set(
+      (Array.isArray(ruleIds) ? ruleIds : [])
+        .map((ruleId) => String(ruleId || '').trim())
+        .filter(Boolean)
+    )
+  );
+
+  if (!normalizedRuleIds.length) {
+    return {};
+  }
+
+  const nowIso = (now instanceof Date ? now : new Date(now)).toISOString();
+  const activeOverrides = await OverrideRequest.find({
+    ruleId: { $in: normalizedRuleIds },
+    requestKind: 'override',
+    status: 'confirmed',
+    overrideExpiresAt: { $gt: nowIso }
+  })
+    .sort({ confirmedAt: -1 })
+    .lean();
+
+  return activeOverrides.reduce((overridesByRuleId, request) => {
+    if (!overridesByRuleId[request.ruleId]) {
+      overridesByRuleId[request.ruleId] = {
+        requestId: request.requestId,
+        confirmedAt: request.confirmedAt || null,
+        overrideExpiresAt: request.overrideExpiresAt || null
+      };
+    }
+
+    return overridesByRuleId;
   }, {});
 }
 
@@ -360,6 +413,10 @@ export async function confirmRuleChangeRequest(payload = {}) {
 
   request.status = 'confirmed';
   request.confirmedAt = new Date().toISOString();
+  request.overrideExpiresAt =
+    request.requestKind === 'override'
+      ? buildOverrideExpiryDate(rule.compiledRule?.schedule, request.confirmedAt)?.toISOString() || null
+      : null;
   request.feeLamports = quote.feeLamports;
   request.transactionSignature = transactionSignature;
   await request.save();
@@ -414,5 +471,61 @@ export async function cancelRuleChangeRequest(payload = {}) {
   return {
     ok: true,
     request: serializeRequest(request.toObject(), buildQuoteFromRequest(request.toObject()))
+  };
+}
+
+export async function settleMeteredViolationPenalty(payload = {}) {
+  const { actor, rule } = await getRuleForActor(payload.ruleId, payload.actor);
+  const normalizedAmountLamports = Math.max(0, Math.round(Number(payload.amountLamports) || 0));
+  if (!payload.violationId) {
+    throw buildRequestError(400, 'BAD_REQUEST', 'violationId is required.');
+  }
+
+  if (normalizedAmountLamports <= 0) {
+    return {
+      ok: true,
+      ruleId: rule.ruleId,
+      violationId: String(payload.violationId),
+      amountLamports: 0,
+      transactionSignature: null,
+      meterStartedAt: payload.meterStartedAt || null,
+      meterEndedAt: payload.meterEndedAt || null,
+      matchedTargets: Array.isArray(payload.matchedTargets) ? payload.matchedTargets : []
+    };
+  }
+
+  if (!canManageMemberRules(actor) && rule.ownerEmail !== actor.email) {
+    throw buildRequestError(403, 'FORBIDDEN', 'Not allowed to settle this metered penalty.');
+  }
+
+  const chargeableWallet = await getLinkedWalletForRule(rule);
+  const penaltyResult = await recordPenaltyLamportsOnChain({
+    walletAddress: chargeableWallet.walletAddress,
+    violationId: String(payload.violationId),
+    amountLamports: normalizedAmountLamports
+  });
+
+  if (!penaltyResult?.transaction) {
+    throw buildRequestError(502, 'ON_CHAIN_PENALTY_FAILED', 'Failed to settle the metered penalty on-chain.');
+  }
+
+  await publishOwnerRuleState(rule.ownerUserId, rule.ownerEmail, 'metered_penalty_recorded', {
+    ruleId: rule.ruleId,
+    violationId: String(payload.violationId),
+    amountLamports: normalizedAmountLamports,
+    meterStartedAt: payload.meterStartedAt || null,
+    meterEndedAt: payload.meterEndedAt || null,
+    matchedTargets: Array.isArray(payload.matchedTargets) ? payload.matchedTargets : []
+  });
+
+  return {
+    ok: true,
+    ruleId: rule.ruleId,
+    violationId: String(payload.violationId),
+    amountLamports: normalizedAmountLamports,
+    transactionSignature: penaltyResult.transaction,
+    meterStartedAt: payload.meterStartedAt || null,
+    meterEndedAt: payload.meterEndedAt || null,
+    matchedTargets: Array.isArray(payload.matchedTargets) ? payload.matchedTargets : []
   };
 }

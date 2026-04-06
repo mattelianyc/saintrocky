@@ -94,6 +94,10 @@ export function showNativeNotification(payload) {
   return getDesktopBridge().showNativeNotification(payload);
 }
 
+export function requestNativeAttention(payload) {
+  return getDesktopBridge().requestNativeAttention(payload);
+}
+
 export function getOpenAtLogin() {
   return getDesktopBridge().getOpenAtLogin();
 }

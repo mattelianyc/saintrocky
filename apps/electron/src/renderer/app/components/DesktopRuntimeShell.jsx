@@ -1,8 +1,14 @@
-import { PendingActionsWidget, PageLayout, StatusBanner } from '@saintrocky/ui';
+import {
+  PendingActionsWidget,
+  PageLayout,
+  StatusBanner,
+  usePendingActionsWidgetMode
+} from '@saintrocky/ui';
 import { extractPendingActions } from '@saintrocky/shared';
 
 import { DesktopRuntimeContent } from './DesktopRuntimeContent.jsx';
 import { DesktopSidebar } from './DesktopSidebar.jsx';
+import { DesktopViolationOverlay } from './DesktopViolationOverlay.jsx';
 
 export function DesktopRuntimeShell({
   activePath,
@@ -27,11 +33,39 @@ export function DesktopRuntimeShell({
   onCancelOverride
 }) {
   const pendingActions = extractPendingActions(runtimeHub?.rules || []);
+  const {
+    availableViewModes,
+    isNarrowViewport,
+    responsiveViewMode,
+    setViewMode,
+    viewMode
+  } = usePendingActionsWidgetMode({
+    defaultViewMode: activeSectionId === 'home' ? 'full' : 'closed',
+    preferredViewMode: activeSectionId === 'home' ? 'full' : 'closed',
+    storageKey: 'electron-live-activity-view-mode'
+  });
+  const isDockedMode = responsiveViewMode === 'rail' || responsiveViewMode === 'full';
+  const widget = (
+    <PendingActionsWidget
+      pendingActions={pendingActions}
+      meteredViolation={runtimeHub?.meteredViolation}
+      submittingActionId={pendingActionSubmittingId}
+      viewMode={viewMode}
+      responsiveViewMode={responsiveViewMode}
+      availableViewModes={availableViewModes}
+      isNarrowViewport={isNarrowViewport}
+      expandViewMode={activeSectionId === 'home' ? 'full' : 'floating'}
+      onViewModeChange={setViewMode}
+      onConfirmAction={onPendingActionConfirm}
+      onCancelAction={onPendingActionCancel}
+    />
+  );
 
   return (
     <div className="desktop-App">
       <PageLayout
         className="desktop-Layout"
+        mainClassName={responsiveViewMode === 'full' ? 'c-PageLayout__main--hidden' : ''}
         sidebar={
           <DesktopSidebar
             activePath={activePath}
@@ -40,6 +74,14 @@ export function DesktopRuntimeShell({
             onNavigate={onSidebarNavigate}
             onLogout={onLogout}
           />
+        }
+        trailingPanel={isDockedMode ? widget : null}
+        trailingPanelClassName={
+          responsiveViewMode === 'rail'
+            ? 'c-PageLayout__trailingPanel--liveActivityRail'
+            : responsiveViewMode === 'full'
+              ? 'c-PageLayout__trailingPanel--liveActivityFull'
+              : ''
         }
       >
         <>
@@ -62,12 +104,14 @@ export function DesktopRuntimeShell({
             onConfirmOverride={onConfirmOverride}
             onCancelOverride={onCancelOverride}
           />
-          <PendingActionsWidget
-            pendingActions={pendingActions}
-            submittingActionId={pendingActionSubmittingId}
-            onConfirmAction={onPendingActionConfirm}
-            onCancelAction={onPendingActionCancel}
+          <DesktopViolationOverlay
+            meteredViolation={runtimeHub?.meteredViolation}
+            pendingOverrideRequest={runtimeHub?.pendingOverrideRequest}
+            onViolationAction={onViolationAction}
+            onConfirmOverride={onConfirmOverride}
+            onCancelOverride={onCancelOverride}
           />
+          {!isDockedMode ? widget : null}
         </>
       </PageLayout>
     </div>

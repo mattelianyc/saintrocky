@@ -23,6 +23,15 @@ export {
 } from './quotes.js';
 
 export {
+  METERED_GRACE_PERIOD_SECONDS,
+  METERED_NOTIFICATION_INTERVAL_SECONDS,
+  METERED_REFERENCE_PERIOD_SECONDS,
+  calculateMeteredViolationAccrual,
+  calculateMeteredViolationRate,
+  formatMeteredViolationRate
+} from './metered-violations.js';
+
+export {
   formatFeeSol,
   formatRemainingDuration,
   getRemainingDuration

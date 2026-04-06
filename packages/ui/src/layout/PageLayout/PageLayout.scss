@@ -12,10 +12,23 @@
 }
 
 .c-PageLayout__main {
+  position: relative;
+  display: block;
   min-width: 0;
   flex: 1 1 auto;
   min-height: 0;
   overflow-x: hidden;
+}
+
+.c-PageLayout__main--hidden {
+  display: none;
+}
+
+.c-PageLayout__trailingPanel {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 0 0 auto;
 }
 
 @media (max-width: 640px) {
@@ -24,6 +37,11 @@
   }
 
   .c-PageLayout__sidebar {
+    width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .c-PageLayout__trailingPanel {
     width: 100%;
     flex: 0 0 auto;
   }
