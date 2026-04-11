@@ -1,5 +1,5 @@
-import { MessagesDashboard } from "@saintrocky/ui/web";
+import { redirect } from "next/navigation";
 
 export default function MessagesPage() {
-  return <MessagesDashboard />;
+  redirect("/dashboard");
 }

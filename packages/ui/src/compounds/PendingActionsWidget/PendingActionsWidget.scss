@@ -232,6 +232,8 @@
   border-right: 0;
   border-top: 0;
   border-bottom: 0;
+  background: var(--ui-shell-brand-divider);
+  color: var(--ui-dark-bg);
 }
 
 .c-PendingActionsWidget.is-view-full .c-PendingActionsWidget__panel {
@@ -239,6 +241,29 @@
   min-height: 100%;
   max-height: none;
   border: 0;
+}
+
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__eyebrow,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__itemEyebrow,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__summaryLabel,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__itemMeta,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__scheduledHint,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__footnote,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__toggleCopy span,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__embeddedSummaryCopy span,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__emptyState {
+  color: color-mix(in srgb, var(--ui-dark-bg) 72%, transparent);
+}
+
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__embeddedSummary,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__summaryCard,
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__item {
+  background: color-mix(in srgb, white 58%, var(--ui-shell-brand-divider));
+  border-color: color-mix(in srgb, var(--ui-dark-bg) 14%, transparent);
+}
+
+.c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__emptyState {
+  border-color: color-mix(in srgb, var(--ui-dark-bg) 18%, transparent);
 }
 
 .c-PendingActionsWidget.is-view-rail .c-PendingActionsWidget__panelUtilityBar,

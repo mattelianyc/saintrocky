@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 import { saintRockyBranding } from "@saintrocky/branding";
-import { useTerminalTyping } from "@saintrocky/shared";
+import { useIsMobileViewport, useTerminalTyping } from "@saintrocky/shared";
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -35,9 +35,64 @@ const REPRISAL_BRAND_NAME =
 const REPRISAL_INSTAGRAM_URL = saintRockyBranding.social?.url || saintRockyBranding.siteUrl || "/";
 const REPRISAL_TERMINAL_COMMAND = saintRockyBranding.social?.handle || "@standarddeviants";
 
+function BrandHeroReprisalMobileFooter({ brandName }) {
+  return (
+    <div
+      className="c-BrandHeroReprisal c-BrandHeroReprisal--mobile"
+      data-corner-icon-tone="dark"
+    >
+      <section className="c-BrandHeroReprisal__mobileSection" aria-label="Brand footer">
+        <div className="c-BrandHeroReprisal__footerRoot">
+          <div className="c-BrandHeroReprisal__footerBrandBlock">
+            <div className="c-BrandHeroReprisal__monogram" aria-hidden="true">
+              {(saintRockyBranding.monogramLines || ["STD", "DEV"]).map((line) => (
+                <span key={line}>{line}</span>
+              ))}
+            </div>
+            <h2 className="c-BrandHeroReprisal__footerBrandName">{brandName}</h2>
+            <p className="c-BrandHeroReprisal__footerDescription">
+              {saintRockyBranding.footerDescription || saintRockyBranding.description}
+            </p>
+          </div>
+
+          <div className="c-BrandHeroReprisal__footerLinkRow">
+            <a
+              href={REPRISAL_INSTAGRAM_URL}
+              rel="noreferrer"
+              className="c-BrandHeroReprisal__footerSocialLink"
+            >
+              {REPRISAL_TERMINAL_COMMAND}
+            </a>
+          </div>
+
+          <div className="c-BrandHeroReprisal__footerBottomRow">
+            <p className="c-BrandHeroReprisal__footerCopyright">
+              &copy; 2026 {brandName}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export function BrandHeroReprisal({
   brandName = REPRISAL_BRAND_NAME
 }) {
+  const isMobileViewport = useIsMobileViewport();
+
+  if (isMobileViewport == null) {
+    return null;
+  }
+
+  if (isMobileViewport) {
+    return <BrandHeroReprisalMobileFooter brandName={brandName} />;
+  }
+
+  return <AnimatedBrandHeroReprisal brandName={brandName} />;
+}
+
+function AnimatedBrandHeroReprisal({ brandName }) {
   const sceneReference = useRef(null);
   const shouldReduceMotion = Boolean(useReducedMotion());
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -258,7 +313,11 @@ export function BrandHeroReprisal({
   }
 
   return (
-    <div ref={sceneReference} className="c-BrandHeroReprisal">
+    <div
+      ref={sceneReference}
+      className="c-BrandHeroReprisal"
+      data-corner-icon-tone="dark"
+    >
       <div className="c-BrandHeroReprisal__viewport">
         <section className="c-BrandHeroReprisal__section" aria-label="Brand reprisal">
           <motion.div

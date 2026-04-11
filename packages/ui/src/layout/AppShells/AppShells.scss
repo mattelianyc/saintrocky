@@ -91,25 +91,149 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgb(9 14 14 / 0.86);
+  --sr-CornerIconLink__glowColor: var(--ui-shell-accent-strong);
+  --sr-CornerIconLink__hoverGlowColor: var(--ui-mint);
+  color: var(--ui-shell-accent-strong);
   text-decoration: none;
+  background-image: none;
+  background-size: 0 0;
   transition: transform 180ms ease, color 180ms ease, filter 180ms ease;
+  filter:
+    drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+    drop-shadow(0 0 0.16em rgb(6 8 10 / 0.68))
+    drop-shadow(0 0 0.05em color-mix(in srgb, var(--ui-shell-accent-strong) 96%, transparent))
+    drop-shadow(0 0 0.18em color-mix(in srgb, var(--ui-shell-accent-strong) 72%, transparent))
+    drop-shadow(0 0 0.52em color-mix(in srgb, var(--ui-shell-accent-strong) 36%, transparent));
+}
+
+.sr-CornerIconLink--lightBackground {
+  --sr-CornerIconLink__glowColor: var(--ui-shell-accent-strong);
+  color: var(--ui-shell-accent-strong);
+  filter:
+    drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+    drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+    drop-shadow(0 0 0.05em color-mix(in srgb, var(--ui-shell-accent-strong) 96%, transparent))
+    drop-shadow(0 0 0.18em color-mix(in srgb, var(--ui-shell-accent-strong) 72%, transparent))
+    drop-shadow(0 0 0.52em color-mix(in srgb, var(--ui-shell-accent-strong) 36%, transparent));
+}
+
+.sr-CornerIconLink--darkBackground {
+  --sr-CornerIconLink__glowColor: var(--ui-shell-accent-strong);
+  color: var(--ui-shell-accent-strong);
+  filter:
+    drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+    drop-shadow(0 0 0.16em rgb(6 8 10 / 0.68))
+    drop-shadow(0 0 0.05em color-mix(in srgb, var(--ui-shell-accent-strong) 96%, transparent))
+    drop-shadow(0 0 0.18em color-mix(in srgb, var(--ui-shell-accent-strong) 72%, transparent))
+    drop-shadow(0 0 0.52em color-mix(in srgb, var(--ui-shell-accent-strong) 36%, transparent));
 }
 
 .sr-CornerIconLink:hover,
 .sr-CornerIconLink:focus-visible {
-  color: color-mix(in srgb, var(--ui-shell-accent) 68%, rgb(5 8 7));
+  color: var(--ui-mint);
+  text-decoration: none;
+  background-image: none;
+  background-size: 0 0;
   transform: translateY(-1px) rotate(-8deg);
-  filter: drop-shadow(0 5px 12px rgb(0 0 0 / 0.24));
+  animation: sr-corner-icon-link-flicker 520ms ease-out 1 both;
+}
+
+.sr-CornerIconLink--darkBackground:hover,
+.sr-CornerIconLink--darkBackground:focus-visible {
+  color: var(--ui-mint);
+  text-decoration: none;
+  filter:
+    drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+    drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+    drop-shadow(0 0 0.06em color-mix(in srgb, var(--ui-mint) 100%, transparent))
+    drop-shadow(0 0 0.24em color-mix(in srgb, var(--ui-mint) 82%, transparent))
+    drop-shadow(0 0 0.76em color-mix(in srgb, var(--ui-mint) 42%, transparent));
+}
+
+.sr-CornerIconLink--lightBackground:hover,
+.sr-CornerIconLink--lightBackground:focus-visible {
+  color: var(--ui-mint);
+  text-decoration: none;
+  filter:
+    drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+    drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+    drop-shadow(0 0 0.06em color-mix(in srgb, var(--ui-mint) 100%, transparent))
+    drop-shadow(0 0 0.24em color-mix(in srgb, var(--ui-mint) 82%, transparent))
+    drop-shadow(0 0 0.76em color-mix(in srgb, var(--ui-mint) 42%, transparent));
 }
 
 .sr-CornerIconLink:focus-visible {
   outline: none;
 }
 
+.sr-CornerIconLink:active {
+  background-image: none;
+  background-size: 0 0;
+}
+
+@keyframes sr-corner-icon-link-flicker {
+  0% {
+    opacity: 0.62;
+    filter:
+      drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+      drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+      drop-shadow(0 0 0.02em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 70%, transparent))
+      drop-shadow(0 0 0.1em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 36%, transparent));
+  }
+
+  14% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+      drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+      drop-shadow(0 0 0.05em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 96%, transparent))
+      drop-shadow(0 0 0.22em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 84%, transparent))
+      drop-shadow(0 0 0.68em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 42%, transparent));
+  }
+
+  24% {
+    opacity: 0.78;
+    filter:
+      drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+      drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+      drop-shadow(0 0 0.02em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 76%, transparent))
+      drop-shadow(0 0 0.12em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 40%, transparent));
+  }
+
+  38% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+      drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+      drop-shadow(0 0 0.06em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 100%, transparent))
+      drop-shadow(0 0 0.3em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 88%, transparent))
+      drop-shadow(0 0 0.9em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 48%, transparent));
+  }
+
+  55% {
+    opacity: 0.84;
+    filter:
+      drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+      drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+      drop-shadow(0 0 0.04em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 92%, transparent))
+      drop-shadow(0 0 0.18em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 58%, transparent));
+  }
+
+  100% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 0.04em rgb(6 8 10 / 0.92))
+      drop-shadow(0 0 0.18em rgb(6 8 10 / 0.72))
+      drop-shadow(0 0 0.06em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 100%, transparent))
+      drop-shadow(0 0 0.24em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 82%, transparent))
+      drop-shadow(0 0 0.76em color-mix(in srgb, var(--sr-CornerIconLink__hoverGlowColor) 42%, transparent));
+  }
+}
+
 .sr-CornerIconLink--topRight {
   top: 0.95rem;
   right: 1rem;
+  text-decoration: none !important;
 }
 
 .sr-CornerIconLink--topLeft {
@@ -143,9 +267,10 @@
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--ui-shell-accent) 92%, white) 0%,
-      color-mix(in srgb, var(--ui-shell-accent) 72%, white) 100%
+      color-mix(in srgb, var(--ui-shell-accent) 34%, var(--ui-dark-bg)) 0%,
+      var(--ui-dark-bg) 100%
     );
+  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--ui-mint) 18%, transparent);
 }
 
 .sr-WebDashboardLayout .c-PageLayout__main {
@@ -166,6 +291,7 @@
 .sr-WebDashboardLayout .c-PageLayout__trailingPanel--liveActivityRail {
   flex: 0 0 var(--ui-live-activity-rail-width);
   width: var(--ui-live-activity-rail-width);
+  background: var(--ui-shell-brand-divider);
 }
 
 .sr-WebDashboardLayout .c-PageLayout__trailingPanel--liveActivityFull {
@@ -175,7 +301,7 @@
 
 .sr-WebDashboardSidebar {
   width: 100%;
-  color: rgb(8 17 13 / 0.96);
+  color: var(--ui-dark-fg);
 }
 
 .sr-WebDashboardSidebar .c-AppSidebar__brand,
@@ -197,19 +323,20 @@
   padding: 0.7rem 0.85rem;
   border-radius: var(--ui-radius);
   background: transparent;
-  color: rgb(8 17 13 / 0.78);
+  color: color-mix(in srgb, var(--ui-mint) 84%, white);
 }
 
 .sr-WebDashboardSidebar .c-AppSidebar__link:hover,
 .sr-WebDashboardSidebar .c-AppSidebar__toggle:hover {
-  background: color-mix(in srgb, white 32%, transparent);
-  color: rgb(8 17 13 / 0.96);
+  background: color-mix(in srgb, var(--ui-mint) 12%, transparent);
+  color: var(--ui-dark-fg);
 }
 
 .sr-WebDashboardSidebar .c-AppSidebar__link.is-active,
 .sr-WebDashboardSidebar .c-AppSidebar__toggle.is-active {
-  background: color-mix(in srgb, rgb(8 17 13) 12%, white 28%);
-  color: rgb(8 17 13 / 0.98);
+  background: color-mix(in srgb, var(--ui-mint) 22%, transparent);
+  color: var(--ui-dark-fg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ui-mint) 26%, transparent);
 }
 
 .sr-WebDashboardBrand {
@@ -220,10 +347,10 @@
 
 .sr-WebDashboardBrandLogo {
   width: 100%;
-  max-width: 7rem;
+  max-width: 12.5rem;
   height: auto;
   justify-self: start;
-  border-radius: 24px;
+  color: var(--ui-dark-fg);
 }
 
 .sr-WebDashboardBrandMeta {
@@ -231,11 +358,15 @@
   gap: 0.35rem;
 }
 
+.sr-WebDashboardBrandEyebrow {
+  color: color-mix(in srgb, var(--ui-mint) 84%, white);
+}
+
 .sr-WebDashboardBrandUser {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: rgb(8 17 13 / 0.88);
+  color: var(--ui-dark-fg);
 }
 
 .sr-WebDashboardFooter {
@@ -245,12 +376,12 @@
 
 .sr-WebDashboardSidebar .ui-Button--ghost {
   justify-content: flex-start;
-  color: rgb(8 17 13 / 0.78);
+  color: color-mix(in srgb, var(--ui-mint) 84%, white);
 }
 
 .sr-WebDashboardSidebar .ui-Button--ghost:not(:disabled):not([data-disabled]):hover {
-  background: color-mix(in srgb, white 32%, transparent);
-  color: rgb(8 17 13 / 0.96);
+  background: color-mix(in srgb, var(--ui-mint) 12%, transparent);
+  color: var(--ui-dark-fg);
 }
 
 .sr-NotFoundShell {
@@ -360,6 +491,7 @@
 .desktop-Layout .c-PageLayout__trailingPanel--liveActivityRail {
   flex: 0 0 var(--ui-live-activity-rail-width);
   width: var(--ui-live-activity-rail-width);
+  background: var(--ui-shell-brand-divider);
 }
 
 .desktop-Layout .c-PageLayout__trailingPanel--liveActivityFull {
@@ -371,15 +503,20 @@
   height: 100vh;
   overflow: hidden;
   padding: 20px 18px;
-  background: var(--ui-desktop-sidebar-surface);
-  border-right: 1px solid color-mix(in srgb, var(--ui-shell-border) 82%, white);
-  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--ui-shell-background-strong) 72%, white);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ui-shell-accent) 34%, var(--ui-dark-bg)) 0%,
+      var(--ui-dark-bg) 100%
+    );
+  border-right: 1px solid color-mix(in srgb, var(--ui-mint) 16%, transparent);
+  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--ui-mint) 18%, transparent);
 }
 
 .desktop-Layout .c-AppSidebar,
 .desktop-Layout .c-AppSidebar__brand,
 .desktop-Layout .c-AppSidebar__footer {
-  color: var(--ui-desktop-text);
+  color: var(--ui-dark-fg);
 }
 
 .desktop-Layout .c-AppSidebar {
@@ -402,22 +539,22 @@
 .desktop-Layout .c-AppSidebar .c-NavLink,
 .desktop-Layout .c-AppSidebar .c-AppSidebar__toggle {
   background: transparent;
-  color: var(--ui-desktop-text-muted);
+  color: color-mix(in srgb, var(--ui-mint) 84%, white);
 }
 
 .desktop-Layout .c-AppSidebar .c-NavLink:hover,
 .desktop-Layout .c-AppSidebar .c-NavLink:focus-visible,
 .desktop-Layout .c-AppSidebar .c-AppSidebar__toggle:hover,
 .desktop-Layout .c-AppSidebar .c-AppSidebar__toggle:focus-visible {
-  background: color-mix(in srgb, var(--ui-shell-accent) 8%, white);
-  color: var(--ui-desktop-text);
+  background: color-mix(in srgb, var(--ui-mint) 12%, transparent);
+  color: var(--ui-dark-fg);
 }
 
 .desktop-Layout .c-AppSidebar .c-NavLink.is-active,
 .desktop-Layout .c-AppSidebar .c-AppSidebar__toggle.is-active {
-  background: color-mix(in srgb, var(--ui-shell-accent) 12%, white);
-  color: var(--ui-desktop-text);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ui-shell-accent) 26%, white);
+  background: color-mix(in srgb, var(--ui-mint) 22%, transparent);
+  color: var(--ui-dark-fg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ui-mint) 26%, transparent);
 }
 
 .desktop-SidebarBrand {
@@ -426,36 +563,12 @@
 }
 
 .desktop-BrandLockup {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display: grid;
+  gap: 8px;
 }
 
 .desktop-BrandLockup--compact {
-  align-items: flex-start;
-}
-
-.desktop-BrandMonogram {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 62px;
-  width: 62px;
-  height: 62px;
-  padding: 0;
-  border-radius: 16px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--ui-shell-background-strong) 90%, white) 0%, rgba(255, 255, 255, 0.96) 100%);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--ui-shell-border) 84%, white),
-    0 18px 40px rgba(15, 23, 42, 0.08);
-  overflow: hidden;
-}
-
-.desktop-BrandMark {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  align-items: stretch;
 }
 
 .desktop-BrandCopy {
@@ -475,20 +588,30 @@
 
 .desktop-BrandWordmark {
   margin: 0;
-  font-size: clamp(30px, 4vw, 42px);
-  line-height: 0.92;
-  color: var(--ui-desktop-text);
-  text-transform: uppercase;
+  width: 100%;
+  max-width: 12.5rem;
+  height: auto;
+  color: var(--ui-dark-fg);
 }
 
 .desktop-BrandLockup--compact .desktop-BrandWordmark {
-  font-size: 24px;
+  max-width: 10rem;
 }
 
 .desktop-BrandDetail,
 .desktop-SidebarHint {
-  color: var(--ui-desktop-text-muted);
+  color: color-mix(in srgb, var(--ui-mint) 84%, white);
   font-size: 12px;
+}
+
+.desktop-Layout .ui-Button--ghost {
+  justify-content: flex-start;
+  color: color-mix(in srgb, var(--ui-mint) 84%, white);
+}
+
+.desktop-Layout .ui-Button--ghost:not(:disabled):not([data-disabled]):hover {
+  background: color-mix(in srgb, var(--ui-mint) 12%, transparent);
+  color: var(--ui-dark-fg);
 }
 
 .desktop-Hero,

@@ -1,5 +1,5 @@
-import { CampaignsDashboard } from "@saintrocky/ui/web";
+import { redirect } from "next/navigation";
 
 export default function CampaignsPage() {
-  return <CampaignsDashboard />;
+  redirect("/dashboard");
 }

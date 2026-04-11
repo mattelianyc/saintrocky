@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { api } from "@saintrocky/api-client";
 import { saintRockyBranding } from "@saintrocky/branding";
 import { Icon } from "@saintrocky/icons";
-import { AppSidebar, Button } from "@saintrocky/ui";
+import { AppSidebar, BrandWordmarkLogo, Button } from "@saintrocky/ui";
 
 import { useAuthSession } from "@/src/auth/auth-session.jsx";
+import { getVisibleDashboardSections } from "@/src/dashboard/dashboard-navigation.js";
 
 const sectionIconMap = {
   tactics: "tactics",
@@ -28,7 +28,7 @@ const navigationItems = [
     href: "/dashboard",
     icon: <Icon name="dashboard" size={18} />
   },
-  ...saintRockyBranding.dashboardSections.map((section) => ({
+  ...getVisibleDashboardSections().map((section) => ({
     id: section.slug,
     label: section.title,
     href: `/dashboard/${section.slug}`,
@@ -62,13 +62,10 @@ export function DashboardSidebarShell() {
       items={navigationItems}
       brand={
         <div className="sr-WebDashboardBrand">
-          <Image
-            src="/images/rocco-icon.png"
-            alt={`${saintRockyBranding.productName} mark`}
-            width={128}
-            height={176}
+          <BrandWordmarkLogo
             className="sr-WebDashboardBrandLogo"
-            priority
+            variant="inline"
+            width="100%"
           />
           <div className="sr-WebDashboardBrandMeta">
             <p className="sr-WebDashboardBrandEyebrow">{saintRockyBranding.companyName}</p>

@@ -114,4 +114,8 @@ export { useTerminalTyping } from './marketing/index.js';
 
 export { extractPendingActions } from './pending-actions.js';
 
+export { useIsMobileViewport } from './useIsMobileViewport.js';
+
+export { useAdaptiveCornerIconTone } from './useAdaptiveCornerIconTone.js';
+
 

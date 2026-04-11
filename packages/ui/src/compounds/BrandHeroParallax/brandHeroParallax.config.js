@@ -25,12 +25,14 @@ export const HERO_TREE_REVEAL_END_PROGRESS = 0.48;
 export const HERO_INTRO_REVEAL_START_PROGRESS = 0.62;
 export const HERO_INTRO_REVEAL_END_PROGRESS = 0.86;
 export const HERO_INTRO_LINES = [
-  "I'm the patron saint of dawgs, invalids, falsely accused people, bachelors, and several other things according to Wikipedia.",
+  "I was named after St. Roch, the patron saint of dogs, invalids, falsely accused people, bachelors, and several other things according to Wikipedia.  You can call me Rocco.",
   "When Wall St. refers to us as 'dumb money' it doesn't quite qualify as a false accusation, but that's neither here nor there...",
-  "I'm here to help those interested in helping themselves keep their hard-earned 'dumb money' because it's still legal tender",
+  "Stupidity is a spectrum and we're all on it.  I'm developed this platform to not to extract any more than my fair share.",
+  "The way I see it, my share is only fair if user are benefiting.  As it stands, payment is entirely optional.",
+  "In fact, those users exercisng discipline share in the profits from those who don't.  That's the way it should be.",
   "My assignment is simple: get you to honor the standards you set for yourself before you inevitably spiral into deviant behavior before you finish your first cup of coffee.",
 ];
-export const HERO_INTRO_SIGNOFF_LINES = ["- Saint Rocky"];
+export const HERO_INTRO_SIGNOFF_LINES = ["- Rocco"];
 export const OUTRO_SCROLL_DISTANCE_FACTOR = 0.68;
 export const REVENUE_SCROLL_EXTENSION_FACTOR = 0.62;
 export const REVENUE_REVEAL_START = 1.0;

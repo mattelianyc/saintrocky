@@ -40,8 +40,8 @@ export function DesktopRuntimeShell({
     setViewMode,
     viewMode
   } = usePendingActionsWidgetMode({
-    defaultViewMode: activeSectionId === 'home' ? 'full' : 'closed',
-    preferredViewMode: activeSectionId === 'home' ? 'full' : 'closed',
+    defaultViewMode: 'rail',
+    preferredViewMode: 'rail',
     storageKey: 'electron-live-activity-view-mode'
   });
   const isDockedMode = responsiveViewMode === 'rail' || responsiveViewMode === 'full';

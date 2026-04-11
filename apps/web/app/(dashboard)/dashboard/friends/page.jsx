@@ -1,5 +1,5 @@
-import { FriendsDashboard } from "@saintrocky/ui/web";
+import { redirect } from "next/navigation";
 
 export default function FriendsPage() {
-  return <FriendsDashboard />;
+  redirect("/dashboard");
 }

@@ -22,8 +22,8 @@ export function useDashboardPendingActionsWidgetState() {
     setViewMode,
     viewMode
   } = usePendingActionsWidgetMode({
-    defaultViewMode: isOverviewRoute ? "full" : "closed",
-    preferredViewMode: isOverviewRoute ? "full" : "closed",
+    defaultViewMode: "rail",
+    preferredViewMode: "rail",
     storageKey: STORAGE_KEY
   });
 

@@ -6,6 +6,8 @@ import { api } from "@saintrocky/api-client";
 import { saintRockyBranding } from "@saintrocky/branding";
 import { DashboardOverview, LeaderboardWidget, RuntimesPanel } from "@saintrocky/ui";
 
+import { getVisibleDashboardSections } from "@/src/dashboard/dashboard-navigation.js";
+
 const fallbackCounts = {
   disciplineScore: "—",
   escrowBalanceSol: "—",
@@ -57,7 +59,7 @@ export default function DashboardPage() {
         title={saintRockyBranding.productName}
         summary="On-chain escrow enforcement, real-time trade monitoring, and discipline rankings for Solana traders."
         counts={counts}
-        sections={saintRockyBranding.dashboardSections}
+        sections={getVisibleDashboardSections()}
       />
 
       <div className="c-DashboardOverviewPage__widgets">

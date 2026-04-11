@@ -203,14 +203,25 @@
 .c-BrandHeroReprisal__stencilCharacterInner--accentLeading,
 .c-BrandHeroReprisal__baseCharacterInner--accentLeading,
 .c-BrandHeroReprisal__footerWordmarkCharacterInner.c-BrandHeroReprisal__characterInner--accentLeading {
+  --c-BrandHeroReprisal__flickerColor: var(--ui-shell-accent-strong);
   color: var(--ui-shell-accent-strong);
+  text-shadow:
+    0 0 0.03em var(--c-BrandHeroReprisal__flickerColor),
+    0 0 0.12em color-mix(in srgb, var(--c-BrandHeroReprisal__flickerColor) 84%, transparent),
+    0 0 0.24em color-mix(in srgb, var(--c-BrandHeroReprisal__flickerColor) 46%, transparent);
 }
 
 .c-BrandHeroReprisal__characterInner--accentTrailing,
 .c-BrandHeroReprisal__stencilCharacterInner--accentTrailing,
 .c-BrandHeroReprisal__baseCharacterInner--accentTrailing,
 .c-BrandHeroReprisal__footerWordmarkCharacterInner.c-BrandHeroReprisal__characterInner--accentTrailing {
+  --c-BrandHeroReprisal__flickerColor: var(--ui-mint);
   color: var(--ui-mint);
+  text-shadow:
+    0 0 0.03em var(--c-BrandHeroReprisal__flickerColor),
+    0 0 0.14em color-mix(in srgb, var(--c-BrandHeroReprisal__flickerColor) 90%, transparent),
+    0 0 0.32em color-mix(in srgb, var(--c-BrandHeroReprisal__flickerColor) 56%, transparent),
+    0 0 0.72em color-mix(in srgb, var(--c-BrandHeroReprisal__flickerColor) 28%, transparent);
 }
 
 .c-BrandHeroReprisal__characterInner--divider,
@@ -307,5 +318,54 @@
 @media (min-width: 768px) {
   .c-BrandHeroReprisal__terminal {
     width: min(46rem, calc(100vw - 6rem));
+  }
+}
+
+.c-BrandHeroReprisal--mobile {
+  background:
+    radial-gradient(circle at top, rgb(122 19 45 / 0.26), transparent 34%),
+    linear-gradient(180deg, rgb(8 14 18), rgb(12 13 16));
+}
+
+.c-BrandHeroReprisal__mobileSection {
+  padding: clamp(2rem, 8vw, 3rem) clamp(1rem, 5vw, 1.5rem);
+}
+
+.c-BrandHeroReprisal--mobile .c-BrandHeroReprisal__footerRoot {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+}
+
+.c-BrandHeroReprisal__footerLinkRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.c-BrandHeroReprisal__footerSocialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+  color: rgb(240 228 205 / 0.94);
+  font-family: "SFMono-Regular", "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+@media (max-width: 767px) {
+  .c-BrandHeroReprisal__mobileSection {
+    padding-inline: 1rem;
+  }
+
+  .c-BrandHeroReprisal--mobile .c-BrandHeroReprisal__footerLayer,
+  .c-BrandHeroReprisal--mobile .c-BrandHeroReprisal__viewport,
+  .c-BrandHeroReprisal--mobile .c-BrandHeroReprisal__scrollSpacer {
+    display: none;
   }
 }

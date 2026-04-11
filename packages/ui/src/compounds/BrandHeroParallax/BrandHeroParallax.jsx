@@ -42,8 +42,11 @@ import {
 import { BrandHeroParallaxOverview } from "./BrandHeroParallaxOverview.jsx";
 
 export function BrandHeroParallax({
-  heroWordmark = HERO_WORDMARK
+  heroWordmark = HERO_WORDMARK,
+  variant = "full",
+  wordmarkOnlyOverlay = null
 }) {
+  const isWordmarkOnlyVariant = variant === "wordmarkOnly";
   const heroContainerReference = useRef(null);
   const heroMediaReference = useRef(null);
   const prefersReducedMotion = useReducedMotion();
@@ -57,12 +60,12 @@ export function BrandHeroParallax({
   const trailingAccentCharacterIndex = compactWordmarkCharacters.lastIndexOf("$");
   const wordmarkFadeProgress = clamp(scrollProgress / 0.16, 0, 1);
   const wordmarkPanelOpacity = isHeroRevealReady ? 1 - wordmarkFadeProgress : 0;
-  const loadOverlayOpacity = isHeroRevealReady ? 1 - wordmarkFadeProgress : 1;
+  const loadOverlayOpacity = isWordmarkOnlyVariant ? 0 : isHeroRevealReady ? 1 - wordmarkFadeProgress : 1;
   const wordmarkTextBlendPercentage = Math.round(clamp(wordmarkFadeProgress * 100, 0, 100));
   const wordmarkPrimaryColor = `color-mix(in srgb, var(--ui-dark-fg) ${
     100 - wordmarkTextBlendPercentage
   }%, var(--ui-shell-text) ${wordmarkTextBlendPercentage}%)`;
-  const stencilPanelOpacity = isHeroRevealReady ? 1 : 0;
+  const stencilPanelOpacity = isWordmarkOnlyVariant ? 1 : isHeroRevealReady ? 1 : 0;
 
   function getCharacterClassName(innerClassName, character, index) {
     const classNames = [innerClassName];
@@ -87,7 +90,7 @@ export function BrandHeroParallax({
   useEffect(() => {
     const heroMediaElement = heroMediaReference.current;
 
-    if (prefersReducedMotion || !heroMediaElement) {
+    if (isWordmarkOnlyVariant || prefersReducedMotion || !heroMediaElement) {
       setIsHeroRevealReady(true);
       return undefined;
     }
@@ -110,7 +113,7 @@ export function BrandHeroParallax({
       heroMediaElement.removeEventListener("loadeddata", markHeroAsReady);
       heroMediaElement.removeEventListener("error", markHeroAsReady);
     };
-  }, [prefersReducedMotion]);
+  }, [isWordmarkOnlyVariant, prefersReducedMotion]);
 
   useEffect(() => {
     function updateViewportDimensions() {
@@ -165,7 +168,9 @@ export function BrandHeroParallax({
   const panelProgress = Math.sin((overlayCoverProgress * Math.PI) / 2);
   let blackPanelClipPath;
 
-  if (isMobileViewport) {
+  if (isWordmarkOnlyVariant) {
+    blackPanelClipPath = "polygon(0 0, 100% 0, 100% 100%, 0 100%)";
+  } else if (isMobileViewport) {
     const curtainY = panelProgress * 100;
     blackPanelClipPath = `polygon(0 0, 100% 0, 100% ${curtainY}%, 0 ${curtainY}%)`;
   } else if (isTabletViewport) {
@@ -194,15 +199,29 @@ export function BrandHeroParallax({
         0,
         1
       );
+  const wordmarkOnlyOverlayProgress = isWordmarkOnlyVariant
+    ? shouldReduceMotion
+      ? 1
+      : clamp((scrollProgress - 0.08) / 0.16, 0, 1)
+    : 0;
   const roccoWalkProgress = shouldReduceMotion
     ? 1
     : clamp((panelProgress - 0.28) / (0.62 - 0.28), 0, 1);
   const isRoccoWalking = !shouldReduceMotion && roccoWalkProgress > 0 && roccoWalkProgress < 1;
-  const overviewRevealProgress = shouldReduceMotion ? 1 : clamp((scrollProgress - 0.68) / 0.32, 0, 1);
-  const heroVideoOpacity = shouldReduceMotion ? 1 : 1 - overviewRevealProgress;
-  const introMediaVeilOpacity = shouldReduceMotion
-    ? 0.22
-    : clamp(0.08 + introRevealProgress * 0.22 - overviewRevealProgress * 0.3, 0, 0.3);
+  const overviewRevealProgress = isWordmarkOnlyVariant
+    ? 0
+    : shouldReduceMotion ? 1 : clamp((scrollProgress - 0.68) / 0.32, 0, 1);
+  const cornerIconTone = isWordmarkOnlyVariant
+    ? "dark"
+    : introRevealProgress > 0.08 && overviewRevealProgress < 0.45
+      ? "light"
+      : "dark";
+  const heroVideoOpacity = isWordmarkOnlyVariant ? 0 : shouldReduceMotion ? 1 : 1 - overviewRevealProgress;
+  const introMediaVeilOpacity = isWordmarkOnlyVariant
+    ? 0
+    : shouldReduceMotion
+      ? 0.22
+      : clamp(0.08 + introRevealProgress * 0.22 - overviewRevealProgress * 0.3, 0, 0.3);
 
   let overviewDoorClipPath;
 
@@ -355,79 +374,107 @@ export function BrandHeroParallax({
     <div
       ref={heroContainerReference}
       id="marketing-hero-section"
-      className={`c-BrandHeroParallax ${isHeroRevealReady ? "c-BrandHeroParallax--heroRevealReady" : ""}`}
+      data-corner-icon-tone={cornerIconTone}
+      className={`c-BrandHeroParallax ${isHeroRevealReady ? "c-BrandHeroParallax--heroRevealReady" : ""} ${isWordmarkOnlyVariant ? "c-BrandHeroParallax--wordmarkOnly" : ""}`}
     >
       <div className="c-BrandHeroParallax__viewport">
         <section className="c-BrandHeroParallax__section" aria-label={`${heroWordmark} hero`}>
-          <div className="c-BrandHeroParallax__media" aria-hidden="true">
-            <motion.video
-              ref={heroMediaReference}
-              className="c-BrandHeroParallax__mediaVideo"
-              src={HERO_BACKGROUND_VIDEO_SRC}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              initial={shouldReduceMotion ? false : { scale: 1.06, filter: "blur(0px)" }}
+          {!isWordmarkOnlyVariant && (
+            <div className="c-BrandHeroParallax__media" aria-hidden="true">
+              <motion.video
+                ref={heroMediaReference}
+                className="c-BrandHeroParallax__mediaVideo"
+                src={HERO_BACKGROUND_VIDEO_SRC}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                initial={shouldReduceMotion ? false : { scale: 1.06, filter: "blur(0px)" }}
+                animate={
+                  shouldReduceMotion
+                    ? { opacity: heroVideoOpacity }
+                    : {
+                        opacity: heroVideoOpacity,
+                        scale: isHeroRevealReady ? 1 : 1.06,
+                        filter: "blur(0px)"
+                      }
+                }
+                transition={{
+                  opacity: { duration: 0.18, ease: "linear" },
+                  scale: {
+                    duration: shouldReduceMotion ? 0 : HERO_MEDIA_SETTLE_DURATION,
+                    ease: [0.16, 1, 0.3, 1]
+                  }
+                }}
+              />
+            </div>
+          )}
+
+          {!isWordmarkOnlyVariant && (
+            <motion.div
+              aria-hidden="true"
+              className="c-BrandHeroParallax__loadOverlay"
+              initial={false}
+              animate={{ opacity: loadOverlayOpacity }}
+              transition={{ duration: shouldReduceMotion ? 0.12 : 0.16, ease: "linear" }}
+            />
+          )}
+
+          {!isWordmarkOnlyVariant && (
+            <motion.div
+              aria-hidden="true"
+              className="c-BrandHeroParallax__introMediaVeil"
+              initial={false}
+              animate={{ opacity: introMediaVeilOpacity }}
+              transition={{ duration: 0.18, ease: "linear" }}
+            />
+          )}
+
+          {!isWordmarkOnlyVariant && (
+            <motion.div
+              aria-hidden="true"
+              className={`c-BrandHeroParallax__introDog ${isRoccoWalking ? "c-BrandHeroParallax__introDog--walking" : ""}`}
+              initial={false}
               animate={
                 shouldReduceMotion
-                  ? { opacity: heroVideoOpacity }
+                  ? { opacity: 1, x: 0, y: 0, scaleX: -1 }
                   : {
-                      opacity: heroVideoOpacity,
-                      scale: isHeroRevealReady ? 1 : 1.06,
-                      filter: "blur(0px)"
+                      opacity: clamp(roccoWalkProgress / 0.15, 0, 1),
+                      x: `${(1 - roccoWalkProgress) * 120}%`,
+                      y: `${(1 - roccoWalkProgress) * 2}%`,
+                      scaleX: -1
                     }
               }
-              transition={{
-                opacity: { duration: 0.18, ease: "linear" },
-                scale: {
-                  duration: shouldReduceMotion ? 0 : HERO_MEDIA_SETTLE_DURATION,
-                  ease: [0.16, 1, 0.3, 1]
-                }
-              }}
-            />
-          </div>
+              transition={{ duration: 0.08, ease: "linear" }}
+            >
+              <img
+                src={HERO_DOG_IMAGE_SRC}
+                alt=""
+                aria-hidden="true"
+                className="c-BrandHeroParallax__introDogImage"
+              />
+            </motion.div>
+          )}
 
-          <motion.div
-            aria-hidden="true"
-            className="c-BrandHeroParallax__loadOverlay"
-            initial={false}
-            animate={{ opacity: loadOverlayOpacity }}
-            transition={{ duration: shouldReduceMotion ? 0.12 : 0.16, ease: "linear" }}
-          />
-
-          <motion.div
-            aria-hidden="true"
-            className="c-BrandHeroParallax__introMediaVeil"
-            initial={false}
-            animate={{ opacity: introMediaVeilOpacity }}
-            transition={{ duration: 0.18, ease: "linear" }}
-          />
-
-          <motion.div
-            aria-hidden="true"
-            className={`c-BrandHeroParallax__introDog ${isRoccoWalking ? "c-BrandHeroParallax__introDog--walking" : ""}`}
-            initial={false}
-            animate={
-              shouldReduceMotion
-                ? { opacity: 1, x: 0, y: 0, scaleX: -1 }
-                : {
-                    opacity: clamp(roccoWalkProgress / 0.15, 0, 1),
-                    x: `${(1 - roccoWalkProgress) * 120}%`,
-                    y: `${(1 - roccoWalkProgress) * 2}%`,
-                    scaleX: -1
-                  }
-            }
-            transition={{ duration: 0.08, ease: "linear" }}
-          >
-            <img
-              src={HERO_DOG_IMAGE_SRC}
-              alt=""
-              aria-hidden="true"
-              className="c-BrandHeroParallax__introDogImage"
-            />
-          </motion.div>
+          {isWordmarkOnlyVariant && (
+            <>
+              <div
+                aria-hidden="true"
+                className="c-BrandHeroParallax__wordmarkOnlyDog"
+              >
+                <img
+                  src={HERO_DOG_IMAGE_SRC}
+                  alt=""
+                  className="c-BrandHeroParallax__wordmarkOnlyDogImage"
+                />
+              </div>
+              <div
+                aria-hidden="true"
+                className="c-BrandHeroParallax__wordmarkOnlyScrim"
+              />
+            </>
+          )}
 
           <div className="c-BrandHeroParallax__wordmarkFrame">
             <motion.div
@@ -510,159 +557,177 @@ export function BrandHeroParallax({
                 clipPath: { duration: 0.08, ease: "linear" }
               }}
             >
-              <motion.div
-                className="c-BrandHeroParallax__intro"
-                initial={false}
-                animate={{
-                  opacity: introRevealProgress,
-                  y: `${(1 - introRevealProgress) * 24}px`,
-                  filter: `blur(${(1 - introRevealProgress) * 8}px)`
-                }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <p className="c-BrandHeroParallax__introEyebrow">DUMB MONEY IS STILL LEGAL TENDER</p>
+              {!isWordmarkOnlyVariant && (
                 <motion.div
-                  className="c-BrandHeroParallax__introBrandStack"
+                  className="c-BrandHeroParallax__intro"
                   initial={false}
                   animate={{
                     opacity: introRevealProgress,
-                    y: (1 - introRevealProgress) * 18,
-                    filter: `blur(${(1 - introRevealProgress) * 6}px)`
+                    y: `${(1 - introRevealProgress) * 24}px`,
+                    filter: `blur(${(1 - introRevealProgress) * 8}px)`
                   }}
-                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 >
-                </motion.div>
-                {HERO_INTRO_LINES.map((line, index) => (
-                  <motion.p
-                    key={line}
-                    className="c-BrandHeroParallax__introLine"
+                  <p className="c-BrandHeroParallax__introEyebrow">DUMB MONEY IS STILL LEGAL TENDER</p>
+                  <motion.div
+                    className="c-BrandHeroParallax__introBrandStack"
                     initial={false}
-                    animate={getIntroLineMotion(index)}
+                    animate={{
+                      opacity: introRevealProgress,
+                      y: (1 - introRevealProgress) * 18,
+                      filter: `blur(${(1 - introRevealProgress) * 6}px)`
+                    }}
                     transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    {renderIntroLine(line)}
-                  </motion.p>
-                ))}
-                <div className="c-BrandHeroParallax__introSignoff">
-                  {HERO_INTRO_SIGNOFF_LINES.map((line, index) => (
+                  </motion.div>
+                  {HERO_INTRO_LINES.map((line, index) => (
                     <motion.p
                       key={line}
-                      className="c-BrandHeroParallax__introSignoffLine"
+                      className="c-BrandHeroParallax__introLine"
                       initial={false}
-                      animate={getIntroLineMotion(HERO_INTRO_LINES.length + index)}
+                      animate={getIntroLineMotion(index)}
                       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                     >
-                      {line}
+                      {renderIntroLine(line)}
                     </motion.p>
                   ))}
-                </div>
-              </motion.div>
+                  <div className="c-BrandHeroParallax__introSignoff">
+                    {HERO_INTRO_SIGNOFF_LINES.map((line, index) => (
+                      <motion.p
+                        key={line}
+                        className="c-BrandHeroParallax__introSignoffLine"
+                        initial={false}
+                        animate={getIntroLineMotion(HERO_INTRO_LINES.length + index)}
+                        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        {line}
+                      </motion.p>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+              {isWordmarkOnlyVariant && wordmarkOnlyOverlay ? (
+                <motion.div
+                  className="c-BrandHeroParallax__wordmarkOnlyOverlay"
+                  initial={false}
+                  animate={{
+                    opacity: wordmarkOnlyOverlayProgress,
+                    y: `${(1 - wordmarkOnlyOverlayProgress) * 18}px`,
+                    filter: `blur(${(1 - wordmarkOnlyOverlayProgress) * 8}px)`
+                  }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {wordmarkOnlyOverlay}
+                </motion.div>
+              ) : null}
               <h1 className="c-BrandHeroParallax__wordmark c-BrandHeroParallax__wordmarkStencil">
                 {renderWordmarkCharacters("c-BrandHeroParallax__characterInner")}
               </h1>
             </motion.div>
           </div>
 
-          <motion.div
-            className="c-BrandHeroParallax__overviewScene"
-            initial={false}
-            animate={{ opacity: overviewRevealProgress }}
-            transition={{ duration: 0.12, ease: "linear" }}
-          >
+          {!isWordmarkOnlyVariant && (
             <motion.div
-              aria-hidden="true"
-              className="c-BrandHeroParallax__overviewDoor"
+              className="c-BrandHeroParallax__overviewScene"
               initial={false}
-              animate={{
-                clipPath: shouldReduceMotion
-                  ? isMobileViewport
-                    ? "polygon(0 0, 100% 0, 100% 100%, 0 100%)"
-                    : "polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)"
-                  : overviewDoorClipPath
-              }}
-              transition={{ duration: 0.08, ease: "linear" }}
-            />
-            <BrandHeroParallaxOverview />
-
-            <motion.div
-              className="c-BrandHeroParallax__revenueModel"
-              initial={false}
-              animate={{
-                opacity: shouldReduceMotion ? 1 : revenueRevealProgress
-              }}
+              animate={{ opacity: overviewRevealProgress }}
               transition={{ duration: 0.12, ease: "linear" }}
             >
-              <motion.p
-                className="c-BrandHeroParallax__revenueEyebrow"
+              <motion.div
+                aria-hidden="true"
+                className="c-BrandHeroParallax__overviewDoor"
                 initial={false}
-                animate={getRevenueItemMotion(0)}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {REVENUE_MODEL_EYEBROW}
-              </motion.p>
+                animate={{
+                  clipPath: shouldReduceMotion
+                    ? isMobileViewport
+                      ? "polygon(0 0, 100% 0, 100% 100%, 0 100%)"
+                      : "polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)"
+                    : overviewDoorClipPath
+                }}
+                transition={{ duration: 0.08, ease: "linear" }}
+              />
+              <BrandHeroParallaxOverview />
 
-              <motion.h2
-                className="c-BrandHeroParallax__revenueHeading"
+              <motion.div
+                className="c-BrandHeroParallax__revenueModel"
                 initial={false}
-                animate={getRevenueItemMotion(1)}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                animate={{
+                  opacity: shouldReduceMotion ? 1 : revenueRevealProgress
+                }}
+                transition={{ duration: 0.12, ease: "linear" }}
               >
-                {REVENUE_MODEL_HEADING}
-              </motion.h2>
+                <motion.p
+                  className="c-BrandHeroParallax__revenueEyebrow"
+                  initial={false}
+                  animate={getRevenueItemMotion(0)}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {REVENUE_MODEL_EYEBROW}
+                </motion.p>
 
-              <motion.p
-                className="c-BrandHeroParallax__revenueSummary"
-                initial={false}
-                animate={getRevenueItemMotion(2)}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {REVENUE_MODEL_SUMMARY}
-              </motion.p>
+                <motion.h2
+                  className="c-BrandHeroParallax__revenueHeading"
+                  initial={false}
+                  animate={getRevenueItemMotion(1)}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {REVENUE_MODEL_HEADING}
+                </motion.h2>
 
-              <div className="c-BrandHeroParallax__revenuePillars">
-                {REVENUE_MODEL_PILLARS.map((pillar, index) => (
-                  <motion.div
-                    key={pillar.title}
-                    className="c-BrandHeroParallax__revenuePillar"
-                    initial={false}
-                    animate={getRevenueItemMotion(3 + index)}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <h4 className="c-BrandHeroParallax__revenuePillarTitle">
-                      {pillar.title}
-                    </h4>
-                    <p className="c-BrandHeroParallax__revenuePillarSummary">
-                      {pillar.summary}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
+                <motion.p
+                  className="c-BrandHeroParallax__revenueSummary"
+                  initial={false}
+                  animate={getRevenueItemMotion(2)}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {REVENUE_MODEL_SUMMARY}
+                </motion.p>
 
-              <motion.ul
-                className="c-BrandHeroParallax__revenueValueProps"
-                initial={false}
-                animate={getRevenueItemMotion(
-                  3 + REVENUE_MODEL_PILLARS.length
-                )}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {REVENUE_MODEL_VALUE_PROPS.map((line) => (
-                  <li key={line} className="c-BrandHeroParallax__revenueValueProp">
-                    {line}
-                  </li>
-                ))}
-              </motion.ul>
+                <div className="c-BrandHeroParallax__revenuePillars">
+                  {REVENUE_MODEL_PILLARS.map((pillar, index) => (
+                    <motion.div
+                      key={pillar.title}
+                      className="c-BrandHeroParallax__revenuePillar"
+                      initial={false}
+                      animate={getRevenueItemMotion(3 + index)}
+                      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <h4 className="c-BrandHeroParallax__revenuePillarTitle">
+                        {pillar.title}
+                      </h4>
+                      <p className="c-BrandHeroParallax__revenuePillarSummary">
+                        {pillar.summary}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
 
-              <motion.p
-                className="c-BrandHeroParallax__revenueSignoff"
-                initial={false}
-                animate={getRevenueItemMotion(totalRevenueItems - 1)}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {REVENUE_MODEL_SIGNOFF}
-              </motion.p>
+                <motion.ul
+                  className="c-BrandHeroParallax__revenueValueProps"
+                  initial={false}
+                  animate={getRevenueItemMotion(
+                    3 + REVENUE_MODEL_PILLARS.length
+                  )}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {REVENUE_MODEL_VALUE_PROPS.map((line) => (
+                    <li key={line} className="c-BrandHeroParallax__revenueValueProp">
+                      {line}
+                    </li>
+                  ))}
+                </motion.ul>
+
+                <motion.p
+                  className="c-BrandHeroParallax__revenueSignoff"
+                  initial={false}
+                  animate={getRevenueItemMotion(totalRevenueItems - 1)}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {REVENUE_MODEL_SIGNOFF}
+                </motion.p>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          )}
 
         </section>
       </div>
@@ -670,7 +735,9 @@ export function BrandHeroParallax({
         className="c-BrandHeroParallax__scrollSpacer"
         aria-hidden="true"
         style={{
-          height: `${(OUTRO_SCROLL_DISTANCE_FACTOR + REVENUE_SCROLL_EXTENSION_FACTOR) * 100}vh`
+          height: isWordmarkOnlyVariant
+            ? `${OUTRO_SCROLL_DISTANCE_FACTOR * 100}vh`
+            : `${(OUTRO_SCROLL_DISTANCE_FACTOR + REVENUE_SCROLL_EXTENSION_FACTOR) * 100}vh`
         }}
       />
     </div>

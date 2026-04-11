@@ -6,6 +6,54 @@
   --c-BrandHeroParallax__roccoBottom: clamp(0.35rem, 1.6vh, 1rem);
 }
 
+.c-BrandHeroParallax--wordmarkOnly .c-BrandHeroParallax__section {
+  background:
+    radial-gradient(circle at top, rgb(122 19 45 / 0.2), transparent 34%),
+    linear-gradient(180deg, rgb(8 14 18), rgb(12 13 16));
+}
+
+.c-BrandHeroParallax__wordmarkOnlyDog {
+  position: absolute;
+  right: clamp(0.4rem, 3vw, 1rem);
+  bottom: 0;
+  z-index: 4;
+  width: min(38.4vw, 12rem);
+  max-width: 10rem;
+  pointer-events: none;
+  opacity: 0.33;
+}
+
+.c-BrandHeroParallax__wordmarkOnlyDogImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter:
+    drop-shadow(0 20px 36px rgb(0 0 0 / 0.36))
+    saturate(0.96);
+}
+
+.c-BrandHeroParallax__wordmarkOnlyScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background:
+    linear-gradient(90deg, rgb(8 14 18 / 0.94) 0%, rgb(8 14 18 / 0.88) 46%, rgb(8 14 18 / 0.6) 72%, rgb(8 14 18 / 0.74) 100%),
+    linear-gradient(180deg, rgb(8 14 18 / 0.26) 0%, rgb(8 14 18 / 0.48) 100%);
+}
+
+.c-BrandHeroParallax__wordmarkOnlyOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  align-content: center;
+  padding: clamp(1.25rem, 6vw, 2rem);
+  pointer-events: auto;
+}
+
 .c-BrandHeroParallax__viewport {
   position: sticky;
   top: 0;
@@ -412,11 +460,20 @@
 .c-BrandHeroParallax__characterInner--accentLeading {
   --c-BrandHeroParallax__flickerColor: var(--ui-shell-accent-strong);
   color: var(--ui-shell-accent-strong);
+  text-shadow:
+    0 0 0.03em var(--c-BrandHeroParallax__flickerColor),
+    0 0 0.12em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 84%, transparent),
+    0 0 0.24em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 46%, transparent);
 }
 
 .c-BrandHeroParallax__characterInner--accentTrailing {
   --c-BrandHeroParallax__flickerColor: var(--ui-mint);
   color: var(--ui-mint);
+  text-shadow:
+    0 0 0.03em var(--c-BrandHeroParallax__flickerColor),
+    0 0 0.14em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 90%, transparent),
+    0 0 0.32em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 56%, transparent),
+    0 0 0.72em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 28%, transparent);
 }
 
 .c-BrandHeroParallax__characterInner--divider {
@@ -549,6 +606,17 @@
     --c-BrandHeroParallax__roccoWidth: min(28.6vw, 7.8rem);
   }
 
+  .c-BrandHeroParallax__wordmarkOnlyDog {
+    right: 0;
+    width: min(43.2vw, 11.2rem);
+    opacity: 0.34;
+  }
+
+  .c-BrandHeroParallax__wordmarkOnlyOverlay {
+    align-content: end;
+    padding: 1rem 1rem calc(18vh + 1rem);
+  }
+
   .c-BrandHeroParallax__viewport {
     height: 100dvh;
     min-height: 100svh;
@@ -660,5 +728,217 @@
     font-size: clamp(1.05rem, 5.2vw, 2.15rem);
     letter-spacing: 0.03em;
     gap: 0.1em;
+  }
+}
+
+.c-MobileHeroSection {
+  background: rgb(255 250 252);
+}
+
+.c-MobileHeroSection__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.c-MobileHeroSection__intro,
+.c-MobileHeroSection__revenueModel,
+.c-MobileHeroSection__leaderboard {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 6vw, 2.5rem);
+}
+
+.c-MobileHeroSection__intro {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.c-MobileHeroSection__intro--mascotOnly {
+  padding-top: clamp(1rem, 4vw, 1.5rem);
+}
+
+.c-MobileHeroSection__introCopy,
+.c-MobileHeroSection__revenueModel,
+.c-MobileHeroSection__leaderboard {
+  color: rgb(10 10 12 / 0.92);
+}
+
+.c-MobileHeroSection__eyebrow {
+  color: var(--ui-shell-accent);
+}
+
+.c-MobileHeroSection__heroCopy {
+  width: min(100%, 28rem);
+  margin: 0 auto;
+  color: rgb(255 255 255 / 0.94);
+}
+
+.c-MobileHeroSection__heroCopyEyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.9);
+}
+
+.c-MobileHeroSection__heroCopyStack {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.c-MobileHeroSection__heroCopyParagraph {
+  margin: 0;
+  font-size: clamp(0.78rem, 2.85vw, 0.9rem);
+  line-height: 1.65;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.c-MobileHeroSection__heroCopySignoff {
+  margin: 1rem 0 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: 0.94rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.98);
+}
+
+.c-MobileHeroSection__copyStack {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.9rem;
+}
+
+.c-MobileHeroSection__bodyCopy,
+.c-MobileHeroSection__sectionSummary,
+.c-MobileHeroSection__pillarSummary,
+.c-MobileHeroSection__footerCopy {
+  margin: 0;
+  font-size: clamp(0.96rem, 4vw, 1.08rem);
+  line-height: 1.7;
+  color: rgb(10 10 12 / 0.72);
+}
+
+.c-MobileHeroSection__signoff {
+  margin-top: 1rem;
+}
+
+.c-MobileHeroSection__signoffLine {
+  margin: 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(10 10 12 / 0.92);
+}
+
+.c-MobileHeroSection__signoffLine--revenue {
+  margin-top: 1.25rem;
+}
+
+.c-MobileHeroSection__mascotFrame {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1rem 0;
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at top, rgb(122 19 45 / 0.16), transparent 54%),
+    linear-gradient(180deg, rgb(245 236 239), rgb(255 255 255));
+}
+
+.c-MobileHeroSection__mascotImage {
+  display: block;
+  width: min(100%, 14rem);
+  height: auto;
+  filter: drop-shadow(0 18px 34px rgb(0 0 0 / 0.14));
+}
+
+.c-MobileHeroSection__sectionHeading {
+  margin: 0.35rem 0 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(1.35rem, 6vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(10 10 12 / 0.94);
+}
+
+.c-MobileHeroSection__sectionSummary {
+  margin-top: 0.95rem;
+}
+
+.c-MobileHeroSection__pillarGrid {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+}
+
+.c-MobileHeroSection__pillarCard {
+  padding: 1rem;
+  border: 1px solid rgb(10 10 12 / 0.08);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.78);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.04);
+}
+
+.c-MobileHeroSection__pillarTitle {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(10 10 12 / 0.92);
+}
+
+.c-MobileHeroSection__pillarSummary {
+  margin-top: 0.5rem;
+}
+
+.c-MobileHeroSection__valuePropList {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-MobileHeroSection__valuePropItem {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgb(10 10 12 / 0.78);
+}
+
+.c-MobileHeroSection__valuePropItem::before {
+  content: "+";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+  color: var(--ui-shell-accent);
+}
+
+.c-MobileHeroSection__leaderboardHeader {
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 1.15rem;
+}
+
+@media (min-width: 768px) {
+  .c-MobileHeroSection {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .c-MobileHeroSection__intro,
+  .c-MobileHeroSection__revenueModel,
+  .c-MobileHeroSection__leaderboard {
+    padding-inline: 1rem;
   }
 }

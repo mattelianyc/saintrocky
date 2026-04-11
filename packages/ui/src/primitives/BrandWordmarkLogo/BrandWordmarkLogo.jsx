@@ -2,8 +2,81 @@ export function BrandWordmarkLogo({
   className = "",
   style,
   width = "100%",
-  height = "auto"
+  height = "auto",
+  variant = "stacked"
 }) {
+  if (variant === "inline") {
+    return (
+      <svg
+        aria-label="Standard Deviants"
+        className={className}
+        focusable="false"
+        height={height}
+        role="img"
+        viewBox="0 0 2600 220"
+        width={width}
+        xmlns="http://www.w3.org/2000/svg"
+        style={style}
+      >
+        <text
+          x="40"
+          y="155"
+          fontFamily="var(--font-silka-mono, monospace)"
+          fontSize="150"
+          fontWeight="400"
+          letterSpacing="0.05em"
+          fill="var(--ui-shell-accent-strong)"
+        >
+          $
+        </text>
+        <text
+          x="150"
+          y="155"
+          fontFamily="var(--font-silka-mono, monospace)"
+          fontSize="136"
+          fontWeight="400"
+          letterSpacing="0.05em"
+          fill="currentColor"
+        >
+          TANDARD
+        </text>
+        <text
+          x="1180"
+          y="155"
+          fontFamily="var(--font-silka-mono, monospace)"
+          fontSize="136"
+          fontWeight="400"
+          letterSpacing="0.03em"
+          fill="var(--ui-shell-brand-divider)"
+        >
+          /
+        </text>
+        <text
+          x="1340"
+          y="155"
+          fontFamily="var(--font-silka-mono, monospace)"
+          fontSize="136"
+          fontWeight="400"
+          letterSpacing="0.05em"
+          fill="currentColor"
+        >
+          DEVIANT
+        </text>
+        <text
+          x="2415"
+          y="155"
+          fontFamily="var(--font-silka-mono, monospace)"
+          fontSize="150"
+          fontWeight="400"
+          letterSpacing="0.05em"
+          fill="var(--ui-shell-accent)"
+        >
+          $
+        </text>
+      </svg>
+    );
+  }
+
   return (
     <svg
       aria-label="Standard Deviants"

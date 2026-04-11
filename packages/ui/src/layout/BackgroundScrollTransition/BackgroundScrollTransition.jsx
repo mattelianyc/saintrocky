@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { useIsMobileViewport } from "@saintrocky/shared";
+
 const START_BACKGROUND_COLOR = [255, 250, 252];
 const END_BACKGROUND_COLOR = [246, 255, 250];
 
@@ -30,9 +32,16 @@ function getInterpolatedBackgroundColor(progress) {
 }
 
 export function BackgroundScrollTransition() {
+  const isMobileViewport = useIsMobileViewport();
+
   useEffect(() => {
     const rootElement = document.documentElement;
     let animationFrameId = null;
+
+    if (isMobileViewport == null || isMobileViewport) {
+      rootElement.style.setProperty("--ui-marketing-background-color", "rgb(255 250 252)");
+      return undefined;
+    }
 
     function updateBackgroundColor() {
       const scrollableDistance = document.documentElement.scrollHeight - window.innerHeight;
@@ -64,7 +73,7 @@ export function BackgroundScrollTransition() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScroll);
     };
-  }, []);
+  }, [isMobileViewport]);
 
   return null;
 }
