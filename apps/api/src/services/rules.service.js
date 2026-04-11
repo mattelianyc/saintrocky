@@ -13,6 +13,10 @@ import {
 } from '@saintrocky/fuckyoupayme';
 import { buildRulesChannel, buildRuntimeChannel } from '@saintrocky/realtime';
 import {
+  classifyRuleEditDirection,
+  mergeExpandingConfig
+} from '@saintrocky/enforcement';
+import {
   validateRuleDraftSubmission,
   validateRuntimeRuleEvent,
   validateTemplateRuleCreation,
@@ -30,6 +34,7 @@ import {
 } from './rules-access.service.js';
 import { getRuleDraftById, listRuleDrafts as listStoredRuleDrafts, saveRuleDraft } from './rule-draft-store.service.js';
 import {
+  findActiveUserRuleByTemplate,
   getUserRuleById,
   listRuleRuntimeEvents,
   listUserRules as listStoredUserRules,
@@ -191,6 +196,79 @@ function buildEditHistoryEntry({
     nextSummary,
     previousProblemIndex,
     nextProblemIndex
+  };
+}
+
+function applyEditToRule({
+  userRule,
+  template,
+  actor,
+  nextConfig,
+  nextCompiledRule,
+  nextProblemIndex,
+  nextLockedStakeLamports,
+  timingQuote
+}) {
+  const nextSummary = nextCompiledRule.summary;
+  const isImmediate = timingQuote.delayHours === 0;
+
+  if (isImmediate) {
+    return {
+      ...userRule,
+      title: template.title,
+      summary: nextSummary,
+      config: nextConfig,
+      compiledRule: nextCompiledRule,
+      bypassPolicy: nextCompiledRule.bypass,
+      enforcementSurfaces: inferRuntimeSurfaces(nextCompiledRule),
+      problemIndex: nextProblemIndex,
+      lockedStakeLamports: nextLockedStakeLamports,
+      pendingEdit: null,
+      updatedAt: timingQuote.requestedAt,
+      editHistory: [
+        ...(userRule.editHistory || []),
+        buildEditHistoryEntry({
+          timingQuote,
+          actor,
+          previousSummary: userRule.summary,
+          nextSummary,
+          previousProblemIndex: userRule.problemIndex,
+          nextProblemIndex,
+          status: 'applied'
+        })
+      ]
+    };
+  }
+
+  return {
+    ...userRule,
+    pendingEdit: {
+      timingOption: timingQuote.timingOption,
+      feeSol: timingQuote.feeSol,
+      paymentRequired: timingQuote.paymentRequired,
+      requestedAt: timingQuote.requestedAt,
+      effectiveAt: timingQuote.effectiveAt,
+      requestedByEmail: actor.email,
+      title: template.title,
+      summary: nextSummary,
+      config: nextConfig,
+      compiledRule: nextCompiledRule,
+      problemIndex: nextProblemIndex,
+      lockedStakeLamports: nextLockedStakeLamports
+    },
+    updatedAt: timingQuote.requestedAt,
+    editHistory: [
+      ...(userRule.editHistory || []),
+      buildEditHistoryEntry({
+        timingQuote,
+        actor,
+        previousSummary: userRule.summary,
+        nextSummary,
+        previousProblemIndex: userRule.problemIndex,
+        nextProblemIndex,
+        status: 'scheduled'
+      })
+    ]
   };
 }
 
@@ -431,12 +509,74 @@ export async function createUserRuleFromTemplate(payload = {}) {
   const actor = await resolveRuleActor(payload.actor);
   const author = await resolveRequestedRuleOwner(actor, payload.ownerEmail);
   const template = getRuleTemplateById(payload.templateId);
-  const compiledRule = buildCompiledRuleFromTemplate(template, payload.config);
+  const incomingConfig = { ...template.defaultConfig, ...(payload.config || {}) };
+
+  const existingRule = await findActiveUserRuleByTemplate(author.id, payload.templateId);
+  if (existingRule) {
+    const resolvedExisting = await materializeDueRuleEdit(existingRule);
+    const baseConfig = resolvedExisting.pendingEdit?.config || resolvedExisting.config || {};
+    const mergedConfig = mergeExpandingConfig(template, baseConfig, incomingConfig);
+    const editClassification = classifyRuleEditDirection(template, baseConfig, mergedConfig);
+
+    if (editClassification.direction === 'identical') {
+      return {
+        ok: true,
+        merged: true,
+        owner: author,
+        rule: await attachRuleRuntimeSnapshot(resolvedExisting, {
+          pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([resolvedExisting.ruleId]),
+          activeOverridesByRuleId: await listActiveOverridesByRuleId([resolvedExisting.ruleId]),
+          enforcementStatesByRuleId: await buildEnforcementStatesByRuleId([resolvedExisting], author.id)
+        })
+      };
+    }
+
+    const nextCompiledRule = buildCompiledRuleFromTemplate(template, mergedConfig);
+    const nextProblemIndex = resolveProblemIndex(payload.problemIndex, resolvedExisting.problemIndex);
+    const nextLockedStakeLamports = calculateLockedStake(nextProblemIndex);
+    const isExpanding = editClassification.direction === 'expanding';
+    const timingQuote = isExpanding
+      ? getRuleEditTimingQuote('instant', new Date())
+      : getRuleEditTimingQuote(payload.editTimingOption || 'delay_24h', new Date());
+    const freeInstantQuote = { ...timingQuote, feeSol: 0, paymentRequired: false };
+    const effectiveQuote = isExpanding ? freeInstantQuote : timingQuote;
+
+    const nextRule = applyEditToRule({
+      userRule: resolvedExisting,
+      template,
+      actor,
+      nextConfig: mergedConfig,
+      nextCompiledRule,
+      nextProblemIndex,
+      nextLockedStakeLamports,
+      timingQuote: effectiveQuote
+    });
+
+    await saveUserRule(nextRule);
+    await publishOwnerRuleState(nextRule.ownerUserId, nextRule.ownerEmail, 'rule_edited', {
+      ruleId: nextRule.ruleId,
+      pendingEdit: Boolean(nextRule.pendingEdit)
+    });
+
+    return {
+      ok: true,
+      merged: true,
+      editQuote: effectiveQuote,
+      owner: author,
+      rule: await attachRuleRuntimeSnapshot(nextRule, {
+        pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId]),
+        activeOverridesByRuleId: await listActiveOverridesByRuleId([nextRule.ruleId]),
+        enforcementStatesByRuleId: await buildEnforcementStatesByRuleId([nextRule], author.id)
+      })
+    };
+  }
+
+  const compiledRule = buildCompiledRuleFromTemplate(template, incomingConfig);
   const userRule = buildUserRuleRecord({
     author,
     source: 'template',
     template,
-    config: { ...template.defaultConfig, ...(payload.config || {}) },
+    config: incomingConfig,
     compiledRule,
     problemIndex: payload.problemIndex
   });
@@ -448,6 +588,7 @@ export async function createUserRuleFromTemplate(payload = {}) {
 
   return {
     ok: true,
+    merged: false,
     owner: author,
     rule: await attachRuleRuntimeSnapshot(userRule, {
       pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([userRule.ruleId]),
@@ -584,68 +725,25 @@ export async function editUserRule(payload = {}) {
   const baseConfig = userRule.pendingEdit?.config || userRule.config || {};
   const nextConfig = { ...baseConfig, ...(payload.config || {}) };
   const nextCompiledRule = buildCompiledRuleFromTemplate(template, nextConfig);
-  const timingQuote = getRuleEditTimingQuote(payload.editTimingOption, new Date());
-  const nextSummary = nextCompiledRule.summary;
   const nextProblemIndex = resolveProblemIndex(payload.problemIndex, userRule.problemIndex);
   const nextLockedStakeLamports = calculateLockedStake(nextProblemIndex);
 
-  const nextRule =
-    timingQuote.delayHours === 0
-      ? {
-          ...userRule,
-          title: template.title,
-          summary: nextSummary,
-          config: nextConfig,
-          compiledRule: nextCompiledRule,
-          bypassPolicy: nextCompiledRule.bypass,
-          enforcementSurfaces: inferRuntimeSurfaces(nextCompiledRule),
-          problemIndex: nextProblemIndex,
-          lockedStakeLamports: nextLockedStakeLamports,
-          pendingEdit: null,
-          updatedAt: timingQuote.requestedAt,
-          editHistory: [
-            ...(userRule.editHistory || []),
-            buildEditHistoryEntry({
-              timingQuote,
-              actor,
-              previousSummary: userRule.summary,
-              nextSummary,
-              previousProblemIndex: userRule.problemIndex,
-              nextProblemIndex,
-              status: 'applied'
-            })
-          ]
-        }
-      : {
-          ...userRule,
-          pendingEdit: {
-            timingOption: timingQuote.timingOption,
-            feeSol: timingQuote.feeSol,
-            paymentRequired: timingQuote.paymentRequired,
-            requestedAt: timingQuote.requestedAt,
-            effectiveAt: timingQuote.effectiveAt,
-            requestedByEmail: actor.email,
-            title: template.title,
-            summary: nextSummary,
-            config: nextConfig,
-            compiledRule: nextCompiledRule,
-            problemIndex: nextProblemIndex,
-            lockedStakeLamports: nextLockedStakeLamports
-          },
-          updatedAt: timingQuote.requestedAt,
-          editHistory: [
-            ...(userRule.editHistory || []),
-            buildEditHistoryEntry({
-              timingQuote,
-              actor,
-              previousSummary: userRule.summary,
-              nextSummary,
-              previousProblemIndex: userRule.problemIndex,
-              nextProblemIndex,
-              status: 'scheduled'
-            })
-          ]
-        };
+  const editClassification = classifyRuleEditDirection(template, baseConfig, nextConfig);
+  const isExpanding = editClassification.direction === 'expanding';
+  const timingQuote = isExpanding
+    ? { ...getRuleEditTimingQuote('instant', new Date()), feeSol: 0, paymentRequired: false }
+    : getRuleEditTimingQuote(payload.editTimingOption, new Date());
+
+  const nextRule = applyEditToRule({
+    userRule,
+    template,
+    actor,
+    nextConfig,
+    nextCompiledRule,
+    nextProblemIndex,
+    nextLockedStakeLamports,
+    timingQuote
+  });
 
   await saveUserRule(nextRule);
   await publishOwnerRuleState(nextRule.ownerUserId, nextRule.ownerEmail, 'rule_edited', {
@@ -656,6 +754,7 @@ export async function editUserRule(payload = {}) {
   return {
     ok: true,
     editQuote: timingQuote,
+    editDirection: editClassification.direction,
     rule: await attachRuleRuntimeSnapshot(nextRule, {
       pendingRequestsByRuleId: await listPendingRuleChangeRequestsByRuleId([nextRule.ruleId]),
       activeOverridesByRuleId: await listActiveOverridesByRuleId([nextRule.ruleId]),

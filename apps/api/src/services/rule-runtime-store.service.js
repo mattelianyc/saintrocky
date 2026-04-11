@@ -13,6 +13,10 @@ export async function getUserRuleById(ruleId) {
   return UserRule.findOne({ ruleId }).lean();
 }
 
+export async function findActiveUserRuleByTemplate(ownerUserId, templateId) {
+  return UserRule.findOne({ ownerUserId, templateId, status: 'active' }).lean();
+}
+
 export async function listUserRules({ ownerUserId } = {}) {
   const filter = ownerUserId ? { ownerUserId } : {};
   return UserRule.find(filter).sort({ updatedAt: -1 }).lean();

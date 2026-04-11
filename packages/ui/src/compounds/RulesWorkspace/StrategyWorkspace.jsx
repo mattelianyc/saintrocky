@@ -7,6 +7,7 @@ import { Tabs } from "../../primitives/Tabs/Tabs.jsx";
 import { ProblemIndexSlider } from "../ProblemIndexSlider/ProblemIndexSlider.jsx";
 import { RuleAuthoringWorkspace } from "../RuleAuthoringWorkspace/RuleAuthoringWorkspace.jsx";
 import { RuleTemplatesPanel } from "./RuleTemplatesPanel.jsx";
+import { useRulesWorkspaceData } from "./useRulesWorkspaceData.js";
 
 const TAB_ANIMATION = {
   initial: { opacity: 0, y: 10 },
@@ -18,6 +19,12 @@ const TAB_ANIMATION = {
 export function StrategyWorkspace({ section }) {
   const [activeTab, setActiveTab] = useState("templates");
   const [problemIndex, setProblemIndex] = useState(50);
+  const [refreshToken, setRefreshToken] = useState(0);
+  const { activeRules } = useRulesWorkspaceData({ refreshToken });
+
+  function handleRuleCreated() {
+    setRefreshToken((current) => current + 1);
+  }
 
   function renderActiveContent() {
     switch (activeTab) {
@@ -26,6 +33,8 @@ export function StrategyWorkspace({ section }) {
           <RuleTemplatesPanel
             problemIndex={problemIndex}
             onProblemIndexChange={setProblemIndex}
+            existingRules={activeRules}
+            onRuleCreated={handleRuleCreated}
           />
         );
       case "create-with-ai":

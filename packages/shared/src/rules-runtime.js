@@ -152,8 +152,20 @@ export const foundationalRuleTemplates = [
     category: 'trade_limits',
     inputSchema: {
       fields: [
-        { key: 'maxTrades', label: 'Max trades per day', type: 'number', required: true },
-        { key: 'blockedDomains', label: 'Trading domains to block after limit', type: 'text', required: false }
+        {
+          key: 'maxTrades',
+          label: 'Max trades per day',
+          type: 'number',
+          required: true,
+          editSemantics: 'lower_is_stricter'
+        },
+        {
+          key: 'blockedDomains',
+          label: 'Trading domains to block after limit',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        }
       ]
     },
     defaultConfig: {
@@ -170,7 +182,13 @@ export const foundationalRuleTemplates = [
     category: 'risk_management',
     inputSchema: {
       fields: [
-        { key: 'maxPositionSizeSol', label: 'Max position size (SOL)', type: 'number', required: true }
+        {
+          key: 'maxPositionSizeSol',
+          label: 'Max position size (SOL)',
+          type: 'number',
+          required: true,
+          editSemantics: 'lower_is_stricter'
+        }
       ]
     },
     defaultConfig: {
@@ -189,8 +207,20 @@ export const foundationalRuleTemplates = [
         { key: 'blockedStart', label: 'Block start time', type: 'time', required: true },
         { key: 'blockedEnd', label: 'Block end time', type: 'time', required: true },
         { key: 'timezone', label: 'Timezone', type: 'text', required: true },
-        { key: 'blockedDomains', label: 'Domains to block', type: 'text', required: false },
-        { key: 'blockedApps', label: 'Apps to block', type: 'text', required: false }
+        {
+          key: 'blockedDomains',
+          label: 'Domains to block',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        },
+        {
+          key: 'blockedApps',
+          label: 'Apps to block',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        }
       ]
     },
     defaultConfig: {
@@ -210,7 +240,13 @@ export const foundationalRuleTemplates = [
     category: 'fomo_protection',
     inputSchema: {
       fields: [
-        { key: 'minTokenAgeHours', label: 'Minimum token age (hours)', type: 'number', required: true }
+        {
+          key: 'minTokenAgeHours',
+          label: 'Minimum token age (hours)',
+          type: 'number',
+          required: true,
+          editSemantics: 'higher_is_stricter'
+        }
       ]
     },
     defaultConfig: {
@@ -226,9 +262,27 @@ export const foundationalRuleTemplates = [
     category: 'risk_management',
     inputSchema: {
       fields: [
-        { key: 'cooldownMinutes', label: 'Cooldown minutes', type: 'number', required: true },
-        { key: 'blockedDomains', label: 'Domains to block during cooldown', type: 'text', required: false },
-        { key: 'blockedApps', label: 'Apps to block during cooldown', type: 'text', required: false }
+        {
+          key: 'cooldownMinutes',
+          label: 'Cooldown minutes',
+          type: 'number',
+          required: true,
+          editSemantics: 'higher_is_stricter'
+        },
+        {
+          key: 'blockedDomains',
+          label: 'Domains to block during cooldown',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        },
+        {
+          key: 'blockedApps',
+          label: 'Apps to block during cooldown',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        }
       ]
     },
     defaultConfig: {
@@ -246,8 +300,20 @@ export const foundationalRuleTemplates = [
     category: 'risk_management',
     inputSchema: {
       fields: [
-        { key: 'maxDailyLossSol', label: 'Max daily loss (SOL)', type: 'number', required: true },
-        { key: 'blockedDomains', label: 'Domains to block after limit', type: 'text', required: false }
+        {
+          key: 'maxDailyLossSol',
+          label: 'Max daily loss (SOL)',
+          type: 'number',
+          required: true,
+          editSemantics: 'lower_is_stricter'
+        },
+        {
+          key: 'blockedDomains',
+          label: 'Domains to block after limit',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        }
       ]
     },
     defaultConfig: {
@@ -264,7 +330,13 @@ export const foundationalRuleTemplates = [
     category: 'fomo_protection',
     inputSchema: {
       fields: [
-        { key: 'blockedMints', label: 'Token mint addresses (comma-separated)', type: 'text', required: true }
+        {
+          key: 'blockedMints',
+          label: 'Token mint addresses (comma-separated)',
+          type: 'text',
+          required: true,
+          editSemantics: 'list_expanding'
+        }
       ]
     },
     defaultConfig: {
@@ -280,8 +352,20 @@ export const foundationalRuleTemplates = [
     category: 'manual_lock',
     inputSchema: {
       fields: [
-        { key: 'blockedDomains', label: 'Domains to lock', type: 'text', required: false },
-        { key: 'blockedApps', label: 'Apps to lock', type: 'text', required: false },
+        {
+          key: 'blockedDomains',
+          label: 'Domains to lock',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        },
+        {
+          key: 'blockedApps',
+          label: 'Apps to lock',
+          type: 'text',
+          required: false,
+          editSemantics: 'list_expanding'
+        },
         { key: 'lockLabel', label: 'Lock label', type: 'text', required: false }
       ]
     },
@@ -300,7 +384,13 @@ export const foundationalRuleTemplates = [
     category: 'schedule_discipline',
     inputSchema: {
       fields: [
-        { key: 'blockedDomains', label: 'Domains to block', type: 'text', required: true },
+        {
+          key: 'blockedDomains',
+          label: 'Domains to block',
+          type: 'text',
+          required: true,
+          editSemantics: 'list_expanding'
+        },
         { key: 'sessionStart', label: 'Block start time', type: 'time', required: true },
         { key: 'sessionEnd', label: 'Block end time', type: 'time', required: true },
         { key: 'timezone', label: 'Timezone', type: 'text', required: true }
@@ -322,7 +412,13 @@ export const foundationalRuleTemplates = [
     category: 'schedule_discipline',
     inputSchema: {
       fields: [
-        { key: 'blockedApps', label: 'Apps to block', type: 'text', required: true },
+        {
+          key: 'blockedApps',
+          label: 'Apps to block',
+          type: 'text',
+          required: true,
+          editSemantics: 'list_expanding'
+        },
         { key: 'sessionStart', label: 'Block start time', type: 'time', required: true },
         { key: 'sessionEnd', label: 'Block end time', type: 'time', required: true },
         { key: 'timezone', label: 'Timezone', type: 'text', required: true }

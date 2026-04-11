@@ -36,7 +36,7 @@ function getFieldInputProps(field) {
   return { type: "text" };
 }
 
-export function RuleTemplatesPanel({ problemIndex = 50, onProblemIndexChange, onRuleCreated }) {
+export function RuleTemplatesPanel({ problemIndex = 50, onProblemIndexChange, onRuleCreated, existingRules = [] }) {
   const [owners, setOwners] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [selectedOwnerEmail, setSelectedOwnerEmail] = useState("");
@@ -49,6 +49,16 @@ export function RuleTemplatesPanel({ problemIndex = 50, onProblemIndexChange, on
     () => templates.find((template) => template.templateId === selectedTemplateId) || templates[0] || null,
     [templates, selectedTemplateId]
   );
+
+  const matchingExistingRule = useMemo(
+    () =>
+      selectedTemplate
+        ? existingRules.find((rule) => rule.templateId === selectedTemplate.templateId) || null
+        : null,
+    [existingRules, selectedTemplate]
+  );
+
+  const isUpdatingExistingRule = matchingExistingRule !== null;
 
   useEffect(() => {
     async function loadTemplates() {
@@ -75,23 +85,34 @@ export function RuleTemplatesPanel({ problemIndex = 50, onProblemIndexChange, on
 
   useEffect(() => {
     if (!selectedTemplate) return;
-    setConfig(selectedTemplate.defaultConfig || {});
-    onProblemIndexChange?.(50);
-  }, [selectedTemplate?.templateId]);
+
+    const existingMatch = existingRules.find((rule) => rule.templateId === selectedTemplate.templateId);
+    if (existingMatch) {
+      setConfig(existingMatch.pendingEdit?.config || existingMatch.config || selectedTemplate.defaultConfig || {});
+      onProblemIndexChange?.(existingMatch.problemIndex ?? 50);
+    } else {
+      setConfig(selectedTemplate.defaultConfig || {});
+      onProblemIndexChange?.(50);
+    }
+  }, [selectedTemplate?.templateId, existingRules]);
 
   async function handleCreateRule() {
     setStatus("submitting");
     setMessage("");
 
     try {
-      await api.rules.createFromTemplate({
+      const response = await api.rules.createFromTemplate({
         ownerEmail: selectedOwnerEmail || undefined,
         templateId: selectedTemplate.templateId,
         config,
         problemIndex
       });
       setStatus("idle");
-      setMessage("Template added to current rules.");
+      setMessage(
+        response.merged
+          ? "Existing rule updated with new configuration."
+          : "Template added to current rules."
+      );
       if (typeof onRuleCreated === "function") {
         onRuleCreated();
       }
@@ -140,22 +161,26 @@ export function RuleTemplatesPanel({ problemIndex = 50, onProblemIndexChange, on
         <div className="c-RulesWorkspacePanel__grid">
           <section className="c-RulesWorkspacePanel__stack">
             <h3>Template library</h3>
-            {templates.map((template, index) => (
-              <motion.button
-                key={template.templateId}
-                type="button"
-                className={`c-RulesWorkspacePanel__templateButton ${
-                  template.templateId === selectedTemplateId ? "is-selected" : ""
-                }`}
-                onClick={() => setSelectedTemplateId(template.templateId)}
-                {...STAGGER_ITEM}
-                transition={{ ...STAGGER_ITEM.transition, delay: index * 0.04 }}
-              >
-                <span>{RULE_TEMPLATE_CATEGORY_LABELS[template.category] || template.category}</span>
-                <strong>{template.title}</strong>
-                <span>{template.summary}</span>
-              </motion.button>
-            ))}
+            {templates.map((template, index) => {
+              const hasExistingRule = existingRules.some((rule) => rule.templateId === template.templateId);
+              return (
+                <motion.button
+                  key={template.templateId}
+                  type="button"
+                  className={`c-RulesWorkspacePanel__templateButton ${
+                    template.templateId === selectedTemplateId ? "is-selected" : ""
+                  } ${hasExistingRule ? "has-existing-rule" : ""}`}
+                  onClick={() => setSelectedTemplateId(template.templateId)}
+                  {...STAGGER_ITEM}
+                  transition={{ ...STAGGER_ITEM.transition, delay: index * 0.04 }}
+                >
+                  <span>{RULE_TEMPLATE_CATEGORY_LABELS[template.category] || template.category}</span>
+                  <strong>{template.title}</strong>
+                  <span>{template.summary}</span>
+                  {hasExistingRule ? <span className="c-RulesWorkspacePanel__activeTag">Active</span> : null}
+                </motion.button>
+              );
+            })}
           </section>
 
           <AnimatePresence mode="wait">
@@ -189,13 +214,18 @@ export function RuleTemplatesPanel({ problemIndex = 50, onProblemIndexChange, on
                       </label>
                     ))}
                   </div>
+                  {isUpdatingExistingRule ? (
+                    <p className="c-RulesWorkspacePanel__mergeHint">
+                      An active rule from this template already exists. Changes that expand protection will apply immediately at no charge.
+                    </p>
+                  ) : null}
                   <div className="c-RulesWorkspacePanel__actions">
                     <Button
                       onClick={handleCreateRule}
                       loading={status === "submitting"}
-                      loadingLabel="Creating rule"
+                      loadingLabel={isUpdatingExistingRule ? "Updating rule" : "Creating rule"}
                     >
-                      Add to current rules
+                      {isUpdatingExistingRule ? "Update existing rule" : "Add to current rules"}
                     </Button>
                   </div>
                 </Card>
