@@ -41,7 +41,8 @@ const schema = defineSchema({
   HELIUS_API_KEY: rules.optionalString(),
   HELIUS_WEBHOOK_SECRET: rules.optionalString(),
   PUBLIC_API_URL: rules.optionalString('http://localhost:4000'),
-  SOLANA_RPC_URL: rules.optionalString('https://api.mainnet-beta.solana.com')
+  SOLANA_RPC_URL: rules.optionalString('https://api.mainnet-beta.solana.com'),
+  SOLANA_PLATFORM_KEYPAIR: rules.optionalString('')
 });
 
 const runtimeConfig = loadApiRuntimeConfig(process.env);
@@ -122,6 +123,7 @@ export const env = {
   heliusWebhookSecret: cfg.HELIUS_WEBHOOK_SECRET,
   publicApiUrl: cfg.PUBLIC_API_URL,
   solanaRpcUrl: cfg.SOLANA_RPC_URL,
+  solanaPlatformKeypair: cfg.SOLANA_PLATFORM_KEYPAIR,
 
   authCookieName: 'saintrocky.auth'
 };
