@@ -17,6 +17,10 @@ export function normalizeOrigin(origin) {
   return String(origin || "").trim().replace(/\/+$/, "");
 }
 
+export function isChromeExtensionOrigin(origin) {
+  return normalizeOrigin(origin).startsWith("chrome-extension://");
+}
+
 export function parseAllowedOrigins(originsValue) {
   return Array.from(
     new Set(

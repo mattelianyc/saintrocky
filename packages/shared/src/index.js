@@ -105,6 +105,7 @@ export {
 
 export {
   BROWSER_EXTENSION_MESSAGE_TYPES,
+  isChromeExtensionOrigin,
   isAllowedOrigin,
   normalizeOrigin,
   parseAllowedOrigins

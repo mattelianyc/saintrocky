@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
+import { isAllowedOrigin, isChromeExtensionOrigin } from '@saintrocky/shared';
 
 import { env } from '@saintrocky/api/config/env';
 import { logger } from '@saintrocky/api/logger';
@@ -23,12 +24,19 @@ function buildAllowedOrigins() {
   return allowedOrigins;
 }
 
-function isAllowedExtensionOrigin(origin) {
-  return String(origin || '').startsWith('chrome-extension://');
+function createCorsOriginError(origin) {
+  const error = new Error(`Origin ${origin} is not allowed by CORS.`);
+  error.status = 403;
+  error.payload = {
+    ok: false,
+    code: 'CORS_ORIGIN_NOT_ALLOWED',
+    message: `Origin ${origin} is not allowed by CORS.`
+  };
+  return error;
 }
 
 function createCorsOptions() {
-  const allowedOrigins = buildAllowedOrigins();
+  const allowedOrigins = Array.from(buildAllowedOrigins());
 
   return {
     credentials: true,
@@ -38,17 +46,17 @@ function createCorsOptions() {
         return;
       }
 
-      if (allowedOrigins.has(origin)) {
+      if (isAllowedOrigin(origin, allowedOrigins)) {
         callback(null, true);
         return;
       }
 
-      if (env.nodeEnv !== 'production' && isAllowedExtensionOrigin(origin)) {
+      if (env.nodeEnv !== 'production' && isChromeExtensionOrigin(origin)) {
         callback(null, true);
         return;
       }
 
-      callback(new Error(`Origin ${origin} is not allowed by CORS.`));
+      callback(createCorsOriginError(origin));
     }
   };
 }

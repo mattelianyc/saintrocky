@@ -1,4 +1,5 @@
 import { defineSchema, loadApiRuntimeConfig, loadConfig, rules } from '@saintrocky/config';
+import { parseAllowedOrigins } from '@saintrocky/shared';
 import { loadEnvFiles } from '@saintrocky/config/load-env-files';
 
 loadEnvFiles();
@@ -88,10 +89,7 @@ export const env = {
   nodeEnv: cfg.NODE_ENV,
   port: cfg.PORT || runtimeConfig.API_PORT || cfg.API_PORT,
   logLevel: cfg.LOG_LEVEL,
-  corsAllowedOrigins: String(cfg.CORS_ALLOWED_ORIGINS || '')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean),
+  corsAllowedOrigins: parseAllowedOrigins(cfg.CORS_ALLOWED_ORIGINS),
 
   mongodbUri: cfg.MONGODB_URI,
   jwtSecret: cfg.JWT_SECRET,
