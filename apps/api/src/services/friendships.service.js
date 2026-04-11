@@ -76,8 +76,8 @@ function formatFriendship(actor, friendship) {
 
 async function findMemberUser({ userId, email }) {
   const query = userId
-    ? { _id: userId, role: MEMBER_ROLE }
-    : { email: String(email || '').trim().toLowerCase(), role: MEMBER_ROLE };
+    ? { _id: userId, role: MEMBER_ROLE, deletionRequestedAt: null }
+    : { email: String(email || '').trim().toLowerCase(), role: MEMBER_ROLE, deletionRequestedAt: null };
   const user = await User.findOne(query).lean();
   return user ? normalizeParticipant(user) : null;
 }
@@ -107,7 +107,7 @@ export async function listFriendships(payload = {}) {
     })
       .sort({ requestedAt: -1 })
       .lean(),
-    User.find({ role: MEMBER_ROLE }).sort({ name: 1, email: 1 }).lean()
+    User.find({ role: MEMBER_ROLE, deletionRequestedAt: null }).sort({ name: 1, email: 1 }).lean()
   ]);
 
   const pendingIncoming = [];

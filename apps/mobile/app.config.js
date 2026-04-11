@@ -2,6 +2,9 @@ const { loadEnvFiles } = require('@saintrocky/config/load-env-files');
 
 loadEnvFiles();
 
+const expoOwner = 'mattelianyc';
+const androidPackage = 'com.standarddeviants.saintrocky';
+
 module.exports = ({ config }) => {
   const extra = { ...(config.extra || {}) };
 
@@ -12,24 +15,34 @@ module.exports = ({ config }) => {
   }
 
   const projectId = extra.EXPO_PUBLIC_EAS_PROJECT_ID || extra.EAS_PROJECT_ID;
+  const plugins = Array.from(new Set([...(config.plugins || []), 'expo-notifications', 'expo-updates']));
   if (projectId) {
     extra.eas = { projectId };
   }
 
   return {
     ...config,
+    owner: expoOwner,
     name: 'Saint Rocky',
     slug: 'saint-rocky',
-    version: config.version || '0.1.0',
+    version: config.version || '1.0.0',
+    runtimeVersion: { policy: 'appVersion' },
     icon: './assets/icon.png',
     userInterfaceStyle: 'dark',
     splash: {
-      image: './assets/splash.png',
+      image: './assets/splash-icon.png',
       resizeMode: 'cover',
-      backgroundColor: '#000000'
+      backgroundColor: '#E6F4FE'
     },
+    updates: projectId
+      ? {
+          ...(config.updates || {}),
+          url: `https://u.expo.dev/${projectId}`
+        }
+      : config.updates,
     android: {
       ...(config.android || {}),
+      package: androidPackage,
       adaptiveIcon: {
         backgroundColor: '#E6F4FE',
         foregroundImage: './assets/android-icon-foreground.png',
@@ -41,7 +54,7 @@ module.exports = ({ config }) => {
       ...(config.web || {}),
       favicon: './assets/favicon.png'
     },
-    plugins: [...(config.plugins || []), 'expo-notifications'],
+    plugins,
     extra
   };
 };

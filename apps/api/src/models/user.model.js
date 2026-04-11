@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, index: true },
     passwordHash: { type: String, required: true },
     avatarUrl: { type: String, default: '' },
+    deletionRequestedAt: { type: Date, default: null },
     authVersion: { type: Number, required: true, default: 0 },
     role: {
       type: String,

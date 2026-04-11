@@ -384,6 +384,23 @@
   color: var(--ui-dark-fg);
 }
 
+.sr-MobileNavHeader {
+  display: none;
+}
+
+.sr-MobileDashboardDrawer {
+  padding: 1.5rem 1.25rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ui-shell-accent) 34%, var(--ui-dark-bg)) 0%,
+      var(--ui-dark-bg) 100%
+    );
+  box-shadow:
+    inset -1px 0 0 color-mix(in srgb, var(--ui-mint) 18%, transparent),
+    0 24px 64px rgb(0 0 0 / 0.34);
+}
+
 .sr-NotFoundShell {
   display: grid;
   min-height: 100vh;
@@ -1061,16 +1078,60 @@
     flex-direction: column;
   }
 
-  .sr-WebDashboardLayout .c-PageLayout__sidebar {
+  .sr-MobileNavHeader {
+    position: sticky;
+    top: 0;
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--ui-shell-accent) 34%, var(--ui-dark-bg)) 0%,
+        var(--ui-dark-bg) 100%
+      );
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--ui-mint) 18%, transparent);
+  }
+
+  .sr-MobileNavHeader__menuButton.ui-Button--ghost {
+    color: var(--ui-dark-fg);
+    background: color-mix(in srgb, var(--ui-mint) 10%, transparent);
+  }
+
+  .sr-MobileNavHeader__menuButton.ui-Button--ghost:not(:disabled):not([data-disabled]):hover {
+    color: var(--ui-dark-fg);
+    background: color-mix(in srgb, var(--ui-mint) 18%, transparent);
+  }
+
+  .sr-MobileNavHeader__brand {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .sr-MobileNavHeader__brandLogo {
     width: 100%;
+    max-width: 10rem;
+    height: auto;
+    color: var(--ui-dark-fg);
+  }
+
+  .sr-WebDashboardLayout {
     min-height: auto;
     height: auto;
+    overflow: visible;
   }
 
   .sr-WebDashboardLayout .c-PageLayout__main {
     height: auto;
     overflow: visible;
     padding: 1.5rem;
+  }
+
+  .sr-WebDashboardLayout .c-PageLayout__trailingPanel {
+    min-height: auto;
+    max-height: none;
   }
 
   .desktop-Layout .c-PageLayout__main {

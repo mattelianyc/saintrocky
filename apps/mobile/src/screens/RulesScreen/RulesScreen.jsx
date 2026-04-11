@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, Linking, Pressable, RefreshControl, Text, View } from 'react-native';
 
 import { api } from '@/api/client.js';
 import { buildRulesChannel } from '@saintrocky/realtime';
@@ -11,13 +11,12 @@ import { useRefreshControl } from '@/hooks/useRefreshControl.js';
 import { RulesScreenConfig } from '@/screens/RulesScreen/RulesScreen.config.js';
 import { createStyles } from '@/screens/RulesScreen/RulesScreen.styles.js';
 
-const FILTER_OPTIONS = ['active', 'inactive', 'draft'];
+const FILTER_OPTIONS = ['active', 'inactive'];
 
 export function RulesScreen({ auth, navigation }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [rules, setRules] = useState([]);
-  const [drafts, setDrafts] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,12 +31,8 @@ export function RulesScreen({ auth, navigation }) {
 
   const loadData = useCallback(async () => {
     try {
-      const [rulesResult, draftsResult] = await Promise.all([
-        api.rules.listRules(ownerEmail),
-        api.rules.listDrafts(ownerEmail)
-      ]);
+      const rulesResult = await api.rules.listRules(ownerEmail);
       setRules(rulesResult.rules || []);
-      setDrafts(draftsResult.drafts || []);
     } catch (error) {
       Alert.alert('Error', error?.message || 'Failed to load rules.');
     }
@@ -51,23 +46,14 @@ export function RulesScreen({ auth, navigation }) {
   const { refreshing, onRefresh } = useRefreshControl(loadData);
 
   const combinedRules = useMemo(() => {
-    const draftItems = drafts.map((draft) => ({
-      ...draft,
-      ruleId: draft.ruleDraftId,
-      title: draft.title || draft.summary || 'AI Draft',
-      status: 'draft',
-      isDraft: true
-    }));
-    const allItems = [...rules, ...draftItems];
-    if (selectedFilters.length === 0) return allItems;
-    return allItems.filter((item) => selectedFilters.includes(item.status));
-  }, [rules, drafts, selectedFilters]);
+    if (selectedFilters.length === 0) return rules;
+    return rules.filter((item) => selectedFilters.includes(item.status));
+  }, [rules, selectedFilters]);
 
   const counts = useMemo(() => ({
     active: rules.filter((r) => r.status === 'active').length,
-    inactive: rules.filter((r) => r.status === 'inactive').length,
-    draft: drafts.length
-  }), [rules, drafts]);
+    inactive: rules.filter((r) => r.status === 'inactive').length
+  }), [rules]);
 
   const toggleFilter = useCallback((filter) => {
     setSelectedFilters((currentFilters) => {
@@ -82,16 +68,22 @@ export function RulesScreen({ auth, navigation }) {
     navigation.navigate('RuleDetail', { rule });
   }, [navigation]);
 
+  const handleManageOnWeb = useCallback(() => {
+    Linking.openURL('https://www.thestandard.dev/dashboard').catch(() => {
+      Alert.alert('Error', 'Could not open the web dashboard.');
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.topActionRow}>
         <Button
           variant="ghost"
           size="sm"
-          leadingIconName="add"
-          onPress={() => navigation.navigate('Templates')}
+          leadingIconName="link"
+          onPress={handleManageOnWeb}
         >
-          Templates
+          Manage on web
         </Button>
       </View>
 

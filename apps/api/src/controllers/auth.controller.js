@@ -105,7 +105,7 @@ async function authenticateUser(email, password) {
   await connectMongo(env.mongodbUri);
 
   const user = await User.findOne({ email: String(email || "").trim().toLowerCase() });
-  if (!user) {
+  if (!user || user.deletionRequestedAt) {
     return null;
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { api } from "@saintrocky/api-client";
@@ -36,13 +37,14 @@ const navigationItems = [
   }))
 ];
 
-export function DashboardSidebarShell() {
+export function DashboardSidebarShell({ onNavigate }) {
   const router = useRouter();
   const { clearSession, sessionUser } = useAuthSession();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   async function handleLogout() {
     setIsLoggingOut(true);
+    onNavigate?.();
 
     try {
       await api.auth.logout();
@@ -60,6 +62,16 @@ export function DashboardSidebarShell() {
     <AppSidebar
       className="sr-WebDashboardSidebar"
       items={navigationItems}
+      onNavigate={onNavigate}
+      renderLink={({ item, children, className, onNavigate: handleNavigate }) => (
+        <Link
+          href={item.href || "#"}
+          className={className}
+          onClick={() => handleNavigate?.(item)}
+        >
+          {children}
+        </Link>
+      )}
       brand={
         <div className="sr-WebDashboardBrand">
           <BrandWordmarkLogo
@@ -67,25 +79,25 @@ export function DashboardSidebarShell() {
             variant="inline"
             width="100%"
           />
-          <div className="sr-WebDashboardBrandMeta">
-            <p className="sr-WebDashboardBrandEyebrow">{saintRockyBranding.companyName}</p>
-            <p className="sr-WebDashboardBrandUser">
-              {sessionUser?.displayName || sessionUser?.email || saintRockyBranding.shortProductName}
-            </p>
-          </div>
         </div>
       }
       footer={
         <div className="sr-WebDashboardFooter">
-          <Button
-            type="button"
-            variant="ghost"
-            block
-            loading={isLoggingOut}
-            loadingLabel="Logging out..."
-            onClick={handleLogout}
-            leadingIcon={<Icon name="logout" size={18} />}
-          >
+          <Link href="/dashboard/profile" className="sr-WebDashboardFooterLink"  >
+            <p className="sr-WebDashboardBrandUser">
+              {sessionUser?.displayName || sessionUser?.email || saintRockyBranding.shortProductName}
+            </p>
+          </Link>
+          <hr className="sr-WebDashboardFooterSeparator" />
+            <Button
+              type="button"
+              variant="ghost"
+              block
+              loading={isLoggingOut}
+              loadingLabel="Logging out..."
+              onClick={handleLogout}
+              leadingIcon={<Icon name="logout" size={18} />}
+            >
             Log out
           </Button>
         </div>

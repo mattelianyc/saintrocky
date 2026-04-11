@@ -10,42 +10,53 @@ export function createStyles(theme) {
       flex: 1,
       backgroundColor: '#060a09'
     },
+    videoHalf: {
+      position: 'relative',
+      height: SCREEN_HEIGHT * 0.5,
+      width: '100%',
+      justifyContent: 'flex-start',
+      backgroundColor: '#000',
+      overflow: 'hidden'
+    },
     backgroundImage: {
       position: 'absolute',
       width: '100%',
-      height: SCREEN_HEIGHT * 0.6,
+      height: SCREEN_HEIGHT * 0.5,
       top: 0,
-      opacity: 0.3
+      left: 0,
+      backgroundColor: '#000'
     },
     backgroundOverlay: {
       position: 'absolute',
       width: '100%',
-      height: '100%',
+      height: SCREEN_HEIGHT * 0.5,
       backgroundColor: 'rgba(6,10,9,0.4)'
+    },
+    brandOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      paddingHorizontal: spacing.large
     },
     keyboardView: {
       flex: 1
     },
+    formSheetFrame: {
+      flex: 1,
+      zIndex: 2
+    },
+    formSheet: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      overflow: 'hidden'
+    },
     scrollContent: {
       flexGrow: 1,
-      justifyContent: 'flex-end',
-      paddingHorizontal: spacing.large
-    },
-    topSection: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      paddingHorizontal: spacing.large
-    },
-    brandArea: {
-      alignItems: 'center',
-      marginBottom: spacing.xlarge
-    },
-    mascot: {
-      width: 100,
-      height: 100,
-      opacity: 0.9
+      paddingHorizontal: spacing.large,
+      paddingTop: spacing.large,
+      paddingBottom: spacing.large,
+      justifyContent: 'space-between'
     },
     formArea: {
       gap: spacing.small

@@ -28,12 +28,6 @@ export function createStyles(theme) {
       marginBottom: spacing.xsmall,
       paddingHorizontal: spacing.medium
     },
-    violationWrapper: {
-      paddingHorizontal: spacing.medium
-    },
-    activityList: {
-      marginTop: spacing.xxsmall
-    },
     tradeLink: {
       paddingHorizontal: spacing.medium,
       marginTop: spacing.small,

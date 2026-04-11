@@ -33,6 +33,7 @@ export function ProfileScreen({ auth }) {
   const [trades, setTrades] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -80,6 +81,36 @@ export function ProfileScreen({ auth }) {
       { text: 'Sign out', style: 'destructive', onPress: () => auth.logout() }
     ]);
   }, [auth]);
+
+  const handleDeleteAccount = useCallback(() => {
+    if (deletingAccount) {
+      return;
+    }
+
+    Alert.alert(
+      'Delete account?',
+      'This will disable your account, revoke your sessions, and remove access to the mobile app.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete account',
+          style: 'destructive',
+          onPress: async () => {
+            setDeletingAccount(true);
+
+            try {
+              await api.users.deleteAccount();
+              await auth.logout();
+            } catch (error) {
+              Alert.alert('Error', error?.message || 'Failed to delete your account.');
+            } finally {
+              setDeletingAccount(false);
+            }
+          }
+        }
+      ]
+    );
+  }, [auth, deletingAccount]);
 
   const totalEscrowLamports = wallets.reduce(
     (sum, wallet) => sum + (wallet.escrowBalanceLamports || 0),
@@ -188,9 +219,28 @@ export function ProfileScreen({ auth }) {
       </Pressable>
 
       <View style={styles.logoutSection}>
-        <Button variant="ghost" leadingIconName="logout" onPress={handleLogout}>
+        <Button
+          variant="ghost"
+          leadingIconName="logout"
+          onPress={handleLogout}
+          disabled={deletingAccount}
+        >
           Sign out
         </Button>
+        <View style={styles.deleteAccountSection}>
+          <Text style={styles.deleteAccountTitle}>Delete account</Text>
+          <Text style={styles.deleteAccountSummary}>
+            Permanently disable this account and revoke access across your active sessions.
+          </Text>
+          <Button
+            variant="danger"
+            leadingIconName="close"
+            onPress={handleDeleteAccount}
+            disabled={deletingAccount}
+          >
+            {deletingAccount ? 'Deleting…' : 'Delete account'}
+          </Button>
+        </View>
         <Text style={styles.versionText}>
           {saintRockyBranding.productName} · v0.1.0
         </Text>

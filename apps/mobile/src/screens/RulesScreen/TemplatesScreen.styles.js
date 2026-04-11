@@ -43,6 +43,21 @@ export function createStyles(theme) {
       color: theme.shell.textMuted,
       lineHeight: 20
     },
+    activeBadge: {
+      alignSelf: 'flex-start',
+      marginTop: spacing.small,
+      paddingHorizontal: spacing.small,
+      paddingVertical: spacing.xxsmall,
+      borderWidth: 1,
+      borderColor: theme.colors.accent,
+      borderRadius: 999,
+      color: theme.colors.accent,
+      fontFamily: typography.fontFamilyMono,
+      fontSize: typography.sizeXxsmall,
+      fontWeight: typography.weightSemibold,
+      letterSpacing: typography.letterSpacingWide,
+      textTransform: 'uppercase'
+    },
     templateSummary: {
       fontSize: typography.sizeBase,
       color: theme.shell.textMuted,
@@ -91,6 +106,13 @@ export function createStyles(theme) {
       fontSize: typography.sizeBase,
       color: theme.colors.foreground,
       fontFamily: typography.fontFamilyMono
+    },
+    mergeHint: {
+      paddingHorizontal: spacing.medium,
+      marginTop: spacing.small,
+      color: theme.shell.textMuted,
+      fontSize: typography.sizeSmall,
+      lineHeight: 20
     },
     actions: {
       paddingHorizontal: spacing.medium,

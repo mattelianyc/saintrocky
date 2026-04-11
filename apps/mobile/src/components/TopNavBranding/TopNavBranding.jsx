@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useTheme } from '@saintrocky/ui-native';
-
-import { brandImages } from '@/assets/images.js';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { BrandWordmarkLogo, useTheme } from '@saintrocky/ui-native';
 
 export function TopNavBranding({
   title,
@@ -14,6 +12,8 @@ export function TopNavBranding({
   const styles = useMemo(() => createStyles(theme), [theme]);
   const isAuthVariant = variant === 'auth';
   const shouldShowCopy = Boolean(title || subtitle);
+  const logoWidth = isAuthVariant ? 164 : 212;
+  const logoHeight = isAuthVariant ? 28 : 36;
   const Container = onPress ? Pressable : View;
   const interactiveProps = onPress
     ? {
@@ -29,11 +29,11 @@ export function TopNavBranding({
       {...interactiveProps}
     >
       {!shouldShowCopy ? (
-        <Image
-          source={brandImages.navLogo}
+        <BrandWordmarkLogo
+          variant="inline"
+          width={logoWidth}
+          height={logoHeight}
           style={[styles.logo, isAuthVariant ? styles.authLogo : styles.headerLogo]}
-          resizeMode="contain"
-          accessibilityIgnoresInvertColors
         />
       ) : (
         <View style={styles.copyBlock}>
@@ -78,8 +78,8 @@ function createStyles(theme) {
       alignSelf: 'center'
     },
     headerLogo: {
-      width: 164,
-      height: 28
+      width: 212,
+      height: 36
     },
     authLogo: {
       width: 164,

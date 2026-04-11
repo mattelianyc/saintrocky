@@ -7,7 +7,6 @@ import {
   RULE_USER_RULE_STATUS_LABELS
 } from '@saintrocky/shared';
 import { Button, useTheme } from '@saintrocky/ui-native';
-import { appConfig } from '@/config/app-config.js';
 
 import { createStyles } from '@/screens/RulesScreen/RuleDetailScreen.styles.js';
 
@@ -148,9 +147,7 @@ export function RuleDetailScreen({ route, navigation }) {
   }, [rule, deactivationRequest]);
 
   const handleViewOnWeb = useCallback(() => {
-    const webBaseUrl = appConfig.EXPO_PUBLIC_WEB_URL || 'https://saintrocky.com';
-    const url = `${webBaseUrl}/dashboard/rules`;
-    Linking.openURL(url).catch(() => {
+    Linking.openURL('https://www.thestandard.dev/dashboard').catch(() => {
       Alert.alert('Error', 'Could not open the web dashboard.');
     });
   }, []);

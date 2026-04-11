@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Linking, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
 
 import { api } from '@/api/client.js';
 import { saintRockyBranding } from '@saintrocky/branding';
 import {
   Button,
   MetricCard,
-  ViolationCard,
   EmptyState,
   useTheme
 } from '@saintrocky/ui-native';
 
-import { appConfig } from '@/config/app-config.js';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton.jsx';
-import { useViolationAlerts } from '@/hooks/useViolationAlerts.js';
 import { useRefreshControl } from '@/hooks/useRefreshControl.js';
 import { HomeScreenConfig } from '@/screens/HomeScreen/HomeScreen.config.js';
 import { createStyles } from '@/screens/HomeScreen/HomeScreen.styles.js';
@@ -23,10 +20,6 @@ export function HomeScreen({ auth, navigation }) {
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const ownerEmail = auth.user?.email;
-  const { violations, loading: violationLoading, comply } =
-    useViolationAlerts(ownerEmail);
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -44,14 +37,6 @@ export function HomeScreen({ auth, navigation }) {
 
   const { refreshing, onRefresh } = useRefreshControl(loadDashboard);
 
-  const handleWebHandoff = useCallback((violation) => {
-    const webBaseUrl = appConfig.EXPO_PUBLIC_WEB_URL || 'https://saintrocky.com';
-    const url = `${webBaseUrl}/dashboard/rules`;
-    Linking.openURL(url).catch(() => {
-      Alert.alert('Error', 'Could not open the web dashboard.');
-    });
-  }, []);
-
   const counts = summary?.counts;
   const stats = summary?.stats;
 
@@ -60,7 +45,8 @@ export function HomeScreen({ auth, navigation }) {
     ? `${Number(counts.escrowBalanceSol).toFixed(2)}`
     : '—';
   const activeRulesCount = counts?.activeRules ?? '—';
-  const violationsCount = counts?.recentViolations ?? violations.length;
+  const violationsCount = counts?.recentViolations ?? '—';
+  const hasRecentViolations = Number(counts?.recentViolations ?? 0) > 0;
 
   const complianceRate = stats?.complianceRate != null
     ? `${Number(stats.complianceRate).toFixed(1)}%`
@@ -90,23 +76,6 @@ export function HomeScreen({ auth, navigation }) {
             <MetricCard label="VIOLATIONS" value={violationsCount} accentColor={theme.colors.error} />
           </View>
 
-          {violations.length > 0 && (
-            <>
-              <Text style={styles.sectionKicker}>ACTIVE VIOLATIONS</Text>
-              {violations.map((violation) => (
-                <View key={violation.ruleId} style={styles.violationWrapper}>
-                  <ViolationCard
-                    violation={violation}
-                    onComply={() => comply(violation)}
-                    onBypass={() => handleWebHandoff(violation)}
-                    bypassLabel="Handle on web"
-                    loading={violationLoading}
-                  />
-                </View>
-              ))}
-            </>
-          )}
-
           <Text style={styles.sectionKicker}>PERFORMANCE</Text>
           <View style={styles.metricsGrid}>
             <MetricCard label="COMPLIANCE" value={complianceRate} accentColor={theme.colors.accent} />
@@ -132,7 +101,7 @@ export function HomeScreen({ auth, navigation }) {
             </Button>
           </View>
 
-          {violations.length === 0 && (
+          {!hasRecentViolations && (
             <EmptyState
               iconName="check"
               title={HomeScreenConfig.emptyActivityTitle}

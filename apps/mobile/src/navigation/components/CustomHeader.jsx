@@ -10,7 +10,10 @@ export function CustomHeader({
   centerTitle,
   centerSubtitle,
   canGoBack = false,
-  showDrawerToggle = true
+  showDrawerToggle = true,
+  leftIconName,
+  leftAccessibilityLabel,
+  onLeftPress
 }) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -20,6 +23,11 @@ export function CustomHeader({
   const hasCenteredCopy = Boolean(centerTitle || centerSubtitle);
 
   const handleLeftPress = () => {
+    if (onLeftPress) {
+      onLeftPress();
+      return;
+    }
+
     if (canGoBack) {
       navigation.goBack();
     } else if (showDrawerToggle) {
@@ -27,7 +35,8 @@ export function CustomHeader({
     }
   };
 
-  const leftIconName = canGoBack ? 'arrowLeft' : 'menu';
+  const resolvedLeftIconName = leftIconName || (canGoBack ? 'arrowLeft' : 'menu');
+  const resolvedLeftAccessibilityLabel = leftAccessibilityLabel || (canGoBack ? 'Go back' : 'Open menu');
   const activityAccessibilityLabel = `Live activity${pendingActionsCount > 0 ? `, ${pendingActionsCount} pending` : ''}`;
 
   return (
@@ -35,11 +44,11 @@ export function CustomHeader({
       <View style={styles.row}>
         <View style={styles.sideSlot}>
           <IconButton
-            name={leftIconName}
+            name={resolvedLeftIconName}
             size={22}
             color={theme.colors.foreground}
             onPress={handleLeftPress}
-            accessibilityLabel={canGoBack ? 'Go back' : 'Open menu'}
+            accessibilityLabel={resolvedLeftAccessibilityLabel}
             style={styles.leftButton}
           />
         </View>

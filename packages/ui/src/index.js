@@ -10,6 +10,7 @@ export { BrandWordmarkLogo } from './primitives/BrandWordmarkLogo/BrandWordmarkL
 export { Collapsible } from './primitives/Collapsible/Collapsible.jsx';
 export { Combobox } from './primitives/Combobox/Combobox.jsx';
 export { ContextMenu } from './primitives/ContextMenu/ContextMenu.jsx';
+export { Drawer } from './primitives/Drawer/Drawer.jsx';
 export { Dialog } from './primitives/Dialog/Dialog.jsx';
 export { DirectionProvider } from './primitives/DirectionProvider/DirectionProvider.jsx';
 export { Field } from './primitives/Field/Field.jsx';

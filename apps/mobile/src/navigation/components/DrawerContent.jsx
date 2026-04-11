@@ -6,14 +6,6 @@ import { Avatar, useTheme } from '@saintrocky/ui-native';
 import { saintRockyBranding } from '@saintrocky/branding';
 import { brandImages } from '@/assets/images.js';
 
-const DRAWER_NAV_ITEMS = [
-  { route: 'Home', icon: 'home', label: 'Home' },
-  { route: 'Rules', icon: 'tactics', label: 'Rules' },
-  { route: 'Social', icon: 'users', label: 'Social' },
-  { route: 'Leaderboard', icon: 'trophy', label: 'Leaderboard' },
-  { route: 'Profile', icon: 'user', label: 'Profile' }
-];
-
 export function DrawerContent({ navigation, auth, toggleTheme }) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -24,8 +16,8 @@ export function DrawerContent({ navigation, auth, toggleTheme }) {
     ? user.displayName.split(' ').map((word) => word[0]).join('').slice(0, 2).toUpperCase()
     : user?.email?.[0]?.toUpperCase() || '?';
 
-  const handleNavigation = (routeName) => {
-    navigation.navigate('MainTabs', { screen: routeName });
+  const handleProfileNavigation = () => {
+    navigation.navigate('Profile');
     navigation.closeDrawer();
   };
 
@@ -59,18 +51,15 @@ export function DrawerContent({ navigation, auth, toggleTheme }) {
         <View style={styles.divider} />
 
         <View style={styles.navSection}>
-          {DRAWER_NAV_ITEMS.map((item) => (
-            <TouchableOpacity
-              key={item.route}
-              style={styles.navItem}
-              onPress={() => handleNavigation(item.route)}
-              accessibilityRole="button"
-              accessibilityLabel={item.label}
-            >
-              <Icon name={item.icon} size={20} color={theme.shell.textMuted} />
-              <Text style={styles.navLabel}>{item.label}</Text>
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={handleProfileNavigation}
+            accessibilityRole="button"
+            accessibilityLabel="Profile"
+          >
+            <Icon name="user" size={20} color={theme.shell.textMuted} />
+            <Text style={styles.navLabel}>Profile</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.divider} />

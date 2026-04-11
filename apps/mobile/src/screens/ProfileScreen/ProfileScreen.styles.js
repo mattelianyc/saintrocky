@@ -152,6 +152,25 @@ export function createStyles(theme) {
       alignItems: 'center',
       gap: spacing.small
     },
+    deleteAccountSection: {
+      width: '100%',
+      marginTop: spacing.medium,
+      padding: spacing.medium,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.error,
+      backgroundColor: `${theme.colors.error}10`,
+      gap: spacing.small
+    },
+    deleteAccountTitle: {
+      fontSize: typography.sizeBase,
+      fontWeight: typography.weightBold,
+      color: theme.colors.foreground
+    },
+    deleteAccountSummary: {
+      fontSize: typography.sizeSmall,
+      lineHeight: 20,
+      color: theme.shell.textMuted
+    },
     versionText: {
       fontFamily: typography.fontFamilyMono,
       fontSize: typography.sizeXxsmall,

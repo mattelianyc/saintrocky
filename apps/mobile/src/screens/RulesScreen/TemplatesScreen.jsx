@@ -21,55 +21,110 @@ export function TemplatesScreen({ auth, navigation }) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [templates, setTemplates] = useState([]);
+  const [activeRules, setActiveRules] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [config, setConfig] = useState({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const ownerEmail = auth.user?.email || '';
 
   const loadTemplates = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await api.rules.listTemplates();
-      setTemplates(response.templates || []);
+      const [templateResponse, rulesResponse] = await Promise.all([
+        api.rules.listTemplates(),
+        ownerEmail ? api.rules.listRules(ownerEmail) : Promise.resolve({ rules: [] })
+      ]);
+      const nextTemplates = templateResponse.templates || [];
+      setTemplates(nextTemplates);
+      setActiveRules((rulesResponse.rules || []).filter((rule) => rule.status === 'active' && rule.templateId));
+      setSelectedTemplate((currentTemplate) => {
+        if (!currentTemplate) {
+          return null;
+        }
+
+        return nextTemplates.find((template) => template.templateId === currentTemplate.templateId) || currentTemplate;
+      });
     } catch (error) {
       Alert.alert('Error', error?.message || 'Failed to load templates.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  }, [ownerEmail]);
 
   useEffect(() => {
     loadTemplates();
   }, [loadTemplates]);
 
+  const matchingExistingRule = useMemo(() => {
+    if (!selectedTemplate) {
+      return null;
+    }
+
+    return activeRules.find((rule) => rule.templateId === selectedTemplate.templateId) || null;
+  }, [activeRules, selectedTemplate]);
+
+  const activeTemplateIds = useMemo(
+    () => new Set(activeRules.map((rule) => rule.templateId).filter(Boolean)),
+    [activeRules]
+  );
+
   const handleSelectTemplate = useCallback((template) => {
     setSelectedTemplate(template);
-    setConfig(template.defaultConfig || {});
   }, []);
 
   const handleConfigChange = useCallback((fieldKey, value) => {
     setConfig((current) => ({ ...current, [fieldKey]: value }));
   }, []);
 
+  useEffect(() => {
+    if (!selectedTemplate) {
+      return;
+    }
+
+    if (matchingExistingRule) {
+      setConfig(
+        matchingExistingRule.pendingEdit?.config ||
+        matchingExistingRule.config ||
+        selectedTemplate.defaultConfig ||
+        {}
+      );
+      return;
+    }
+
+    setConfig(selectedTemplate.defaultConfig || {});
+  }, [matchingExistingRule, selectedTemplate]);
+
   const handleCreateRule = useCallback(async () => {
     if (!selectedTemplate) return;
     setSubmitting(true);
     try {
-      await api.rules.createFromTemplate({
-        ownerEmail: auth.user?.email,
+      const response = await api.rules.createFromTemplate({
+        ownerEmail,
         templateId: selectedTemplate.templateId,
         config,
         problemIndex: 50
       });
-      Alert.alert('Rule created', `"${selectedTemplate.title}" has been added to your rules.`, [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      const wasMerged = Boolean(response?.merged);
+      Alert.alert(
+        wasMerged ? 'Existing rule updated' : 'Rule created',
+        wasMerged
+          ? `"${selectedTemplate.title}" was updated with your latest protection changes.`
+          : `"${selectedTemplate.title}" has been added to your rules.`,
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
     } catch (error) {
       Alert.alert('Error', error?.message || 'Failed to create rule from template.');
     } finally {
       setSubmitting(false);
     }
-  }, [selectedTemplate, config, auth, navigation]);
+  }, [selectedTemplate, config, navigation, ownerEmail]);
 
   if (selectedTemplate) {
+    const submitLabel = submitting
+      ? (matchingExistingRule ? 'Updating…' : 'Creating…')
+      : (matchingExistingRule ? 'Update existing rule' : 'Add to my rules');
+
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <ScreenHeader kicker="CONFIGURE" title={selectedTemplate.title} />
@@ -93,6 +148,12 @@ export function TemplatesScreen({ auth, navigation }) {
             />
           </View>
         ))}
+        {matchingExistingRule ? (
+          <Text style={styles.mergeHint}>
+            An active rule from this template already exists. Changes that expand protection apply immediately at no
+            charge.
+          </Text>
+        ) : null}
 
         <View style={styles.actions}>
           <Button
@@ -101,7 +162,7 @@ export function TemplatesScreen({ auth, navigation }) {
             disabled={submitting}
             size="lg"
           >
-            {submitting ? 'Creating…' : 'Add to my rules'}
+            {submitLabel}
           </Button>
           <View style={styles.actionSpacer} />
           <Button variant="ghost" onPress={() => setSelectedTemplate(null)}>
@@ -130,7 +191,10 @@ export function TemplatesScreen({ auth, navigation }) {
               tintColor={theme.colors.accent}
             />
           }
-          renderItem={({ item }) => (
+          renderItem={({ item }) => {
+            const hasExistingRule = activeTemplateIds.has(item.templateId);
+
+            return (
             <Pressable
               style={({ pressed }) => [styles.templateCard, pressed && styles.pressed]}
               onPress={() => handleSelectTemplate(item)}
@@ -142,8 +206,10 @@ export function TemplatesScreen({ auth, navigation }) {
               <Text style={styles.templateDescription} numberOfLines={2}>
                 {item.summary}
               </Text>
+              {hasExistingRule ? <Text style={styles.activeBadge}>Active</Text> : null}
             </Pressable>
-          )}
+            );
+          }}
           ListEmptyComponent={
             <EmptyState iconName="tactics" title="No templates" message="Templates will appear here." />
           }

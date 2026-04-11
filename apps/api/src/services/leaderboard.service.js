@@ -28,7 +28,7 @@ function getCleanStreakDays(latestViolationTrade, hasRecentTrades) {
 }
 
 export async function computeDisciplineScores() {
-  const activeUsers = await User.find({ role: MEMBER_ROLE }).lean();
+  const activeUsers = await User.find({ role: MEMBER_ROLE, deletionRequestedAt: null }).lean();
   const scores = await Promise.all(
     activeUsers.map(async (user) => {
       const score = await computeUserDisciplineScore(user.email);

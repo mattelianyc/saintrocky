@@ -7,9 +7,9 @@
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#E6F4FE"
     },
     "ios": {
       "supportsTablet": true,
@@ -19,6 +19,7 @@
       }
     },
     "android": {
+      "package": "com.standarddeviants.saintrocky",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -29,6 +30,18 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-notifications"]
+    "plugins": [
+      "expo-notifications"
+    ],
+    "extra": {
+      "EXPO_PUBLIC_EAS_PROJECT_ID": "551ff6dd-f55a-445a-ba4e-85a581b51829",
+      "EXPO_PUBLIC_API_URL": "https://blowsier-fogbound-heriberto.ngrok-free.dev",
+      "EXPO_PUBLIC_APP_ENV": "development",
+      "EXPO_PUBLIC_APP_NAME": "Saint Rocky",
+      "EXPO_PUBLIC_PRODUCT_NAME": "Standard Deviants",
+      "eas": {
+        "projectId": "551ff6dd-f55a-445a-ba4e-85a581b51829"
+      }
+    }
   }
 }

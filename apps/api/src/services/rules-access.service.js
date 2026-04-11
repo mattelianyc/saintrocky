@@ -32,7 +32,10 @@ async function ensureRulesMongo() {
 
 async function findUserByEmail(email) {
   await ensureRulesMongo();
-  const user = await User.findOne({ email: String(email || '').trim().toLowerCase() }).lean();
+  const user = await User.findOne({
+    email: String(email || '').trim().toLowerCase(),
+    deletionRequestedAt: null
+  }).lean();
   return user ? normalizeUser(user) : null;
 }
 
@@ -60,7 +63,7 @@ export async function listManageableRuleOwners(actor) {
     return [actor];
   }
 
-  const users = await User.find({ role: MEMBER_ROLE }).sort({ name: 1, email: 1 }).lean();
+  const users = await User.find({ role: MEMBER_ROLE, deletionRequestedAt: null }).sort({ name: 1, email: 1 }).lean();
   return users.map(normalizeUser);
 }
 

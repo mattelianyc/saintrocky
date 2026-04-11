@@ -14,6 +14,7 @@ const sharedReactDomPath = path.dirname(electronRequire.resolve('react-dom/packa
 
 export default defineConfig({
   root: path.join(currentDirectoryPath, 'src', 'renderer'),
+  base: './',
   resolve: {
     dedupe: ['react', 'react-dom'],
     alias: {

@@ -22,6 +22,20 @@ export const validationTranslations = {
             required: 'Password is required.',
             min: 'Password must be at least 6 characters.'
           }
+        },
+        register: {
+          name: {
+            required: 'Name is required.',
+            min: 'Name must be at least 2 characters.'
+          },
+          email: {
+            required: 'Email is required.',
+            invalid: 'Enter a valid email address.'
+          },
+          password: {
+            required: 'Password is required.',
+            min: 'Password must be at least 8 characters.'
+          }
         }
       },
       users: {
@@ -324,6 +338,20 @@ export const validationTranslations = {
           password: {
             required: 'La contraseña es obligatoria.',
             min: 'La contraseña debe tener al menos 6 caracteres.'
+          }
+        },
+        register: {
+          name: {
+            required: 'El nombre es obligatorio.',
+            min: 'El nombre debe tener al menos 2 caracteres.'
+          },
+          email: {
+            required: 'El email es obligatorio.',
+            invalid: 'Introduce un email válido.'
+          },
+          password: {
+            required: 'La contraseña es obligatoria.',
+            min: 'La contraseña debe tener al menos 8 caracteres.'
           }
         }
       },

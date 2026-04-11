@@ -17,6 +17,10 @@ export function ProfileStack({ auth }) {
             centerTitle={options.headerCenterTitle}
             centerSubtitle={options.headerCenterSubtitle}
             canGoBack={!!back}
+            showDrawerToggle={!!back}
+            leftIconName={back ? undefined : 'arrowLeft'}
+            leftAccessibilityLabel={back ? undefined : 'Back to app'}
+            onLeftPress={back ? undefined : () => navigation.getParent()?.navigate('MainTabs')}
           />
         )
       }}

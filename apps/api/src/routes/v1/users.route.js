@@ -7,7 +7,8 @@ import {
   updateMe,
   getUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  requestAccountDeletion
 } from '@saintrocky/api/controllers/users';
 
 export function createUsersRouter() {
@@ -17,6 +18,7 @@ export function createUsersRouter() {
   router.post('/', createUser);
   router.get('/me', getMe);
   router.put('/me', updateMe);
+  router.post('/me/delete-account', requestAccountDeletion);
   router.get('/:id', getUser);
   router.put('/:id', updateUser);
   router.delete('/:id', deleteUser);

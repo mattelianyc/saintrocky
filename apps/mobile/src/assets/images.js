@@ -1,5 +1,5 @@
 export const brandImages = {
-  cherryBlossomTree: require('../../assets/images/flowerbg.png'),
+  cherryBlossomTree: require('../../assets/images/auth-bg.png'),
   mascot: require('../../assets/images/dawgfull.png'),
   roccoIcon: require('../../assets/images/rocco-icon.png'),
   monogramMark: require('../../assets/images/rocco-icon.png'),

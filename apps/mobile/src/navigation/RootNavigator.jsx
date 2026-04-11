@@ -3,6 +3,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useTheme } from '@saintrocky/ui-native';
 import { AuthStack } from '@/navigation/navigators/AuthStack.jsx';
 import { MainTabs } from '@/navigation/navigators/MainTabs.jsx';
+import { ProfileStack } from '@/navigation/navigators/ProfileStack.jsx';
 import { DrawerContent } from '@/navigation/components/DrawerContent.jsx';
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +30,9 @@ function AuthenticatedDrawer({ auth }) {
     >
       <Drawer.Screen name="MainTabs">
         {() => <MainTabs auth={auth} />}
+      </Drawer.Screen>
+      <Drawer.Screen name="Profile">
+        {() => <ProfileStack auth={auth} />}
       </Drawer.Screen>
     </Drawer.Navigator>
   );

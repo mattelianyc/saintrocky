@@ -16,6 +16,16 @@
       "@saintrocky/mobile/react-native/**"
     ]
   },
+  "resolutions": {
+    "@electron/notarize": "2.5.0",
+    "@electron/rebuild": "3.7.2",
+    "app-builder-lib": "26.0.13",
+    "builder-util": "26.0.13",
+    "builder-util-runtime": "9.3.2",
+    "dmg-builder": "26.0.13",
+    "electron-builder": "26.0.13",
+    "electron-publish": "26.0.13"
+  },
   "scripts": {
     "dev": "PORT=5175 NODE_ENV=development yarn workspace @saintrocky/web dev",
     "dev:web": "yarn workspace @saintrocky/web dev",

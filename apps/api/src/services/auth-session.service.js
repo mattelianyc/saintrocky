@@ -36,6 +36,10 @@ export async function authenticateSessionToken(token) {
     throw buildAuthError(401, "Session user no longer exists", "UNAUTHORIZED");
   }
 
+  if (user.deletionRequestedAt) {
+    throw buildAuthError(401, "Account has been deleted", "UNAUTHORIZED");
+  }
+
   if (Number(payload.authVersion ?? 0) !== Number(user.authVersion ?? 0)) {
     throw buildAuthError(401, "Session has been revoked", "UNAUTHORIZED");
   }

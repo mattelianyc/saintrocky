@@ -2,6 +2,7 @@ export { ThemeProvider, useTheme, createNavigationTheme } from './theme.js';
 
 export { Avatar } from './primitives/Avatar.js';
 export { Badge } from './primitives/Badge.js';
+export { BrandWordmarkLogo, INLINE_WORDMARK_GLYPHS } from './primitives/BrandWordmarkLogo.jsx';
 export { Button } from './primitives/Button.js';
 export { Card } from './primitives/Card.js';
 export { IconButton } from './primitives/IconButton.js';

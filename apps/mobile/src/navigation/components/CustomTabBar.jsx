@@ -7,9 +7,7 @@ import { useTheme } from '@saintrocky/ui-native';
 const TAB_ICONS = {
   Home: 'home',
   Rules: 'tactics',
-  Social: 'users',
-  Leaderboard: 'trophy',
-  Profile: 'user'
+  Leaderboard: 'trophy'
 };
 
 export function CustomTabBar({ state, descriptors, navigation }) {

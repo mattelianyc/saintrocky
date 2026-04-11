@@ -8,6 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { RootNavigator } from '@/navigation/RootNavigator.jsx';
 import { NotificationProvider } from '@/context/NotificationContext.jsx';
+import { AnimatedSplashOverlay } from '@/components/AnimatedSplashOverlay/AnimatedSplashOverlay.jsx';
 import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary.jsx';
 import { PendingActionsOverlay } from '@/components/PendingActionsOverlay/PendingActionsOverlay.jsx';
 import { api } from '@/api/client.js';
@@ -24,6 +25,10 @@ import { AnalyticsEvents, trackEvent } from '@saintrocky/analytics';
 import { saintRockyBranding } from '@saintrocky/branding';
 import { createValidationT, initValidation } from '@saintrocky/validation';
 import { createNavigationTheme, ThemeProvider, useTheme } from '@saintrocky/ui-native';
+
+// Set splash screen options: duration 2000ms and fade true
+SplashScreen.setOptions({ duration: 2000, fade: true });
+SplashScreen.preventAutoHideAsync();
 
 function AppShell() {
   const { theme } = useTheme();
@@ -154,18 +159,19 @@ function AppShell() {
   );
 }
 
-SplashScreen.preventAutoHideAsync();
-
 export default function App() {
   const [fontsLoaded] = useFonts({
     'SilkaMono-Regular': require('./assets/fonts/SilkaMono-Regular.ttf')
   });
+  const [nativeSplashHidden, setNativeSplashHidden] = useState(false);
+  const [splashComplete, setSplashComplete] = useState(false);
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
+    if (fontsLoaded && !nativeSplashHidden) {
       await SplashScreen.hideAsync();
+      setNativeSplashHidden(true);
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, nativeSplashHidden]);
 
   if (!fontsLoaded) return null;
 
@@ -173,7 +179,12 @@ export default function App() {
     <GestureHandlerRootView style={styles.root} onLayout={onLayoutRootView}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <AppShell />
+          <View style={styles.root}>
+            <AppShell />
+            {nativeSplashHidden && !splashComplete ? (
+              <AnimatedSplashOverlay onComplete={() => setSplashComplete(true)} />
+            ) : null}
+          </View>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
