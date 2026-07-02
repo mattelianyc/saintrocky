@@ -1,0 +1,9 @@
+@font-face {
+  font-family: "SilkaMonoWeb";
+  src: url("./fonts/silkamono-regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+body.sr-WebBody {
+  --font-silka-mono: "SilkaMonoWeb";
+}

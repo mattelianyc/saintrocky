@@ -1,0 +1,118 @@
+.sr-DownloadPage {
+  display: grid;
+  gap: 2rem;
+}
+
+.sr-DownloadPage__hero,
+.sr-DownloadPage__details {
+  padding: 6rem 1.5rem 2rem;
+}
+
+.sr-DownloadPage__details {
+  padding-top: 0;
+  padding-bottom: 4rem;
+}
+
+.sr-DownloadPage__content,
+.sr-DownloadPage__grid {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+}
+
+.sr-DownloadPage__content {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.sr-DownloadPage__content h1,
+.sr-DownloadPage__panel h2 {
+  margin: 0;
+}
+
+.sr-DownloadPage__lede {
+  max-width: 44rem;
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--ui-shell-text-muted);
+}
+
+.sr-DownloadPage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+}
+
+.sr-DownloadPage__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.sr-DownloadPage__button:hover,
+.sr-DownloadPage__button:focus-visible {
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.sr-DownloadPage__button--primary {
+  background: var(--ui-shell-accent);
+  color: var(--ui-primary-contrast);
+  box-shadow: var(--ui-shell-shadow);
+}
+
+.sr-DownloadPage__button--secondary {
+  background: color-mix(in srgb, var(--ui-shell-panel) 88%, white);
+  color: var(--ui-shell-text);
+  border: 1px solid color-mix(in srgb, var(--ui-shell-border) 86%, white);
+}
+
+.sr-DownloadPage__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.sr-DownloadPage__panel {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--ui-shell-panel) 92%, white);
+  border: 1px solid color-mix(in srgb, var(--ui-shell-border) 86%, white);
+  box-shadow: var(--ui-shell-shadow);
+}
+
+.sr-DownloadPage__panel ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--ui-shell-text-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+  .sr-DownloadPage__hero,
+  .sr-DownloadPage__details {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .sr-DownloadPage__hero {
+    padding-top: 5rem;
+  }
+
+  .sr-DownloadPage__grid {
+    grid-template-columns: 1fr;
+  }
+}

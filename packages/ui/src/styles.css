@@ -1,0 +1,79 @@
+@import '@saintrocky/design-tokens/tokens.css';
+
+.ui-Button {
+  font-family: var(--ui-font);
+  border-radius: var(--ui-radius);
+  border: 1px solid var(--ui-border);
+  padding: 10px 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+}
+
+.ui-Button--primary {
+  background: var(--ui-fg);
+  color: var(--ui-bg);
+  border-color: var(--ui-fg);
+}
+
+.ui-Button--secondary {
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+}
+
+.ui-Button--sm {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+.ui-Button--md {
+  font-size: 1rem;
+}
+
+.ui-Button--lg {
+  padding: 12px 16px;
+  font-size: 1.05rem;
+}
+
+.ui-Input {
+  font-family: var(--ui-font);
+  width: 100%;
+  border-radius: var(--ui-radius);
+  border: 1px solid var(--ui-border);
+  padding: 10px 12px;
+  color: var(--ui-fg);
+  background: var(--ui-bg);
+}
+
+.ui-Input--sm {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+.ui-Input--md {
+  font-size: 1rem;
+}
+
+.ui-Input--lg {
+  padding: 12px 14px;
+  font-size: 1.05rem;
+}
+
+.ui-Input--invalid {
+  border-color: var(--ui-fg);
+}
+
+.ui-Card {
+  font-family: var(--ui-font);
+  background: var(--ui-card);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  padding: 16px;
+}
+
+/* Generic hint: all generated Base UI slot wrappers follow `ui-${Component}${Slot}`. */
+
+

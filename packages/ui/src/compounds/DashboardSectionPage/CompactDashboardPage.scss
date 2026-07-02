@@ -1,0 +1,106 @@
+.c-CompactDashboardPage {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-CompactDashboardPage__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.c-CompactDashboardPage__toolbarGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.c-CompactDashboardPage__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.c-CompactDashboardPage__grid--single {
+  grid-template-columns: 1fr;
+}
+
+.c-CompactDashboardPage__stack,
+.c-CompactDashboardPage__rail {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-CompactDashboardPage__rail {
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+}
+
+.c-CompactDashboardCard {
+  border-radius: 0;
+  padding: 1rem;
+}
+
+.c-CompactDashboardCard__stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.c-CompactDashboardCard__stack h2,
+.c-CompactDashboardCard__stack p {
+  margin: 0;
+}
+
+.c-CompactDashboardCard__stack p {
+  color: var(--ui-shell-text-muted);
+  line-height: 1.6;
+}
+
+.c-CompactDashboardSelectLabel {
+  display: grid;
+  gap: 0.35rem;
+  min-width: min(100%, 260px);
+  color: var(--ui-shell-text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.c-CompactDashboardSelect {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid var(--ui-shell-border);
+  border-radius: 0;
+  background: var(--ui-shell-panel);
+  color: var(--ui-shell-text);
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+@media (max-width: 960px) {
+  .c-CompactDashboardPage__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .c-CompactDashboardPage__rail {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .c-CompactDashboardPage__toolbar,
+  .c-CompactDashboardPage__toolbarGroup {
+    align-items: stretch;
+  }
+
+  .c-CompactDashboardSelectLabel {
+    min-width: 0;
+  }
+}

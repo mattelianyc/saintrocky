@@ -1,0 +1,25 @@
+.c-SummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 16px;
+}
+
+.c-SummaryGrid__card {
+  background: var(--ui-desktop-card-surface, var(--ui-card));
+  border-color: var(--ui-desktop-border, var(--ui-border));
+  color: var(--ui-desktop-text, var(--ui-fg));
+  box-shadow: var(--ui-desktop-shadow, var(--ui-shadow));
+}
+
+.c-SummaryGrid__label {
+  display: block;
+  font-size: 12px;
+  color: var(--ui-desktop-text-muted, var(--ui-muted));
+  letter-spacing: 0.04em;
+}
+
+.c-SummaryGrid__value {
+  display: block;
+  margin-top: 4px;
+  color: var(--ui-desktop-text, var(--ui-fg));
+}

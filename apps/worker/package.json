@@ -1,0 +1,30 @@
+{
+  "name": "@saintrocky/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "dev": "node --watch ./src/index.js",
+    "start": "node ./src/index.js",
+    "build": "node -e \"console.log('worker: no build step')\"",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -c jest.config.js --passWithNoTests",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@saintrocky/alerts": "0.1.0",
+    "@saintrocky/api": "0.1.0",
+    "@saintrocky/config": "0.1.0",
+    "@saintrocky/network-policies": "0.1.0",
+    "@saintrocky/workflows": "0.1.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^9.17.0",
+    "jest": "^29.7.0"
+  }
+}
+
+

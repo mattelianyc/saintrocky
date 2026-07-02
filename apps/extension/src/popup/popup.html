@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>$TANDARD / DEVIANT$</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <div class="brand">
+        <img class="brand-mark" src="./rocco-icon.png" alt="$TANDARD / DEVIANT$ mark" />
+        <div class="brand-copy">
+          <p class="eyebrow">$TANDARD / DEVIANT$</p>
+          <h1>Browser runtime</h1>
+        </div>
+      </div>
+      <p id="connection-summary" class="summary">Waiting for auth handoff.</p>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Status</strong>
+          <span id="monitor-status" class="badge">idle</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <span>Assignments</span>
+            <strong id="assignment-count">0</strong>
+          </div>
+          <div class="metric">
+            <span>Browser monitor</span>
+            <strong id="browser-monitor-status">idle</strong>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="sign-out-button" class="button button-secondary" type="button">Sign out</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Pending violation</strong>
+        </div>
+        <div id="violation-empty" class="empty">No live violation.</div>
+        <div id="violation-card" class="violation hidden">
+          <strong id="violation-title"></strong>
+          <p id="violation-summary"></p>
+          <div id="violation-actions-default" class="actions">
+            <button id="comply-button" class="button button-secondary" type="button">Stay blocked</button>
+            <button id="bypass-button" class="button" type="button">Start override</button>
+          </div>
+          <div id="violation-override" class="override-state hidden">
+            <div class="override-fee-row">
+              <span id="override-fee-label" class="override-fee-amount"></span>
+              <span id="override-countdown-label" class="override-countdown"></span>
+            </div>
+            <div class="actions">
+              <button id="confirm-override-button" class="button" type="button">Confirm override</button>
+              <button id="cancel-override-button" class="button button-secondary" type="button">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Assignments</strong>
+        </div>
+        <ul id="assignment-list" class="list"></ul>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <strong>Recent activity</strong>
+        </div>
+        <ul id="activity-list" class="list"></ul>
+      </section>
+    </main>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>

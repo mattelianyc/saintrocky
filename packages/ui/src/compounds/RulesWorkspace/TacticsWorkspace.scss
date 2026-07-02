@@ -1,0 +1,68 @@
+.c-TacticsWorkspace {
+  gap: 0.75rem;
+}
+
+
+
+.c-TacticsWorkspace__toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.c-TacticsWorkspace__memberSelect {
+  min-width: min(100%, 320px);
+}
+
+.c-TacticsWorkspace__filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.c-TacticsWorkspace__filterButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ui-muted);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.c-TacticsWorkspace__filterButton:hover {
+  border-color: color-mix(in srgb, var(--ui-shell-accent) 24%, transparent);
+  color: var(--ui-shell-text);
+}
+
+.c-TacticsWorkspace__filterButton.is-active {
+  border-color: color-mix(in srgb, var(--ui-shell-accent) 34%, transparent);
+  background: color-mix(in srgb, var(--ui-shell-accent) 10%, transparent);
+  color: var(--ui-shell-accent);
+}
+
+@media (max-width: 720px) {
+  .c-TacticsWorkspace__toolbar,
+  .c-TacticsWorkspace__toolbarGroup {
+    align-items: stretch;
+  }
+
+  .c-TacticsWorkspace__memberSelect {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .c-TacticsWorkspace__filterBar {
+    width: 100%;
+  }
+}

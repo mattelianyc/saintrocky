@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "$TANDARD / DEVIANT$",
+    "slug": "saint-rocky",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#E6F4FE"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.standarddeviants.saintrocky",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.standarddeviants.saintrocky",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-notifications"
+    ],
+    "extra": {
+      "EXPO_PUBLIC_EAS_PROJECT_ID": "551ff6dd-f55a-445a-ba4e-85a581b51829",
+      "EXPO_PUBLIC_API_URL": "https://blowsier-fogbound-heriberto.ngrok-free.dev",
+      "EXPO_PUBLIC_APP_ENV": "development",
+      "EXPO_PUBLIC_APP_NAME": "$TANDARD / DEVIANT$",
+      "EXPO_PUBLIC_PRODUCT_NAME": "$TANDARD / DEVIANT$",
+      "eas": {
+        "projectId": "551ff6dd-f55a-445a-ba4e-85a581b51829"
+      }
+    }
+  }
+}

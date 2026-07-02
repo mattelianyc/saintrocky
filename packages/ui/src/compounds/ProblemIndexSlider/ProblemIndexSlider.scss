@@ -1,0 +1,76 @@
+.c-ProblemIndexSlider {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-ProblemIndexSlider--hero {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--ui-shell-border);
+}
+
+.c-ProblemIndexSlider__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.c-ProblemIndexSlider__header strong,
+.c-ProblemIndexSlider__summary strong,
+.c-ProblemIndexSlider__summary span {
+  display: block;
+}
+
+.c-ProblemIndexSlider--hero .c-ProblemIndexSlider__value {
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+}
+
+.c-ProblemIndexSlider__eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--ui-shell-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+}
+
+.c-ProblemIndexSlider__summary {
+  text-align: right;
+}
+
+.c-ProblemIndexSlider__summary span,
+.c-ProblemIndexSlider__label span {
+  color: var(--ui-shell-text-muted);
+}
+
+.c-ProblemIndexSlider__labels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.c-ProblemIndexSlider--hero .c-ProblemIndexSlider__labels {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.c-ProblemIndexSlider__label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.c-ProblemIndexSlider__label strong {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .c-ProblemIndexSlider--hero .c-ProblemIndexSlider__labels {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .c-ProblemIndexSlider--hero .c-ProblemIndexSlider__value {
+    font-size: 1.2rem;
+  }
+}

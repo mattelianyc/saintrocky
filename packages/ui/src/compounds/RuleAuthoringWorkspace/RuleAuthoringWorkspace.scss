@@ -1,0 +1,139 @@
+.c-RuleAuthoringWorkspace {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.c-RuleAuthoringWorkspace__header {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-RuleAuthoringWorkspace__header h1,
+.c-RuleAuthoringWorkspace__header p {
+  margin: 0;
+}
+
+.c-RuleAuthoringWorkspace__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ui-shell-accent);
+}
+
+.c-RuleAuthoringWorkspace__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.c-RuleAuthoringWorkspace__form,
+.c-RuleAuthoringWorkspace__reviewStack {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-RuleAuthoringWorkspace__formHeader {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.c-RuleAuthoringWorkspace__formHeader h2,
+.c-RuleAuthoringWorkspace__formHeader p {
+  margin: 0;
+}
+
+.c-RuleAuthoringWorkspace__formHeader p,
+.c-RuleAuthoringWorkspace__emptyState,
+.c-RuleAuthoringWorkspace__historyCard span {
+  color: var(--ui-shell-text-muted);
+  line-height: 1.7;
+}
+
+.c-RuleAuthoringWorkspace__field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.c-RuleAuthoringWorkspace__textarea,
+.c-RuleAuthoringWorkspace__select {
+  width: 100%;
+  border: 1px solid var(--ui-shell-border);
+  border-radius: 0.75rem;
+  background: var(--ui-shell-panel);
+  color: inherit;
+  padding: 0.9rem 1rem;
+  font: inherit;
+}
+
+.c-RuleAuthoringWorkspace__textarea {
+  resize: vertical;
+  min-height: 7rem;
+}
+
+.c-RuleAuthoringWorkspace__clarificationStack {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-RuleAuthoringWorkspace__clarificationStack h3 {
+  margin: 0;
+}
+
+.c-RuleAuthoringWorkspace__detailList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-RuleAuthoringWorkspace__detailList div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.c-RuleAuthoringWorkspace__detailList span {
+  color: var(--ui-shell-text-muted);
+}
+
+.c-RuleAuthoringWorkspace__canonicalCard {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.c-RuleAuthoringWorkspace__canonicalCard h3,
+.c-RuleAuthoringWorkspace__canonicalCard p {
+  margin: 0;
+}
+
+.c-RuleAuthoringWorkspace__noteList {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.c-RuleAuthoringWorkspace__historyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.c-RuleAuthoringWorkspace__historyCard {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--ui-shell-border);
+  border-radius: 1rem;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.c-RuleAuthoringWorkspace__loadingState {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}

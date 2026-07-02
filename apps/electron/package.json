@@ -1,0 +1,92 @@
+{
+  "name": "@saintrocky/electron",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"yarn dev:renderer\" \"yarn dev:app\"",
+    "dev:renderer": "vite --host 127.0.0.1 --port 5174",
+    "dev:app": "wait-on tcp:5174 && cross-env ELECTRON_RENDERER_URL=http://127.0.0.1:5174 electron .",
+    "start": "electron .",
+    "build": "vite build",
+    "pack": "yarn build && electron-builder --dir",
+    "dist": "yarn build && electron-builder",
+    "dist:mac": "yarn build && electron-builder --mac",
+    "dist:win": "yarn build && electron-builder --win",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@saintrocky/alerts": "0.1.0",
+    "@saintrocky/api-client": "0.1.0",
+    "@saintrocky/branding": "0.1.0",
+    "@saintrocky/chain": "0.1.0",
+    "@saintrocky/config": "0.1.0",
+    "@saintrocky/enforcement": "0.1.0",
+    "@saintrocky/fuckyoupayme": "0.1.0",
+    "@saintrocky/icons": "0.1.0",
+    "@saintrocky/network-policies": "0.1.0",
+    "@saintrocky/realtime": "0.1.0",
+    "@saintrocky/shared": "0.1.0",
+    "@saintrocky/ui": "0.1.0",
+    "@saintrocky/workflows": "0.1.0",
+    "dotenv": "^16.4.5",
+    "electron-store": "11.0.2",
+    "electron-updater": "6.8.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "37.2.6",
+    "electron-builder": "26.0.13",
+    "eslint": "^9.17.0",
+    "sass": "^1.98.0",
+    "vite": "^8.0.3",
+    "wait-on": "^9.0.4"
+  },
+  "build": {
+    "appId": "com.saintrocky.desktop",
+    "productName": "$TANDARD DEVIANT$",
+    "directories": {
+      "buildResources": "resources"
+    },
+    "files": [
+      "src/**/*",
+      "dist-renderer/**/*",
+      "resources/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.finance",
+      "icon": "resources/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "resources/entitlements.mac.plist",
+      "entitlementsInherit": "resources/entitlements.mac.inherit.plist"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "resources/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "mattelianyc",
+        "repo": "saintrocky"
+      }
+    ]
+  }
+}

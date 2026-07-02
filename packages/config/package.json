@@ -1,0 +1,21 @@
+{
+  "name": "@saintrocky/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./load-env-files": {
+      "import": "./src/load-env-files.js",
+      "require": "./load-env-files.cjs"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "build": "node -e \"console.log('config: no build step')\""
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}

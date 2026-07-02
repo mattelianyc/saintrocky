@@ -1,0 +1,155 @@
+.c-StrategyWorkspace {
+  gap: 0rem;
+}
+
+.c-StrategyWorkspace__header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.c-StrategyWorkspace__headerCopy {
+  display: grid;
+  gap: 0.45rem;
+  max-width: 54rem;
+}
+
+.c-StrategyWorkspace__headerCopy h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.65rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.c-StrategyWorkspace__headerCopy p:last-child {
+  margin: 0;
+  color: var(--ui-shell-text-muted);
+  line-height: 1.7;
+}
+
+.c-StrategyWorkspace__tabList {
+  align-self: start;
+}
+
+.c-RulesWorkspacePanel--strategy {
+  gap: 0.5rem;
+}
+
+.c-RulesWorkspacePanel__strategyGrid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.15fr) minmax(360px, 0.92fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.c-RulesWorkspacePanel__stack--library {
+  gap: 0;
+}
+
+.c-RulesWorkspacePanel__libraryCard,
+.c-RulesWorkspacePanel__problemCard,
+.c-RulesWorkspacePanel__detailCard {
+  border-radius: 0;
+}
+
+.c-RulesWorkspacePanel__libraryCard {
+  padding: 0;
+}
+
+.c-RulesWorkspacePanel__detailRail {
+  display: grid;
+  gap: 0.5rem;
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+}
+
+.c-RulesWorkspacePanel__problemCard {
+  padding: 0;
+}
+
+.c-RulesWorkspacePanel__problemCard .c-ProblemIndexSlider--hero {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.c-RulesWorkspacePanel__detailCard {
+  gap: 0.5rem;
+}
+
+.c-RulesWorkspacePanel__detailSummary,
+.c-RulesWorkspacePanel__mergeHint {
+  color: var(--ui-shell-text-muted);
+  line-height: 1.65;
+}
+
+.c-RulesWorkspacePanel__itemHeader strong {
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
+.c-RulesWorkspacePanel__actions .ui-Button {
+  min-width: 13rem;
+}
+
+.c-RulesWorkspacePanel__templateButton {
+  gap: 0.35rem;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    background-color 160ms ease,
+    padding-inline 160ms ease;
+}
+
+.c-RulesWorkspacePanel__templateButton.is-selected {
+  color: var(--ui-shell-text);
+  padding-inline: 0.5rem;
+  background: color-mix(in srgb, var(--ui-shell-accent) 8%, transparent);
+}
+
+.c-RulesWorkspacePanel__templateButton strong {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.c-RulesWorkspacePanel__templateButton:hover {
+  border-bottom-color: color-mix(in srgb, var(--ui-shell-accent) 28%, transparent);
+}
+
+.c-RulesWorkspacePanel__activeTag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--ui-shell-accent) 38%, white);
+  background: color-mix(in srgb, var(--ui-shell-accent) 12%, transparent);
+  color: var(--ui-shell-accent);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.c-RulesWorkspacePanel__mergeHint {
+  margin: 0;
+  padding-top: 0.25rem;
+}
+
+@media (max-width: 960px) {
+  .c-RulesWorkspacePanel__strategyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .c-RulesWorkspacePanel__detailRail {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .c-StrategyWorkspace__header {
+    grid-template-columns: 1fr;
+  }
+
+  .c-StrategyWorkspace__tabList {
+    width: fit-content;
+  }
+}

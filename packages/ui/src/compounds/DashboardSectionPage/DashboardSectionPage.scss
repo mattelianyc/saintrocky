@@ -1,0 +1,43 @@
+.c-DashboardSectionPage {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.c-DashboardSectionPage__header {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-DashboardSectionPage__header h1,
+.c-DashboardSectionPage__header p {
+  margin: 0;
+}
+
+.c-DashboardSectionPage__header p {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  line-height: 1.8;
+  max-width: 42rem;
+}
+
+.c-DashboardSectionPage__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.c-DashboardSectionPage__cardStack {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.c-DashboardSectionPage__cardStack h2,
+.c-DashboardSectionPage__cardStack p {
+  margin: 0;
+}
+
+.c-DashboardSectionPage__cardStack p {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  line-height: 1.7;
+}

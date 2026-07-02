@@ -1,0 +1,23 @@
+{
+  "name": "@saintrocky/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node -e \"console.log('extension: run yarn workspace @saintrocky/extension build:dev and load apps/extension/dist as unpacked')\"",
+    "build": "node ./scripts/sync-design-tokens.mjs && vite build && EXTENSION_BUILD_ENV=production node ./scripts/build-content-script.mjs && node ./scripts/write-manifest.mjs",
+    "build:dev": "node ./scripts/sync-design-tokens.mjs && vite build --mode development && EXTENSION_BUILD_ENV=development node ./scripts/build-content-script.mjs && node ./scripts/write-manifest.mjs",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@saintrocky/api-client": "0.1.0",
+    "@saintrocky/enforcement": "0.1.0",
+    "@saintrocky/fuckyoupayme": "0.1.0",
+    "@saintrocky/realtime": "0.1.0",
+    "@saintrocky/shared": "0.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "vite": "^8.0.3"
+  }
+}

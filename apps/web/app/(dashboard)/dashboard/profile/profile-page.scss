@@ -1,0 +1,96 @@
+.sr-ProfilePage__intro .c-DashboardSectionPage__grid {
+  display: none;
+}
+
+.sr-ProfilePage {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+}
+
+.sr-ProfilePage__overview,
+.sr-ProfilePage__panel {
+  min-width: 0;
+}
+
+.sr-ProfilePage__panelStack {
+  display: grid;
+  gap: 1rem;
+}
+
+.sr-ProfilePage__panelHeader {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sr-ProfilePage__panelHeader h2,
+.sr-ProfilePage__panelHeader h3,
+.sr-ProfilePage__panelHeader p,
+.sr-ProfilePage__dangerBlock p,
+.sr-ProfilePage__dangerBlock h3 {
+  margin: 0;
+}
+
+.sr-ProfilePage__panelHeader p,
+.sr-ProfilePage__dangerBlock p {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  line-height: 1.7;
+}
+
+.sr-ProfilePage__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.sr-ProfilePage__field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sr-ProfilePage__fieldLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.sr-ProfilePage__fieldError {
+  color: var(--ui-error);
+  font-size: 0.9rem;
+}
+
+.sr-ProfilePage__formActions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.sr-ProfilePage__successMessage {
+  margin: 0;
+  color: var(--ui-primary);
+  font-weight: 600;
+}
+
+.sr-ProfilePage__actions {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.sr-ProfilePage__danger {
+  grid-column: 2;
+}
+
+.sr-ProfilePage__dangerBlock {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ui-border);
+}
+
+@media (max-width: 960px) {
+  .sr-ProfilePage {
+    grid-template-columns: 1fr;
+  }
+
+  .sr-ProfilePage__danger {
+    grid-column: auto;
+  }
+}

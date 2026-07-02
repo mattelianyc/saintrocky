@@ -1,0 +1,42 @@
+import "@saintrocky/ui/base.scss";
+import "@saintrocky/ui/primitives.scss";
+import "@saintrocky/ui/layout.scss";
+import "@saintrocky/ui/compounds.scss";
+import "@saintrocky/ui/widgets.scss";
+import "./web-fonts.css";
+
+import { saintRockyBranding } from "@saintrocky/branding";
+import { loadWebRuntimeConfig } from "@saintrocky/config";
+import { AuthSessionProvider } from "@/src/auth/auth-session.jsx";
+
+const runtimeConfig = loadWebRuntimeConfig(process.env);
+
+export const metadata = {
+  title: saintRockyBranding.title,
+  description: saintRockyBranding.description,
+  icons: {
+    icon: "/images/rocco-icon.png",
+    apple: "/images/rocco-icon.png",
+    shortcut: "/images/rocco-icon.png"
+  }
+};
+
+export default function RootLayout({ children }) {
+  const publicApiBaseUrl =
+    runtimeConfig.NEXT_PUBLIC_API_BASE_URL || runtimeConfig.API_BASE_URL || "";
+
+  return (
+    <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__SAINTROCKY_API_BASE_URL__ = ${JSON.stringify(publicApiBaseUrl)};`
+          }}
+        />
+      </head>
+      <body className="sr-WebBody">
+        <AuthSessionProvider>{children}</AuthSessionProvider>
+      </body>
+    </html>
+  );
+}

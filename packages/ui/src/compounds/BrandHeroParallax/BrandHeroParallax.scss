@@ -1,0 +1,946 @@
+.c-BrandHeroParallax {
+  position: relative;
+  width: 100%;
+  --c-BrandHeroParallax__roccoWidth: min(19.5vw, 15rem);
+  --c-BrandHeroParallax__roccoLeft: calc(50% - (var(--c-BrandHeroParallax__roccoWidth) / 2));
+  --c-BrandHeroParallax__roccoBottom: clamp(0.35rem, 1.6vh, 1rem);
+}
+
+.c-BrandHeroParallax--wordmarkOnly .c-BrandHeroParallax__section {
+  background:
+    radial-gradient(circle at top, rgb(122 19 45 / 0.2), transparent 34%),
+    linear-gradient(180deg, rgb(8 14 18), rgb(12 13 16));
+}
+
+.c-BrandHeroParallax__wordmarkOnlyDog {
+  position: absolute;
+  right: clamp(0.4rem, 3vw, 1rem);
+  bottom: 0;
+  z-index: 4;
+  width: min(38.4vw, 12rem);
+  max-width: 10rem;
+  pointer-events: none;
+  opacity: 0.33;
+}
+
+.c-BrandHeroParallax__wordmarkOnlyDogImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter:
+    drop-shadow(0 20px 36px rgb(0 0 0 / 0.36))
+    saturate(0.96);
+}
+
+.c-BrandHeroParallax__wordmarkOnlyScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background:
+    linear-gradient(90deg, rgb(8 14 18 / 0.94) 0%, rgb(8 14 18 / 0.88) 46%, rgb(8 14 18 / 0.6) 72%, rgb(8 14 18 / 0.74) 100%),
+    linear-gradient(180deg, rgb(8 14 18 / 0.26) 0%, rgb(8 14 18 / 0.48) 100%);
+}
+
+.c-BrandHeroParallax__wordmarkOnlyOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  align-content: center;
+  padding: clamp(1.25rem, 6vw, 2rem);
+  pointer-events: auto;
+}
+
+.c-BrandHeroParallax__viewport {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  min-height: 100svh;
+  width: 100%;
+}
+
+.c-BrandHeroParallax__section {
+  position: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.c-BrandHeroParallax__scrollSpacer {
+  height: var(--ui-marketing-hero-scroll-runway);
+  pointer-events: none;
+}
+
+.c-BrandHeroParallax__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.c-BrandHeroParallax__mediaVideo {
+  position: absolute;
+  inset: 0;
+}
+
+.c-BrandHeroParallax__mediaVideo {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  will-change: opacity, transform;
+}
+
+.c-BrandHeroParallax__loadOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgb(0 0 0);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.c-BrandHeroParallax__introMediaVeil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgb(7 8 12 / 0) 34%,
+    rgb(7 8 12 / 0.08) 58%,
+    rgb(7 8 12 / 0.18) 78%,
+    rgb(7 8 12 / 0.28) 100%
+  );
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.c-BrandHeroParallax__stencilPanel {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(10 10 12);
+  pointer-events: none;
+  will-change: opacity, transform, filter;
+}
+
+.c-BrandHeroParallax__contentPanel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: opacity, transform, filter;
+}
+
+.c-BrandHeroParallax__wordmarkFrame {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  pointer-events: none;
+}
+
+.c-BrandHeroParallax__introDog {
+  position: absolute;
+  left: var(--c-BrandHeroParallax__roccoLeft);
+  right: auto;
+  bottom: var(--c-BrandHeroParallax__roccoBottom);
+  z-index: 8;
+  width: var(--c-BrandHeroParallax__roccoWidth);
+  max-width: none;
+  pointer-events: none;
+  transform-origin: bottom center;
+  will-change: opacity, transform;
+}
+
+.c-BrandHeroParallax__introDogImage {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  filter: drop-shadow(0 24px 44px rgb(0 0 0 / 0.16));
+  transform-origin: bottom center;
+}
+
+.c-BrandHeroParallax__introDog--walking .c-BrandHeroParallax__introDogImage {
+  animation: brand-hero-parallax-rocco-stride 0.48s ease-in-out infinite;
+}
+
+@keyframes brand-hero-parallax-rocco-stride {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-1.2%);
+  }
+}
+
+.c-BrandHeroParallax__intro {
+  position: absolute;
+  inset: 0 50% 0 0;
+  z-index: 6;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.85rem;
+  width: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+  text-align: center;
+  color: rgb(255 255 255 / 0.96);
+  pointer-events: auto;
+}
+
+.c-BrandHeroParallax__introEyebrow {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.9);
+}
+
+.c-BrandHeroParallax__introBrandStack {
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+}
+
+.c-BrandHeroParallax__introLogo {
+  display: block;
+  width: min(8rem, 32vw);
+  height: auto;
+}
+
+.c-BrandHeroParallax__introWordmark {
+  margin: 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(1.35rem, 2.2vw, 2.25rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.98);
+}
+
+.c-BrandHeroParallax__introLine {
+  margin: 0;
+  width: min(32rem, calc(50vw - clamp(2.5rem, 8vw, 6rem)));
+  font-size: clamp(0.95rem, 1.15vw, 1.12rem);
+  line-height: 1.8;
+  color: rgb(255 255 255 / 0.9);
+}
+
+.c-BrandHeroParallax__introLink {
+  position: relative;
+  z-index: 1;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  pointer-events: auto;
+}
+
+.c-BrandHeroParallax__introSignoff {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+  justify-items: center;
+}
+
+.c-BrandHeroParallax__introSignoffLine {
+  margin: 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.98);
+}
+
+/* ── Leaderboard reveal (overview scene) ── */
+
+.c-BrandHeroParallax__overviewScene {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: stretch;
+  pointer-events: none;
+  background: rgb(255 255 255);
+  will-change: opacity;
+}
+
+.c-BrandHeroParallax__overviewDoor {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: linear-gradient(180deg, rgb(5 5 5 / 0.985), rgb(10 10 12 / 0.98));
+  pointer-events: none;
+  will-change: clip-path;
+}
+
+.c-BrandHeroParallax__leaderboardReveal {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 50%;
+  height: 100%;
+  padding: 0;
+  pointer-events: auto;
+}
+
+/* ── Revenue model reveal (right half, over black door) ── */
+
+.c-BrandHeroParallax__revenueModel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 7;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.9rem;
+  padding-inline: clamp(1.5rem, 4vw, 3.5rem);
+  padding-block: clamp(1.5rem, 3vh, 2.5rem);
+  text-align: center;
+  color: rgb(255 255 255 / 0.96);
+  background: rgb(10 10 12);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.c-BrandHeroParallax__revenueEyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.72);
+}
+
+.c-BrandHeroParallax__revenueHeading {
+  margin: 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: rgb(236 223 197);
+}
+
+.c-BrandHeroParallax__revenueSummary {
+  margin: 0;
+  width: min(28rem, calc(50vw - 4rem));
+  font-size: clamp(0.88rem, 1vw, 1rem);
+  line-height: 1.7;
+  color: rgb(255 255 255 / 0.78);
+}
+
+.c-BrandHeroParallax__revenuePillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: min(36rem, calc(50vw - 3rem));
+}
+
+.c-BrandHeroParallax__revenuePillar {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.65rem 0.6rem;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.03);
+}
+
+.c-BrandHeroParallax__revenuePillarTitle {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgb(236 223 197 / 0.94);
+}
+
+.c-BrandHeroParallax__revenuePillarSummary {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: rgb(255 255 255 / 0.62);
+}
+
+.c-BrandHeroParallax__revenueValueProps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+  width: min(28rem, calc(50vw - 4rem));
+}
+
+.c-BrandHeroParallax__revenueValueProp {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.c-BrandHeroParallax__revenueValueProp::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: rgb(236 223 197 / 0.7);
+  font-size: 0.72rem;
+}
+
+.c-BrandHeroParallax__revenueSignoff {
+  margin: 0.5rem 0 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(0.88rem, 1.1vw, 1.05rem);
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: rgb(236 223 197 / 0.8);
+}
+
+.c-BrandHeroParallax__wordmark {
+  margin: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.18em;
+  width: fit-content;
+  max-width: calc(100vw - (2 * clamp(1rem, 4vw, 2.5rem)));
+  margin-inline: auto;
+  padding-inline: 0;
+  text-align: center;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(2rem, 5.8vw, 6rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.c-BrandHeroParallax__word {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
+}
+
+.c-BrandHeroParallax__wordmarkPrimary {
+  color: inherit;
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.28),
+    0 10px 30px rgb(0 0 0 / 0.18);
+}
+
+.c-BrandHeroParallax__wordmarkStencil {
+  color: var(--ui-primary-contrast);
+}
+
+.c-BrandHeroParallax__characterOuter,
+.c-BrandHeroParallax__characterInner {
+  display: inline-block;
+}
+
+.c-BrandHeroParallax__characterInner--accentLeading {
+  --c-BrandHeroParallax__flickerColor: var(--ui-shell-accent-strong);
+  color: var(--ui-shell-accent-strong);
+  text-shadow:
+    0 0 0.03em var(--c-BrandHeroParallax__flickerColor),
+    0 0 0.12em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 84%, transparent),
+    0 0 0.24em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 46%, transparent);
+}
+
+.c-BrandHeroParallax__characterInner--accentTrailing {
+  --c-BrandHeroParallax__flickerColor: var(--ui-mint);
+  color: var(--ui-mint);
+  text-shadow:
+    0 0 0.03em var(--c-BrandHeroParallax__flickerColor),
+    0 0 0.14em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 90%, transparent),
+    0 0 0.32em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 56%, transparent),
+    0 0 0.72em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 28%, transparent);
+}
+
+.c-BrandHeroParallax__characterInner--divider {
+  color: var(--ui-shell-brand-divider);
+}
+
+.c-BrandHeroParallax--heroRevealReady .c-BrandHeroParallax__characterInner--accentLeading,
+.c-BrandHeroParallax--heroRevealReady .c-BrandHeroParallax__characterInner--accentTrailing {
+  animation: brand-hero-parallax-neon-flicker 1.4s ease-out 0.22s 1 both;
+}
+
+@keyframes brand-hero-parallax-neon-flicker {
+  0% {
+    opacity: 0.18;
+    text-shadow: none;
+  }
+
+  8% {
+    opacity: 0.28;
+    text-shadow: none;
+  }
+
+  12% {
+    opacity: 1;
+    text-shadow:
+      0 0 0.04em var(--c-BrandHeroParallax__flickerColor),
+      0 0 0.18em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 92%, transparent),
+      0 0 0.42em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 68%, transparent),
+      0 0 0.92em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 34%, transparent);
+  }
+
+  18% {
+    opacity: 0.36;
+    text-shadow: none;
+  }
+
+  24% {
+    opacity: 0.92;
+    text-shadow:
+      0 0 0.03em var(--c-BrandHeroParallax__flickerColor),
+      0 0 0.14em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 88%, transparent),
+      0 0 0.3em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 54%, transparent);
+  }
+
+  31% {
+    opacity: 0.52;
+    text-shadow: none;
+  }
+
+  40% {
+    opacity: 1;
+    text-shadow:
+      0 0 0.05em var(--c-BrandHeroParallax__flickerColor),
+      0 0 0.2em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 96%, transparent),
+      0 0 0.48em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 76%, transparent),
+      0 0 1.1em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 38%, transparent);
+  }
+
+  52% {
+    opacity: 0.74;
+    text-shadow:
+      0 0 0.03em var(--c-BrandHeroParallax__flickerColor),
+      0 0 0.14em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 84%, transparent),
+      0 0 0.28em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 50%, transparent);
+  }
+
+  66% {
+    opacity: 1;
+    text-shadow:
+      0 0 0.04em var(--c-BrandHeroParallax__flickerColor),
+      0 0 0.16em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 90%, transparent),
+      0 0 0.34em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 62%, transparent),
+      0 0 0.8em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 28%, transparent);
+  }
+
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 0.03em var(--c-BrandHeroParallax__flickerColor),
+      0 0 0.12em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 82%, transparent),
+      0 0 0.24em color-mix(in srgb, var(--c-BrandHeroParallax__flickerColor) 42%, transparent);
+  }
+}
+
+@media (max-width: 1024px) {
+  .c-BrandHeroParallax {
+    --c-BrandHeroParallax__roccoWidth: min(18.2vw, 11.75rem);
+  }
+
+  .c-BrandHeroParallax__intro {
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+
+  .c-BrandHeroParallax__introWordmark {
+    font-size: clamp(1.15rem, 2.4vw, 1.8rem);
+  }
+
+  .c-BrandHeroParallax__introLine {
+    width: min(24rem, calc(50vw - clamp(2rem, 8vw, 4rem)));
+  }
+
+  .c-BrandHeroParallax__introSignoffLine {
+    font-size: clamp(0.92rem, 1.8vw, 1.15rem);
+  }
+
+  .c-BrandHeroParallax__revenueModel {
+    padding-inline: clamp(1rem, 3vw, 2rem);
+    gap: 0.65rem;
+  }
+
+  .c-BrandHeroParallax__revenueHeading {
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+  }
+
+  .c-BrandHeroParallax__revenuePillars {
+    grid-template-columns: 1fr;
+    width: min(24rem, calc(50vw - 2rem));
+  }
+
+  .c-BrandHeroParallax__wordmark {
+    max-width: calc(100vw - (2 * clamp(0.875rem, 4vw, 2rem)));
+    font-size: clamp(1.65rem, 6.2vw, 4.75rem);
+    letter-spacing: 0.05em;
+    gap: 0.16em;
+  }
+}
+
+@media (max-width: 640px) {
+  .c-BrandHeroParallax {
+    --c-BrandHeroParallax__roccoWidth: min(28.6vw, 7.8rem);
+  }
+
+  .c-BrandHeroParallax__wordmarkOnlyDog {
+    right: 0;
+    width: min(43.2vw, 11.2rem);
+    opacity: 0.34;
+  }
+
+  .c-BrandHeroParallax__wordmarkOnlyOverlay {
+    align-content: end;
+    padding: 1rem 1rem calc(18vh + 1rem);
+  }
+
+  .c-BrandHeroParallax__viewport {
+    height: 100dvh;
+    min-height: 100svh;
+  }
+
+  .c-BrandHeroParallax__section {
+    overflow: visible;
+    min-height: 100svh;
+    height: 100%;
+  }
+
+  .c-BrandHeroParallax__overviewScene {
+    position: relative;
+    inset: auto;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .c-BrandHeroParallax__overviewDoor {
+    inset: 0;
+  }
+
+  .c-BrandHeroParallax__intro {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    gap: 0.55rem;
+    padding: clamp(1.25rem, 6vw, 2rem);
+    place-content: center;
+  }
+
+  .c-BrandHeroParallax__introLogo {
+    width: min(5.25rem, 26vw);
+  }
+
+  .c-BrandHeroParallax__introEyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+  }
+
+  .c-BrandHeroParallax__introWordmark {
+    font-size: 0.88rem;
+    letter-spacing: 0.09em;
+  }
+
+  .c-BrandHeroParallax__introLine {
+    width: min(100%, 22rem);
+    font-size: 0.74rem;
+    line-height: 1.5;
+  }
+
+  .c-BrandHeroParallax__introSignoffLine {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+  }
+
+  .c-BrandHeroParallax__introDog {
+    left: var(--c-BrandHeroParallax__roccoLeft);
+    right: auto;
+    bottom: var(--c-BrandHeroParallax__roccoBottom);
+    opacity: 0.72;
+  }
+
+  .c-BrandHeroParallax__leaderboardReveal {
+    width: 100%;
+    height: auto;
+    padding: 0;
+  }
+
+  .c-BrandHeroParallax__revenueModel {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    align-content: start;
+    padding-inline: 1rem;
+    padding-block: clamp(2rem, 5vh, 3rem);
+    gap: 0.5rem;
+    background: rgb(10 10 12);
+  }
+
+  .c-BrandHeroParallax__revenueHeading {
+    font-size: 1rem;
+  }
+
+  .c-BrandHeroParallax__revenueSummary {
+    width: min(100%, 24rem);
+    font-size: 0.8rem;
+  }
+
+  .c-BrandHeroParallax__revenuePillars {
+    grid-template-columns: 1fr;
+    width: min(100%, 24rem);
+    gap: 0.5rem;
+  }
+
+  .c-BrandHeroParallax__revenueValueProps {
+    width: min(100%, 24rem);
+  }
+
+  .c-BrandHeroParallax__revenueValueProp {
+    font-size: 0.76rem;
+  }
+
+  .c-BrandHeroParallax__wordmark {
+    max-width: calc(100vw - 1.25rem);
+    font-size: clamp(1.05rem, 5.2vw, 2.15rem);
+    letter-spacing: 0.03em;
+    gap: 0.1em;
+  }
+}
+
+.c-MobileHeroSection {
+  background: rgb(255 250 252);
+}
+
+.c-MobileHeroSection__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.c-MobileHeroSection__intro,
+.c-MobileHeroSection__revenueModel,
+.c-MobileHeroSection__leaderboard {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 6vw, 2.5rem);
+}
+
+.c-MobileHeroSection__intro {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.c-MobileHeroSection__intro--mascotOnly {
+  padding-top: clamp(1rem, 4vw, 1.5rem);
+}
+
+.c-MobileHeroSection__introCopy,
+.c-MobileHeroSection__revenueModel,
+.c-MobileHeroSection__leaderboard {
+  color: rgb(10 10 12 / 0.92);
+}
+
+.c-MobileHeroSection__eyebrow {
+  color: var(--ui-shell-accent);
+}
+
+.c-MobileHeroSection__heroCopy {
+  width: min(100%, 28rem);
+  margin: 0 auto;
+  color: rgb(255 255 255 / 0.94);
+}
+
+.c-MobileHeroSection__heroCopyEyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.9);
+}
+
+.c-MobileHeroSection__heroCopyStack {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.c-MobileHeroSection__heroCopyParagraph {
+  margin: 0;
+  font-size: clamp(0.78rem, 2.85vw, 0.9rem);
+  line-height: 1.65;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.c-MobileHeroSection__heroCopySignoff {
+  margin: 1rem 0 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: 0.94rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(236 223 197 / 0.98);
+}
+
+.c-MobileHeroSection__copyStack {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.9rem;
+}
+
+.c-MobileHeroSection__bodyCopy,
+.c-MobileHeroSection__sectionSummary,
+.c-MobileHeroSection__pillarSummary,
+.c-MobileHeroSection__footerCopy {
+  margin: 0;
+  font-size: clamp(0.96rem, 4vw, 1.08rem);
+  line-height: 1.7;
+  color: rgb(10 10 12 / 0.72);
+}
+
+.c-MobileHeroSection__signoff {
+  margin-top: 1rem;
+}
+
+.c-MobileHeroSection__signoffLine {
+  margin: 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(10 10 12 / 0.92);
+}
+
+.c-MobileHeroSection__signoffLine--revenue {
+  margin-top: 1.25rem;
+}
+
+.c-MobileHeroSection__mascotFrame {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1rem 0;
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at top, rgb(122 19 45 / 0.16), transparent 54%),
+    linear-gradient(180deg, rgb(245 236 239), rgb(255 255 255));
+}
+
+.c-MobileHeroSection__mascotImage {
+  display: block;
+  width: min(100%, 14rem);
+  height: auto;
+  filter: drop-shadow(0 18px 34px rgb(0 0 0 / 0.14));
+}
+
+.c-MobileHeroSection__sectionHeading {
+  margin: 0.35rem 0 0;
+  font-family: var(--ui-font-brand, var(--ui-font));
+  font-size: clamp(1.35rem, 6vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(10 10 12 / 0.94);
+}
+
+.c-MobileHeroSection__sectionSummary {
+  margin-top: 0.95rem;
+}
+
+.c-MobileHeroSection__pillarGrid {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+}
+
+.c-MobileHeroSection__pillarCard {
+  padding: 1rem;
+  border: 1px solid rgb(10 10 12 / 0.08);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.78);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.04);
+}
+
+.c-MobileHeroSection__pillarTitle {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(10 10 12 / 0.92);
+}
+
+.c-MobileHeroSection__pillarSummary {
+  margin-top: 0.5rem;
+}
+
+.c-MobileHeroSection__valuePropList {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-MobileHeroSection__valuePropItem {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgb(10 10 12 / 0.78);
+}
+
+.c-MobileHeroSection__valuePropItem::before {
+  content: "+";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+  color: var(--ui-shell-accent);
+}
+
+.c-MobileHeroSection__leaderboardHeader {
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 1.15rem;
+}
+
+@media (min-width: 768px) {
+  .c-MobileHeroSection {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .c-MobileHeroSection__intro,
+  .c-MobileHeroSection__revenueModel,
+  .c-MobileHeroSection__leaderboard {
+    padding-inline: 1rem;
+  }
+}

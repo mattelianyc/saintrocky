@@ -1,0 +1,23 @@
+.c-MetricGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.c-MetricGrid__card {
+  display: grid;
+  gap: 4px;
+}
+
+.c-MetricGrid__label {
+  display: block;
+  font-size: 12px;
+  color: var(--ui-desktop-text-muted, var(--ui-muted));
+  letter-spacing: 0.04em;
+}
+
+.c-MetricGrid__value {
+  display: block;
+  color: var(--ui-desktop-text, var(--ui-fg));
+  font-size: 22px;
+}

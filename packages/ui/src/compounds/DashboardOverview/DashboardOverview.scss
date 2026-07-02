@@ -1,0 +1,101 @@
+.c-DashboardOverview {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.c-DashboardOverview--compact {
+  gap: 1rem;
+}
+
+.c-DashboardOverview__hero {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.c-DashboardOverview__hero h1,
+.c-DashboardOverview__hero p {
+  margin: 0;
+}
+
+.c-DashboardOverview__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ui-shell-accent, var(--ui-primary));
+}
+
+.c-DashboardOverview__summary {
+  max-width: 48rem;
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  line-height: 1.8;
+}
+
+.c-DashboardOverview__metricGrid,
+.c-DashboardOverview__sectionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.c-DashboardOverview__metricCard,
+.c-DashboardOverview__sectionCard {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.c-DashboardOverview--compact .c-DashboardOverview__metricGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.c-DashboardOverview__metricLabel {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+}
+
+.c-DashboardOverview__metricCard strong {
+  font-size: 2rem;
+}
+
+.c-DashboardOverview--compact .c-DashboardOverview__metricCard {
+  gap: 0.3rem;
+}
+
+.c-DashboardOverview--compact .c-DashboardOverview__metricLabel {
+  font-size: 0.68rem;
+}
+
+.c-DashboardOverview--compact .c-DashboardOverview__metricCard strong {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.c-DashboardOverview__sectionCard h2,
+.c-DashboardOverview__sectionCard p {
+  margin: 0;
+}
+
+.c-DashboardOverview__sectionCard p {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+  line-height: 1.7;
+}
+
+.c-DashboardOverviewPage {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-DashboardOverviewPage__widgets {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .c-DashboardOverview--compact .c-DashboardOverview__metricGrid,
+  .c-DashboardOverviewPage__widgets {
+    grid-template-columns: 1fr;
+  }
+}

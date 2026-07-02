@@ -1,0 +1,353 @@
+.c-MarketingOverviewSection {
+  --section-padding: 200px;
+  --marketing-band-beige: rgb(236 223 197);
+
+  display: grid;
+}
+
+/* ── Shared band ── */
+
+.c-MarketingOverviewSection__band {
+  padding: var(--section-padding) 1.25rem;
+}
+
+.c-MarketingOverviewSection__inner {
+  position: relative;
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  display: grid;
+  gap: 2rem;
+}
+
+.c-MarketingOverviewSection__inner--centered {
+  justify-items: center;
+  text-align: center;
+}
+
+.c-MarketingOverviewSection__copyColumn {
+  display: grid;
+  gap: 1rem;
+  max-width: 54rem;
+}
+
+.c-MarketingOverviewSection__eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ui-shell-accent);
+}
+
+.c-MarketingOverviewSection__heading {
+  margin: 0;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.18;
+  max-width: 44rem;
+}
+
+.c-MarketingOverviewSection__subheading {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  line-height: 1.25;
+}
+
+.c-MarketingOverviewSection__summary {
+  margin: 0;
+  color: var(--ui-shell-text-muted);
+  max-width: 42rem;
+  line-height: 1.7;
+}
+
+.c-MarketingOverviewSection__actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Band 1: Economics ── */
+
+.c-MarketingOverviewSection__band--economics {
+  background: var(--ui-shell-background-strong);
+  color: var(--ui-shell-text);
+}
+
+/* ── Band 2: Feature Matrix ── */
+
+.c-MarketingOverviewSection__band--features {
+  background: var(--marketing-band-beige);
+  color: var(--ui-shell-text);
+}
+
+.c-MarketingOverviewSection__featureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+}
+
+.c-MarketingOverviewSection__featureCard {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.c-MarketingOverviewSection__featureIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ui-shell-accent) 10%, transparent);
+  color: var(--ui-shell-accent);
+}
+
+.c-MarketingOverviewSection__featureTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.c-MarketingOverviewSection__featureSummary {
+  margin: 0;
+  color: var(--ui-shell-text-muted);
+  line-height: 1.65;
+  max-width: 28rem;
+}
+
+/* ── Band 3: Platforms ── */
+
+.c-MarketingOverviewSection__band--platforms {
+  background: var(--marketing-band-beige);
+  color: var(--ui-shell-text);
+}
+
+.c-MarketingOverviewSection__platformRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem 2.5rem;
+  margin-top: 1rem;
+}
+
+.c-MarketingOverviewSection__platformBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--ui-shell-text) 10%, transparent);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: var(--ui-shell-text);
+}
+
+.c-MarketingOverviewSection__platformBadge--link {
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+.c-MarketingOverviewSection__platformBadge--link:hover,
+.c-MarketingOverviewSection__platformBadge--link:focus-visible {
+  transform: translateY(-1px);
+  color: var(--ui-shell-accent);
+  border-color: color-mix(in srgb, var(--ui-shell-accent) 28%, transparent);
+  background: color-mix(in srgb, var(--ui-shell-accent) 7%, transparent);
+  text-decoration: none;
+}
+
+.c-MarketingOverviewSection__platformLabel {
+  white-space: nowrap;
+}
+
+/* ── Band 4: Product Modules ── */
+
+.c-MarketingOverviewSection__band--modules {
+  background: var(--marketing-band-beige);
+  color: var(--ui-shell-text);
+}
+
+.c-MarketingOverviewSection__moduleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.c-MarketingOverviewSection__moduleCard {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--ui-shell-text) 8%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ui-shell-background-strong) 60%, transparent);
+}
+
+.c-MarketingOverviewSection__moduleIcon {
+  color: var(--ui-shell-accent);
+  margin-bottom: 0.2rem;
+}
+
+.c-MarketingOverviewSection__moduleTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.c-MarketingOverviewSection__moduleSummary {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--ui-shell-text-muted);
+  line-height: 1.6;
+}
+
+.c-MarketingOverviewSection__decorativeDog {
+  position: absolute;
+  right: -2rem;
+  bottom: -6rem;
+  width: min(18rem, 20vw);
+  height: auto;
+  opacity: 0.12;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
+/* ── Band 5: Ecosystem ── */
+
+.c-MarketingOverviewSection__band--ecosystem {
+  background: var(--ui-shell-background-strong);
+  color: var(--ui-shell-text);
+}
+
+.c-MarketingOverviewSection__band--ecosystem .c-MarketingOverviewSection__eyebrow {
+  color: var(--ui-shell-accent);
+}
+
+.c-MarketingOverviewSection__band--ecosystem .c-MarketingOverviewSection__summary {
+  color: var(--ui-shell-text-muted);
+}
+
+.c-MarketingOverviewSection__pillarGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.c-MarketingOverviewSection__pillar {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.c-MarketingOverviewSection__pillarIcon {
+  color: var(--ui-shell-accent);
+}
+
+.c-MarketingOverviewSection__cardStack {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.c-MarketingOverviewSection__cardStack h3,
+.c-MarketingOverviewSection__cardStack p {
+  margin: 0;
+}
+
+.c-MarketingOverviewSection__cardStack h3 {
+  font-size: 1.05rem;
+}
+
+.c-MarketingOverviewSection__cardStack p {
+  color: var(--ui-shell-text-muted);
+  line-height: 1.65;
+  font-size: 0.9rem;
+}
+
+/* ── Band 6: Ethos ── */
+
+.c-MarketingOverviewSection__band--ethos {
+  position: relative;
+  background: var(--marketing-band-beige);
+  color: var(--ui-shell-text);
+  overflow: hidden;
+}
+
+.c-MarketingOverviewSection__ethosBody {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 40rem;
+}
+
+.c-MarketingOverviewSection__ethosLine {
+  margin: 0;
+  color: var(--ui-shell-text-muted);
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.c-MarketingOverviewSection__ethosWatermark {
+  position: absolute;
+  right: 4%;
+  bottom: 8%;
+  width: min(16rem, 22vw);
+  height: auto;
+  opacity: 0.06;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1024px) {
+  .c-MarketingOverviewSection {
+    --section-padding: 140px;
+  }
+
+  .c-MarketingOverviewSection__moduleGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .c-MarketingOverviewSection__decorativeDog {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .c-MarketingOverviewSection__featureGrid,
+  .c-MarketingOverviewSection__pillarGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .c-MarketingOverviewSection__featureCard {
+    max-width: 32rem;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .c-MarketingOverviewSection {
+    --section-padding: 100px;
+  }
+
+  .c-MarketingOverviewSection__band {
+    padding-inline: 1rem;
+  }
+
+  .c-MarketingOverviewSection__moduleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .c-MarketingOverviewSection__platformRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .c-MarketingOverviewSection__ethosWatermark {
+    width: min(10rem, 30vw);
+    opacity: 0.04;
+  }
+}

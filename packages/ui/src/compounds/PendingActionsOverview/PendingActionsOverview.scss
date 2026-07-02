@@ -1,0 +1,90 @@
+.c-PendingActionsOverview {
+  display: grid;
+  gap: 1rem;
+}
+
+.c-PendingActionsOverview__header h2,
+.c-PendingActionsOverview__summary,
+.c-PendingActionsOverview__itemHeader h3,
+.c-PendingActionsOverview__itemSummary,
+.c-PendingActionsOverview__itemMeta {
+  margin: 0;
+}
+
+.c-PendingActionsOverview__eyebrow,
+.c-PendingActionsOverview__itemEyebrow {
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--ui-shell-accent, var(--ui-primary));
+}
+
+.c-PendingActionsOverview__summary,
+.c-PendingActionsOverview__itemMeta,
+.c-PendingActionsOverview__scheduledHint {
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+}
+
+.c-PendingActionsOverview__metricGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.875rem;
+}
+
+.c-PendingActionsOverview__metric {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 1rem;
+}
+
+.c-PendingActionsOverview__metric span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+}
+
+.c-PendingActionsOverview__metric strong {
+  font-size: 1.25rem;
+}
+
+.c-PendingActionsOverview__list {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.c-PendingActionsOverview__item {
+  display: grid;
+  gap: 0.625rem;
+  padding: 1rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--ui-muted-bg) 35%, transparent);
+}
+
+.c-PendingActionsOverview__itemHeader,
+.c-PendingActionsOverview__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.c-PendingActionsOverview__actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.c-PendingActionsOverview__emptyState {
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px dashed var(--ui-border);
+}
+
+.c-PendingActionsOverview__emptyState p {
+  margin: 0;
+  color: var(--ui-shell-text-muted, var(--ui-muted));
+}
