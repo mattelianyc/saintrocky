@@ -46,6 +46,8 @@ flowchart TD
 
 In production, `apps/web` (Next.js) and `apps/api` (Express) don't even run as separate services: [server.mjs](server.mjs) mounts the Express API app as middleware in front of the Next.js request handler on a single `http.Server`, so the API, the SSR/RSC app, and the realtime WebSocket layer all share one process and one port. In development they run as two separate processes (`yarn dev:web`, `yarn dev:api`) for faster iteration.
 
+The same "one source of truth" philosophy that governs styling also governs cross-app state: `@saintrocky/realtime` is the single protocol and client implementation that keeps the web app, the Electron shell, the browser extension, and the mobile app all looking at the same state at the same time — see [Realtime sync layer](#realtime-sync-layer) below.
+
 ---
 
 ## Monorepo layout
@@ -65,7 +67,7 @@ saintrocky/
 │   ├── auth/  users/  payments/  billing/  booking/  escrow/     # domain logic
 │   ├── chain/  wallet/  enforcement/  network-policies/          # domain logic (cont'd)
 │   ├── workflows/  alerts/  notifications/  events/  chatbot/    # domain logic (cont'd)
-│   ├── fuckyoupayme/                                             # product copy/scoring domain
+│   ├── f**kyoupayme/                                             # product copy/scoring domain
 │   ├── shared/  config/  api-client/  validation/  assets/       # platform / infra
 │   └── storage/  cache/  logger/  realtime/  analytics/          # platform / infra (cont'd)
 ├── docs/               # deep-dive architecture docs (enforcement, Solana setup, quickstart)
@@ -108,10 +110,10 @@ Every package is consumed by two or more apps; nothing here exists for a single 
 - `enforcement`, `network-policies` — rule-schedule evaluation (`isScheduleActive`) and target/domain matching shared by the extension, desktop, and chain watcher.
 - `workflows`, `alerts`, `notifications`, `events` — cross-cutting orchestration, alerting, and push/email notification delivery.
 - `chatbot` — client/server/shared code for the in-app support/rules assistant.
-- `fuckyoupayme` — product-specific domain logic for violation messaging, discipline scoring, and copy ("problem index", metered violations, quotes).
+- `f**kyoupayme` — product-specific domain logic for violation messaging, discipline scoring, and copy ("problem index", metered violations, quotes). (Package name censored here for readability; the actual workspace name is unchanged in code.)
 
 **Platform / infrastructure**
-- `shared` — rule-authoring engine, locale/i18n constants, marketing helpers, and other runtime utilities with no single "owning" domain.
+- `shared` — **known, deliberately-contained technical debt.** This is the catch-all for cross-cutting logic that doesn't have an obvious package home yet: the rule-authoring/runtime engine, locale/i18n constants, user-role helpers, social (friends/campaigns) constants, browser-extension origin checks, and a couple of one-off React hooks. It exists on purpose as a staging area rather than being scattered ad hoc across apps — new cross-app logic lands here first, then gets promoted into its own focused package (or deleted) once its shape and ownership are clear. `rules-runtime.js` (the rule-compilation/schedule-evaluation engine, ~650 lines) is the current top candidate for extraction into a dedicated `@saintrocky/rules` package. Treat growth in this package as a signal to refactor, not a place to keep adding to indefinitely.
 - `config` — environment schema + `loadEnvFiles()`/runtime config shared by every Node process.
 - `api-client` — typed HTTP client for the full API surface, consumed by web, mobile, electron, and the extension.
 - `validation` — Yup schemas plus translated message keys, shared by both client-side forms and server-side request validation.
@@ -130,6 +132,18 @@ Every package is consumed by two or more apps; nothing here exists for a single 
 5. **Theme switching** — both consumers resolve `light`/`dark` the same way conceptually: system preference as a default, explicit user override persisted (native: `AsyncStorage` via `@saintrocky/storage`; web: an equivalent persisted preference), applied at the token level rather than scattered `if (darkMode)` checks throughout component code.
 
 Net effect: a rebrand or a contrast fix is a one-line change in `tokens.js`, not a multi-repo/multi-app find-and-replace.
+
+---
+
+## Realtime sync layer
+
+Four very different runtimes need to agree on the same state in real time: a user can arm a rule on the web app, have it enforced a second later by the desktop app and the browser extension, and see it reflected instantly on their phone. Rather than each surface polling the API or reimplementing its own WebSocket handling, all four talk through one shared client: [`@saintrocky/realtime`](packages/realtime/src/index.js).
+
+- **One client, four consumers** — `createRealtimeClient()` is the same factory imported by `apps/web`, `apps/electron`, `apps/extension`, and `apps/mobile` (`REALTIME_CLIENT_TYPES = ["web", "electron", "extension", "mobile"]`). Nobody hand-rolls their own `WebSocket` wiring, reconnect/backoff logic, or auth handshake — it's written once and reused.
+- **One server, one socket** — `apps/api` attaches a single `ws` server (`attachRealtimeServer`) to the same `http.Server` that serves HTTP traffic (and, in production, the Next.js app too — see [server.mjs](server.mjs)). Every client type connects to the same endpoint and speaks the same message protocol.
+- **Typed channels, not ad-hoc events** — state is partitioned into named channel types (`rules`, `runtime`, `extension_sessions`, `friends`, `direct_messages`, `campaigns`, `leaderboard`), each with a deterministic channel-key builder (`buildRulesChannel`, `buildRuntimeChannel`, ...) and parser (`parseRealtimeChannel`) shared by client and server, so "what does this message mean" is never ambiguous or duplicated between ends.
+- **Resilience built in once**: token-based `auth.authenticate` handshake, automatic re-subscription to all channels on reconnect, exponential backoff (`1s → 2s → 5s → 10s`), and a `session_revoked` path that stops reconnecting and force-logs-out a surface — all implemented once in the package instead of once per app.
+- **Why it matters for the product**: this is what makes the enforcement system in [docs/architecture-solana-enforcement.md](docs/architecture-solana-enforcement.md) actually feel instant — a rule change, a violation, or a friend's leaderboard move is broadcast once by the API and fanned out over the same channel abstraction to every connected surface, rather than each app polling on its own schedule and drifting out of sync with the others.
 
 ---
 
@@ -252,6 +266,7 @@ yarn lint   # root ESLint + `yarn workspaces run lint`
 - **Thin route handlers, fat services.** Both `apps/api` and `apps/web` keep request/response wiring minimal and push logic into domain packages or `lib`/`services`.
 - **Single responsibility, bounded file size.** Components and modules target roughly 200–300 lines; larger units are split into subcomponents/hooks rather than allowed to grow into god files.
 - **Absolute imports over deep relative paths**, colocation of route-specific code over a global dumping-ground `/components`.
+- **Technical debt is named, contained, and tracked — not hidden.** `@saintrocky/shared` is an explicit, intentional staging area for cross-app logic whose final home isn't clear yet. Rather than letting undecided code sprawl across apps, it lands in one visible place and gets promoted into a purpose-built package (or deleted) as its shape solidifies. Growth there is treated as a prompt to refactor, not ignored.
 
 ## Further reading
 
